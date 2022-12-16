@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="30dp"
+    tools:context=".ui.fragments.CreateFragment">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/createBtn"
+        style="@style/ButtonLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="?actionBarSize"
+        android:text="@string/create" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/scopesLayout"
+        style="@style/TextLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tailLayout"
+        android:layout_marginTop="30dp"
+        android:hint="@string/scopes">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/scopeInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textAutoComplete"
+            android:singleLine="true"
+            android:textColor="@color/primary" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tailLayout"
+        style="@style/TextLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="55dp"
+        android:hint="@string/tail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tailInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textAutoComplete"
+            android:singleLine="true"
+            android:textColor="@color/primary" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</RelativeLayout>

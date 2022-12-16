@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_add">
+    app:startDestination="@+id/navigation_create">
 
     <fragment
-        android:id="@+id/navigation_add"
-        android:name="com.tecknobit.glider.ui.fragments.AddFragment"
-        android:label="@string/add"
-        tools:layout="@layout/fragment_add" />
+        android:id="@+id/navigation_create"
+        android:name="com.tecknobit.glider.ui.fragments.CreateFragment"
+        android:label="@string/create"
+        tools:layout="@layout/fragment_create" />
 
     <fragment
         android:id="@+id/navigation_insert"

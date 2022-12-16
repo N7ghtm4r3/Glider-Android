@@ -3,23 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_add">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.tecknobit.glider.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_add"
+        android:name="com.tecknobit.glider.ui.fragments.AddFragment"
+        android:label="@string/add"
+        tools:layout="@layout/fragment_add" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.tecknobit.glider.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_insert"
+        android:name="com.tecknobit.glider.ui.fragments.InsertFragment"
+        android:label="@string/insert"
+        tools:layout="@layout/fragment_insert" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.tecknobit.glider.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_list"
+        android:name="com.tecknobit.glider.ui.fragments.ListFragment"
+        android:label="@string/list"
+        tools:layout="@layout/fragment_list" />
+
+    <fragment
+        android:id="@+id/navigation_removed"
+        android:name="com.tecknobit.glider.ui.fragments.RemovedFragment"
+        android:label="@string/removed"
+        tools:layout="@layout/fragment_removed" />
+
+    <fragment
+        android:id="@+id/navigation_account"
+        android:name="com.tecknobit.glider.ui.fragments.AccountFragment"
+        android:label="@string/account"
+        tools:layout="@layout/fragment_account" />
+
 </navigation>

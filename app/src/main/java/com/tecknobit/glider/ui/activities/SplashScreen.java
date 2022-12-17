@@ -1,6 +1,7 @@
 package com.tecknobit.glider.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -14,6 +15,7 @@ import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
 @SuppressLint("CustomSplashScreen")
 public class SplashScreen extends AppCompatActivity {
 
+    public static Activity STARTER_ACTIVITY;
     private static volatile boolean start = true;
 
     @Override
@@ -21,6 +23,7 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
         setDefaultNightMode(MODE_NIGHT_NO);
+        STARTER_ACTIVITY = this;
         new Thread() {
             @Override
             public void run() {

@@ -3,50 +3,113 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="30dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="20dp"
     tools:context=".ui.fragments.CreateFragment">
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/createBtn"
         style="@style/ButtonLayout"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="?actionBarSize"
+        android:layout_width="140dp"
+        android:layout_height="65dp"
+        android:layout_below="@id/scopesLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="40dp"
         android:text="@string/create" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/scopesLayout"
-        style="@style/TextLayout"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/passwordCard"
         android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@id/lengthLayout"
+        android:layout_marginTop="25dp"
+        android:backgroundTint="@color/background"
+        android:clickable="true"
+        android:visibility="gone"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/passwordCreated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:clickable="true"
+                android:text="Password"
+                android:textSize="20sp" />
+
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/lengthLayout"
+        style="@style/RequiredTextLayout"
+        android:layout_width="140dp"
+        android:layout_below="@id/scopesLayout"
+        android:layout_alignParentStart="true"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tailLayout"
-        android:layout_marginTop="30dp"
-        android:hint="@string/scopes">
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:hint="@string/length">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/scopeInput"
+            android:id="@+id/lengthInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textAutoComplete"
+            android:inputType="number"
+            android:maxLength="2"
             android:singleLine="true"
+            android:textSize="17sp"
             android:textColor="@color/primary" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tailLayout"
-        style="@style/TextLayout"
+        style="@style/RequiredTextLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="55dp"
-        android:hint="@string/tail">
+        android:layout_marginTop="100dp"
+        android:hint="@string/tail"
+        app:counterEnabled="true"
+        app:counterMaxLength="30">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tailInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textAutoComplete"
+            android:maxLength="30"
             android:singleLine="true"
+            android:textColor="@color/primary"
+            android:textSize="17sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/scopesLayout"
+        style="@style/TextLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:helperText="@string/scopes_must_be_divided_by"
+        app:helperTextTextColor="@color/primary"
+        android:layout_below="@id/tailLayout"
+        android:layout_marginTop="30dp"
+        android:hint="@string/scopes">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/scopesInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textAutoComplete"
+            android:singleLine="true"
+            android:textSize="17sp"
             android:textColor="@color/primary" />
 
     </com.google.android.material.textfield.TextInputLayout>

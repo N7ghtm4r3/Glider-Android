@@ -22,6 +22,6 @@
     <string name="length_is_required">Length is required</string>
     <string name="invalid_length">Invalid length</string>
     <string name="tail_hint">Tail for the password es. TraderBot</string>
-    <string name="scopes_hint">Scopes where use the password es. Tecknobit, GitHub, ...</string>
+    <string name="scopes_hint">Scopes where use the password es. Tecknobit, GitHub, …</string>
     <string name="length_hint">Length of the password to create</string>
 </resources>

@@ -1,11 +1,13 @@
 package com.tecknobit.glider.ui.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -26,6 +28,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.tecknobit.glider.helpers.Utils.COLOR_PRIMARY;
+import static com.tecknobit.glider.helpers.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.Utils.PASSWORD_LENGTH_KEY;
 import static com.tecknobit.glider.helpers.Utils.PASSWORD_MAX_LENGTH;
 import static com.tecknobit.glider.helpers.Utils.PASSWORD_MIN_LENGTH;
@@ -33,36 +37,117 @@ import static com.tecknobit.glider.helpers.Utils.SCOPES_KEY;
 import static com.tecknobit.glider.helpers.Utils.TAIL_KEY;
 import static com.tecknobit.glider.helpers.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.Utils.hideKeyBoard;
-import static com.tecknobit.glider.helpers.Utils.loadViews;
+import static com.tecknobit.glider.helpers.Utils.instantiateViews;
 import static com.tecknobit.glider.helpers.Utils.showSnackbar;
 
-public class CreateFragment extends Fragment implements View.OnClickListener {
+/**
+ * The {@link CreateFragment} fragment is the section of the app where the password can be created
+ * with the parameters inserted in the {@code GUI}
+ *
+ * @author Tecknobit - N7ghtm4r3
+ * @see CreateFragment
+ * @see OnClickListener
+ **/
+public class CreateFragment extends Fragment implements OnClickListener {
 
-
+    /**
+     * {@code inputsErrors} list of the error messages to show when an error occurred during the insertion
+     * of the parameters for the password creation
+     * **/
     private static final HashMap<Integer, String> inputsErrors = new HashMap<>();
+
+    /**
+     * {@code inputsHints} list of the hint messages to show when the user trigger the
+     * {@link TextInputLayout#setStartIconOnClickListener(OnClickListener)}
+     * **/
     private static final HashMap<Integer, String> inputsHints = new HashMap<>();
-    private final TextInputEditText[] textInputEditTexts = new TextInputEditText[3];
+
+    /**
+     * {@code textInputLayouts} list of the layout for the {@link #textInputEditTexts}
+     * **/
     private final TextInputLayout[] textInputLayouts = new TextInputLayout[3];
+
+    /**
+     * {@code textInputEditTexts} list of the text input edit texts from fetch the password's parameters
+     * for it creation
+     * **/
+    private final TextInputEditText[] textInputEditTexts = new TextInputEditText[3];
+
+    /**
+     * {@code passwordCardView} card view where the password created will appear
+     * @apiNote clicking on this will be copied the passowrd with the
+     * {@link Utils#copyText(MaterialTextView, View)}
+     * **/
     private MaterialCardView passwordCardView;
+
+    /**
+     * {@code passwordTextView} text view where the password created will appear
+     * @apiNote clicking on this will be copied the passowrd with the
+     * {@link Utils#copyText(MaterialTextView, View)}
+     * **/
     private MaterialTextView passwordTextView;
+
+    /**
+     * {@code createBtn} button to make a request for the password creation
+     * **/
     private MaterialButton createBtn;
+
+    /**
+     * {@code createContainer} the main view container of {@link CreateFragment}
+     * **/
     private View createContainer;
 
+    /**
+     * Required empty public constructor for the normal Android's workflow
+     * **/
     public CreateFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     * This is optional, and non-graphical fragments can return null. This will be called between
+     * {@link #onCreate(Bundle)} and {@link #onViewCreated(View, Bundle)}.
+     * <p>A default View can be returned by calling {@link Fragment(int)} in your
+     * constructor. Otherwise, this method returns null.
+     *
+     * <p>It is recommended to <strong>only</strong> inflate the layout in this method and move
+     * logic that operates on the returned View to {@link #onViewCreated(View, Bundle)}.
+     *
+     * <p>If you return a View from here, you will later be called in
+     * {@link #onDestroyView} when the view is being released.
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return createContainer = inflater.inflate(R.layout.fragment_create, container, false);
     }
 
+    /**
+     * Called immediately after {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}
+     * has returned, but before any saved state has been restored in to the view.
+     * This gives subclasses a chance to initialize themselves once
+     * they know their view hierarchy has been completely created.  The fragment's
+     * view hierarchy is not however attached to its parent at this point.
+     * @param view The View returned by {@link #onCreateView(LayoutInflater, ViewGroup, Bundle)}.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         loadLists();
-        loadViews(view, textInputEditTexts, new int[]{R.id.tailInput, R.id.scopesInput, R.id.lengthInput});
-        loadViews(view, textInputLayouts, new int[]{R.id.tailLayout, R.id.scopesLayout,
+        instantiateViews(view, textInputEditTexts, new int[]{R.id.tailInput, R.id.scopesInput, R.id.lengthInput});
+        instantiateViews(view, textInputLayouts, new int[]{R.id.tailLayout, R.id.scopesLayout,
                 R.id.lengthLayout});
         createBtn = view.findViewById(R.id.createBtn);
         createBtn.setOnClickListener(this);
@@ -73,6 +158,11 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
         startInputsListenWorkflow();
     }
 
+    /**
+     * Method to load the {@link #inputsErrors} and the {@link #inputsHints} lists
+     * with the right messages <br>
+     * Any params required
+     * */
     private void loadLists() {
         inputsErrors.put(0, getString(R.string.tail_is_required));
         inputsErrors.put(1, getString(R.string.invalid_length));
@@ -82,6 +172,20 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
         inputsHints.put(2, getString(R.string.length_hint));
     }
 
+    /**
+     * Method to set the:
+     * <ul>
+     *     <li>
+     *          {@link TextInputEditText#addTextChangedListener(TextWatcher)} for the {@link #textInputEditTexts}
+     *          to check if the required field are filled or not and get error from {@link #inputsErrors}
+     *     </li>
+     *     <li>
+     *          {@link TextInputLayout#setStartIconOnClickListener(OnClickListener)} for the {@link #textInputLayouts}
+     *          to show the hint or not from {@link #inputsHints}
+     *     </li>
+     * </ul> <br>
+     * Any params required
+     * */
     private void startInputsListenWorkflow() {
         for (int j = 0; j < textInputEditTexts.length; j++) {
             int finalJ = j;
@@ -95,7 +199,7 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                         if (start + count > 0)
-                            textInputLayouts[finalJ].setError("");
+                            textInputLayouts[finalJ].setError(null);
                         else
                             textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
                     }
@@ -106,20 +210,43 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
                     }
                 });
             }
-            // TODO: 17/12/2022 TO WORK ON THIS CHANGING HELPER TEXT AND ITS COLOR 
             textInputLayouts[j].setStartIconOnClickListener(v -> {
                 if (finalJ != 1) {
                     String required = getString(R.string.required);
-                    if (textInputLayouts[finalJ].getHelperText() != required) {
-                        textInputLayouts[finalJ].setHelperText(required);
-                    } else {
+                    if (textInputLayouts[finalJ].getHelperText() != required)
+                        setHelperTextLayout(textInputLayouts[finalJ], required);
+                    else
+                        setHelperTextLayout(textInputLayouts[finalJ], inputsHints.get(finalJ));
+                } else {
+                    String defScopes = getString(R.string.scopes_must_be_divided_by);
+                    if (!textInputLayouts[finalJ].getHelperText().equals(defScopes))
+                        textInputLayouts[finalJ].setHelperText(defScopes);
+                    else
                         textInputLayouts[finalJ].setHelperText(inputsHints.get(finalJ));
-                    }
                 }
             });
         }
     }
 
+    /**
+     * Method to set the text helper layout of {@link TextInputLayout}
+     *
+     * @param layout: text input layout where set helper text layout
+     * @param text:   text to set for the helper text
+     */
+    private void setHelperTextLayout(TextInputLayout layout, String text) {
+        ColorStateList colorStateList = ColorStateList.valueOf(COLOR_RED);
+        if (!text.equals(getString(R.string.required)))
+            colorStateList = ColorStateList.valueOf(COLOR_PRIMARY);
+        layout.setHelperText(text);
+        layout.setHelperTextColor(colorStateList);
+    }
+
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
     @Override
     @SuppressLint("NonConstantResourceId")
     public void onClick(View v) {
@@ -146,11 +273,27 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Method to enable or not the {@link #textInputEditTexts}
+     *
+     * @param enable: whether enable the {@link #textInputEditTexts}:
+     *                <ul>
+     *                    <li>{@code "true"} -> the {@link #textInputEditTexts} can be filled</li>
+     *                    <li>{@code "false"} -> the {@link #textInputEditTexts} cannot be filled</li>
+     *                </ul>
+     */
     private void enableEditTexts(boolean enable) {
         for (TextInputEditText editText : textInputEditTexts)
             editText.setEnabled(enable);
     }
 
+    /**
+     * Method to create the payload for the password creation request <br>
+     * Any params required
+     *
+     * @return creation payload with the parameters inserted in the {@code GUI} as {@link JSONObject}
+     * or null if an error occurred
+     */
     private JSONObject getCreatePayload() {
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
@@ -178,6 +321,11 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
         return null;
     }
 
+    /**
+     * Method show an error with the {@link Utils#showSnackbar(View, int)} method
+     *
+     * @param index: index of the error tho show
+     */
     private void showsError(int index) {
         String errorMsg = inputsErrors.get(index);
         if (index == 1) {
@@ -188,11 +336,22 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
         textInputLayouts[index].setError(errorMsg);
     }
 
+    /**
+     * Method clear all views an set the {@link CreateFragment} in an initial state <br>
+     * Any params required
+     *
+     * @apiNote this method is called when:
+     * <ul>
+     *     <li>this fragment is not more the first showing</li>
+     *     <li>an error is occurred during the password creation</li>
+     *     <li>the normal conclusion of the password creation's routine</li>
+     * </ul>
+     */
     private void clearViews() {
         if (createBtn != null) {
             for (int j = 0; j < textInputEditTexts.length; j++) {
                 textInputEditTexts[j].setText("");
-                textInputLayouts[j].setError("");
+                textInputLayouts[j].setError(null);
             }
             enableEditTexts(true);
             passwordCardView.setVisibility(View.GONE);
@@ -200,6 +359,19 @@ public class CreateFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Callback for when the primary navigation state of this Fragment has changed. This can be
+     * the result of the {@link #getParentFragmentManager()}  containing FragmentManager} having its
+     * primary navigation fragment changed via
+     * {@link androidx.fragment.app.FragmentTransaction#setPrimaryNavigationFragment} or due to
+     * the primary navigation fragment changing in a parent FragmentManager.
+     *
+     * @param isPrimaryNavigationFragment True if and only if this Fragment and any
+     *                                    {@link #getParentFragment() parent fragment} is set as the primary navigation fragment
+     *                                    via {@link androidx.fragment.app.FragmentTransaction#setPrimaryNavigationFragment}.
+     * @apiNote if {@code "isPrimaryNavigationFragment"} is {@code "true"} will be called the
+     * {@link #clearViews()} method to set the view in an initial state
+     */
     @Override
     public void onPrimaryNavigationFragmentChanged(boolean isPrimaryNavigationFragment) {
         super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment);

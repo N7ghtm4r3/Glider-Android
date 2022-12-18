@@ -12,6 +12,11 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.ui.fragments.AccountFragment;
+import com.tecknobit.glider.ui.fragments.CreateFragment;
+import com.tecknobit.glider.ui.fragments.InsertFragment;
+import com.tecknobit.glider.ui.fragments.ListFragment;
+import com.tecknobit.glider.ui.fragments.RemovedFragment;
 
 import static com.tecknobit.glider.R.id.nav_host_fragment_activity_main;
 import static com.tecknobit.glider.R.id.navigation_account;
@@ -20,11 +25,33 @@ import static com.tecknobit.glider.R.id.navigation_insert;
 import static com.tecknobit.glider.R.id.navigation_list;
 import static com.tecknobit.glider.R.id.navigation_removed;
 
+/**
+ * The {@link MainActivity} activity is the container menu for all the fragments of the {@link BottomNavigationView}. <br>
+ * From this activity is possible reach:
+ * <ul>
+ *     <li>{@link CreateFragment}</li>
+ *     <li>{@link InsertFragment}</li>
+ *     <li>{@link ListFragment}</li>
+ *     <li>{@link RemovedFragment}</li>
+ *     <li>{@link AccountFragment}</li>
+ * </ul>
+ *
+ * @author Tecknobit - N7ghtm4r3
+ * @see AppCompatActivity
+ **/
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * {@code MAIN_ACTIVITY} is the {@link MainActivity} context for the {@code Glider}'s workflow
+     **/
     @SuppressLint("StaticFieldLeak")
     public static Activity MAIN_ACTIVITY;
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Perform initialization of all fragments.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,12 +65,22 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @apiNote when called will be invoked the {@link #finishAffinity()} method to exit from this app
+     **/
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finishAffinity();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @apiNote when called will be invoked the {@link #finishAffinity()} method to exit from this app
+     **/
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();

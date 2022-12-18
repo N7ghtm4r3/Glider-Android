@@ -45,15 +45,15 @@ import static com.tecknobit.glider.helpers.Utils.showSnackbar;
  * with the parameters inserted in the {@code GUI}
  *
  * @author Tecknobit - N7ghtm4r3
- * @see CreateFragment
+ * @see GliderFragment
  * @see OnClickListener
  **/
-public class CreateFragment extends Fragment implements OnClickListener {
+public class CreateFragment extends GliderFragment implements OnClickListener {
 
     /**
      * {@code inputsErrors} list of the error messages to show when an error occurred during the insertion
      * of the parameters for the password creation
-     * **/
+     **/
     private static final HashMap<Integer, String> inputsErrors = new HashMap<>();
 
     /**
@@ -198,10 +198,12 @@ public class CreateFragment extends Fragment implements OnClickListener {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (start + count > 0)
-                            textInputLayouts[finalJ].setError(null);
-                        else
-                            textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
+                        if (before > 0) {
+                            if (start + count > 0)
+                                textInputLayouts[finalJ].setError(null);
+                            else
+                                textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
+                        }
                     }
 
                     @Override
@@ -337,8 +339,7 @@ public class CreateFragment extends Fragment implements OnClickListener {
     }
 
     /**
-     * Method clear all views an set the {@link CreateFragment} in an initial state <br>
-     * Any params required
+     * {@inheritDoc}
      *
      * @apiNote this method is called when:
      * <ul>
@@ -347,7 +348,8 @@ public class CreateFragment extends Fragment implements OnClickListener {
      *     <li>the normal conclusion of the password creation's routine</li>
      * </ul>
      */
-    private void clearViews() {
+    @Override
+    protected void clearViews() {
         if (createBtn != null) {
             for (int j = 0; j < textInputEditTexts.length; j++) {
                 textInputEditTexts[j].setText("");
@@ -357,26 +359,6 @@ public class CreateFragment extends Fragment implements OnClickListener {
             passwordCardView.setVisibility(View.GONE);
             createBtn.setText(R.string.create);
         }
-    }
-
-    /**
-     * Callback for when the primary navigation state of this Fragment has changed. This can be
-     * the result of the {@link #getParentFragmentManager()}  containing FragmentManager} having its
-     * primary navigation fragment changed via
-     * {@link androidx.fragment.app.FragmentTransaction#setPrimaryNavigationFragment} or due to
-     * the primary navigation fragment changing in a parent FragmentManager.
-     *
-     * @param isPrimaryNavigationFragment True if and only if this Fragment and any
-     *                                    {@link #getParentFragment() parent fragment} is set as the primary navigation fragment
-     *                                    via {@link androidx.fragment.app.FragmentTransaction#setPrimaryNavigationFragment}.
-     * @apiNote if {@code "isPrimaryNavigationFragment"} is {@code "true"} will be called the
-     * {@link #clearViews()} method to set the view in an initial state
-     */
-    @Override
-    public void onPrimaryNavigationFragmentChanged(boolean isPrimaryNavigationFragment) {
-        super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment);
-        if (!isPrimaryNavigationFragment)
-            clearViews();
     }
 
 }

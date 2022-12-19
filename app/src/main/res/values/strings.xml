@@ -25,4 +25,6 @@
     <string name="scopes_hint">Scopes where use the password es. Tecknobit, GitHub, …</string>
     <string name="length_hint">Length of the password to create</string>
     <string name="password" translatable="false">Password</string>
+    <string name="password_is_required">Password is required</string>
+    <string name="password_hint">Custom password to insert in Glider</string>
 </resources>

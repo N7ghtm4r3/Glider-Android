@@ -1,7 +1,6 @@
 package com.tecknobit.glider.ui.fragments;
 
 import android.annotation.SuppressLint;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,15 +20,14 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.Utils;
+import com.tecknobit.glider.ui.fragments.general.FormFragment;
+import com.tecknobit.glider.ui.fragments.general.GliderFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
 
-import static com.tecknobit.glider.helpers.Utils.COLOR_PRIMARY;
-import static com.tecknobit.glider.helpers.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.Utils.PASSWORD_LENGTH_KEY;
 import static com.tecknobit.glider.helpers.Utils.PASSWORD_MAX_LENGTH;
 import static com.tecknobit.glider.helpers.Utils.PASSWORD_MIN_LENGTH;
@@ -37,7 +35,6 @@ import static com.tecknobit.glider.helpers.Utils.SCOPES_KEY;
 import static com.tecknobit.glider.helpers.Utils.TAIL_KEY;
 import static com.tecknobit.glider.helpers.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.Utils.hideKeyBoard;
-import static com.tecknobit.glider.helpers.Utils.instantiateViews;
 import static com.tecknobit.glider.helpers.Utils.showSnackbar;
 
 /**
@@ -46,38 +43,17 @@ import static com.tecknobit.glider.helpers.Utils.showSnackbar;
  *
  * @author Tecknobit - N7ghtm4r3
  * @see GliderFragment
+ * @see FormFragment
  * @see OnClickListener
  **/
-public class CreateFragment extends GliderFragment implements OnClickListener {
-
-    /**
-     * {@code inputsErrors} list of the error messages to show when an error occurred during the insertion
-     * of the parameters for the password creation
-     **/
-    private static final HashMap<Integer, String> inputsErrors = new HashMap<>();
-
-    /**
-     * {@code inputsHints} list of the hint messages to show when the user trigger the
-     * {@link TextInputLayout#setStartIconOnClickListener(OnClickListener)}
-     * **/
-    private static final HashMap<Integer, String> inputsHints = new HashMap<>();
-
-    /**
-     * {@code textInputLayouts} list of the layout for the {@link #textInputEditTexts}
-     * **/
-    private final TextInputLayout[] textInputLayouts = new TextInputLayout[3];
-
-    /**
-     * {@code textInputEditTexts} list of the text input edit texts from fetch the password's parameters
-     * for it creation
-     * **/
-    private final TextInputEditText[] textInputEditTexts = new TextInputEditText[3];
+public class CreateFragment extends FormFragment implements OnClickListener {
 
     /**
      * {@code passwordCardView} card view where the password created will appear
+     *
      * @apiNote clicking on this will be copied the passowrd with the
      * {@link Utils#copyText(MaterialTextView, View)}
-     * **/
+     **/
     private MaterialCardView passwordCardView;
 
     /**
@@ -93,15 +69,11 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
     private MaterialButton createBtn;
 
     /**
-     * {@code createContainer} the main view container of {@link CreateFragment}
-     * **/
-    private View createContainer;
-
-    /**
      * Required empty public constructor for the normal Android's workflow
      * **/
     public CreateFragment() {
-        // Required empty public constructor
+        textInputLayouts = new TextInputLayout[3];
+        textInputEditTexts = new TextInputEditText[3];
     }
 
     /**
@@ -129,7 +101,7 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return createContainer = inflater.inflate(R.layout.fragment_create, container, false);
+        return viewContainer = inflater.inflate(R.layout.fragment_create, container, false);
     }
 
     /**
@@ -145,10 +117,9 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadLists();
-        instantiateViews(view, textInputEditTexts, new int[]{R.id.tailInput, R.id.scopesInput, R.id.lengthInput});
-        instantiateViews(view, textInputLayouts, new int[]{R.id.tailLayout, R.id.scopesLayout,
-                R.id.lengthLayout});
+        loadInputMessagesLists();
+        instantiateInputs(view, new int[]{R.id.tailLayout, R.id.scopesLayout, R.id.lengthLayout},
+                new int[]{R.id.tailInput, R.id.scopesInput, R.id.lengthInput});
         createBtn = view.findViewById(R.id.createBtn);
         createBtn.setOnClickListener(this);
         passwordCardView = view.findViewById(R.id.passwordCard);
@@ -159,11 +130,10 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
     }
 
     /**
-     * Method to load the {@link #inputsErrors} and the {@link #inputsHints} lists
-     * with the right messages <br>
-     * Any params required
-     * */
-    private void loadLists() {
+     * {@inheritDoc}
+     **/
+    @Override
+    protected void loadInputMessagesLists() {
         inputsErrors.put(0, getString(R.string.tail_is_required));
         inputsErrors.put(1, getString(R.string.invalid_length));
         inputsErrors.put(2, getString(R.string.length_is_required));
@@ -173,22 +143,27 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
     }
 
     /**
-     * Method to set the:
-     * <ul>
-     *     <li>
-     *          {@link TextInputEditText#addTextChangedListener(TextWatcher)} for the {@link #textInputEditTexts}
-     *          to check if the required field are filled or not and get error from {@link #inputsErrors}
-     *     </li>
-     *     <li>
-     *          {@link TextInputLayout#setStartIconOnClickListener(OnClickListener)} for the {@link #textInputLayouts}
-     *          to show the hint or not from {@link #inputsHints}
-     *     </li>
-     * </ul> <br>
-     * Any params required
-     * */
-    private void startInputsListenWorkflow() {
+     * {@inheritDoc}
+     **/
+    @Override
+    protected void startInputsListenWorkflow() {
         for (int j = 0; j < textInputEditTexts.length; j++) {
             int finalJ = j;
+            textInputLayouts[j].setStartIconOnClickListener(v -> {
+                if (finalJ != 1) {
+                    String required = getString(R.string.required);
+                    if (textInputLayouts[finalJ].getHelperText() != required)
+                        setHelperTextLayout(textInputLayouts[finalJ], required);
+                    else
+                        setHelperTextLayout(textInputLayouts[finalJ], inputsHints.get(finalJ));
+                } else {
+                    String defScopes = getString(R.string.scopes_must_be_divided_by);
+                    if (!textInputLayouts[finalJ].getHelperText().equals(defScopes))
+                        textInputLayouts[finalJ].setHelperText(defScopes);
+                    else
+                        textInputLayouts[finalJ].setHelperText(inputsHints.get(finalJ));
+                }
+            });
             if (j != 1) {
                 textInputEditTexts[j].addTextChangedListener(new TextWatcher() {
                     @Override
@@ -212,36 +187,7 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
                     }
                 });
             }
-            textInputLayouts[j].setStartIconOnClickListener(v -> {
-                if (finalJ != 1) {
-                    String required = getString(R.string.required);
-                    if (textInputLayouts[finalJ].getHelperText() != required)
-                        setHelperTextLayout(textInputLayouts[finalJ], required);
-                    else
-                        setHelperTextLayout(textInputLayouts[finalJ], inputsHints.get(finalJ));
-                } else {
-                    String defScopes = getString(R.string.scopes_must_be_divided_by);
-                    if (!textInputLayouts[finalJ].getHelperText().equals(defScopes))
-                        textInputLayouts[finalJ].setHelperText(defScopes);
-                    else
-                        textInputLayouts[finalJ].setHelperText(inputsHints.get(finalJ));
-                }
-            });
         }
-    }
-
-    /**
-     * Method to set the text helper layout of {@link TextInputLayout}
-     *
-     * @param layout: text input layout where set helper text layout
-     * @param text:   text to set for the helper text
-     */
-    private void setHelperTextLayout(TextInputLayout layout, String text) {
-        ColorStateList colorStateList = ColorStateList.valueOf(COLOR_RED);
-        if (!text.equals(getString(R.string.required)))
-            colorStateList = ColorStateList.valueOf(COLOR_PRIMARY);
-        layout.setHelperText(text);
-        layout.setHelperTextColor(colorStateList);
     }
 
     /**
@@ -275,19 +221,6 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
         }
     }
 
-    /**
-     * Method to enable or not the {@link #textInputEditTexts}
-     *
-     * @param enable: whether enable the {@link #textInputEditTexts}:
-     *                <ul>
-     *                    <li>{@code "true"} -> the {@link #textInputEditTexts} can be filled</li>
-     *                    <li>{@code "false"} -> the {@link #textInputEditTexts} cannot be filled</li>
-     *                </ul>
-     */
-    private void enableEditTexts(boolean enable) {
-        for (TextInputEditText editText : textInputEditTexts)
-            editText.setEnabled(enable);
-    }
 
     /**
      * Method to create the payload for the password creation request <br>
@@ -328,13 +261,13 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
      *
      * @param index: index of the error tho show
      */
-    private void showsError(int index) {
+    protected void showsError(int index) {
         String errorMsg = inputsErrors.get(index);
         if (index == 1) {
             index++;
-            showSnackbar(createContainer, R.string.password_length_input_error);
+            showSnackbar(viewContainer, R.string.password_length_input_error);
         } else
-            showSnackbar(createContainer, errorMsg);
+            showSnackbar(viewContainer, errorMsg);
         textInputLayouts[index].setError(errorMsg);
     }
 
@@ -350,12 +283,8 @@ public class CreateFragment extends GliderFragment implements OnClickListener {
      */
     @Override
     protected void clearViews() {
-        if (createBtn != null) {
-            for (int j = 0; j < textInputEditTexts.length; j++) {
-                textInputEditTexts[j].setText("");
-                textInputLayouts[j].setError(null);
-            }
-            enableEditTexts(true);
+        if (viewContainer != null) {
+            super.clearViews();
             passwordCardView.setVisibility(View.GONE);
             createBtn.setText(R.string.create);
         }

@@ -1,4 +1,6 @@
-package com.tecknobit.glider.ui.fragments;
+package com.tecknobit.glider.ui.fragments.general;
+
+import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
@@ -10,6 +12,11 @@ import androidx.fragment.app.Fragment;
  * @see Fragment
  **/
 public abstract class GliderFragment extends Fragment {
+
+    /**
+     * {@code viewContainer} the main view container of the {@link Fragment}
+     **/
+    protected View viewContainer;
 
     /**
      * Method to clear all views and set the {@link GliderFragment} in an initial state <br>

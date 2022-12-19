@@ -6,6 +6,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragments.InsertFragment">
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tailLayout"
+        style="@style/RequiredTextLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="125dp"
+        android:hint="@string/tail"
+        app:counterMaxLength="30">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tailInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textAutoComplete"
+            android:maxLength="30"
+            android:singleLine="true"
+            android:textColor="@color/primary"
+            android:textSize="17sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/insertBtn"
         style="@style/ButtonLayout"
@@ -28,27 +49,6 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:maxLength="32"
-            android:singleLine="true"
-            android:textColor="@color/primary"
-            android:textSize="17sp" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tailLayout"
-        style="@style/RequiredTextLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="125dp"
-        android:hint="@string/tail"
-        app:counterMaxLength="30">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/tailInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textAutoComplete"
-            android:maxLength="30"
             android:singleLine="true"
             android:textColor="@color/primary"
             android:textSize="17sp" />

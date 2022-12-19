@@ -4,6 +4,8 @@ import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
+import org.json.JSONObject;
+
 /**
  * The {@link GliderFragment} is the super class where a fragment inherit the base methods for the normal
  * {@code Glider}'s fragment workflow
@@ -17,6 +19,14 @@ public abstract class GliderFragment extends Fragment {
      * {@code viewContainer} the main view container of the {@link Fragment}
      **/
     protected View viewContainer;
+
+    /**
+     * Method to create the payload for a request <br>
+     *
+     * @param parameters: parameters to insert to invoke this method
+     * @return payload with the parameters inserted as {@link JSONObject}
+     */
+    protected abstract <T> JSONObject getRequestPayload(T... parameters);
 
     /**
      * Method to clear all views and set the {@link GliderFragment} in an initial state <br>

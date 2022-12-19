@@ -203,7 +203,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
                 if (createBtn.getText().equals(getString(R.string.create))) {
                     hideKeyBoard(v);
                     enableEditTexts(false);
-                    JSONObject payload = getCreatePayload();
+                    JSONObject payload = getRequestPayload();
                     if (payload != null) {
                         // TODO: 17/12/2022 REQUEST THEN
                         showSnackbar(v, R.string.password_successfully_created);
@@ -221,46 +221,46 @@ public class CreateFragment extends FormFragment implements OnClickListener {
         }
     }
 
-
     /**
-     * Method to create the payload for the password creation request <br>
-     * Any params required
+     * Method to create the payload for the password creation request
      *
+     * @param parameters: parameters to insert to invoke this method
      * @return creation payload with the parameters inserted in the {@code GUI} as {@link JSONObject}
      * or null if an error occurred
      */
-    private JSONObject getCreatePayload() {
+    @SafeVarargs
+    @Override
+    protected final <T> JSONObject getRequestPayload(T... parameters) {
+        JSONObject payload = null;
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
             if (!tail.isEmpty()) {
-                JSONObject payload = new JSONObject()
+                payload = new JSONObject()
                         .put(TAIL_KEY, tail)
                         .put(SCOPES_KEY, List.of(getTextFromEdit(textInputEditTexts[1]).split(",")));
                 try {
                     int length = Integer.parseInt(getTextFromEdit(textInputEditTexts[2]));
                     if (length < PASSWORD_MIN_LENGTH || length > PASSWORD_MAX_LENGTH) {
                         showsError(1);
-                        return null;
+                        payload = null;
                     } else
                         payload.put(PASSWORD_LENGTH_KEY, length);
-                    return payload;
                 } catch (NumberFormatException e) {
                     showsError(2);
-                    return null;
+                    payload = null;
                 }
             } else
                 showsError(0);
         } catch (JSONException e) {
-            return null;
+            payload = null;
         }
-        return null;
+        return payload;
     }
 
     /**
-     * Method show an error with the {@link Utils#showSnackbar(View, int)} method
-     *
-     * @param index: index of the error tho show
-     */
+     * {@inheritDoc}
+     **/
+    @Override
     protected void showsError(int index) {
         String errorMsg = inputsErrors.get(index);
         if (index == 1) {

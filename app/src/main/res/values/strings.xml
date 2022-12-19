@@ -27,4 +27,5 @@
     <string name="password" translatable="false">Password</string>
     <string name="password_is_required">Password is required</string>
     <string name="password_hint">Custom password to insert in Glider</string>
+    <string name="password_inserted_successfully">Password inserted successfully</string>
 </resources>

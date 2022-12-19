@@ -7,6 +7,7 @@ import android.view.View;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.Utils;
 
 import java.util.HashMap;
 
@@ -14,6 +15,13 @@ import static com.tecknobit.glider.helpers.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.Utils.instantiateViews;
 
+/**
+ * The {@link FormFragment} is the super class where a fragment inherit the base methods to get data from a
+ * form {@link GliderFragment}
+ *
+ * @author Tecknobit - N7ghtm4r3
+ * @see GliderFragment
+ **/
 public abstract class FormFragment extends GliderFragment {
 
     /**
@@ -39,6 +47,13 @@ public abstract class FormFragment extends GliderFragment {
      **/
     protected TextInputEditText[] textInputEditTexts;
 
+    /**
+     * Method to instantiate the {@link #textInputLayouts} and {@link #textInputEditTexts} instances
+     *
+     * @param container:  the container view where the instates are contained
+     * @param layoutsIds: the ids of the {@link #textInputLayouts}
+     * @param editsIds:   the ids of the {@link #textInputEditTexts}
+     */
     protected void instantiateInputs(View container, int[] layoutsIds, int[] editsIds) {
         instantiateViews(container, textInputLayouts, layoutsIds);
         instantiateViews(container, textInputEditTexts, editsIds);
@@ -113,5 +128,12 @@ public abstract class FormFragment extends GliderFragment {
         for (TextInputEditText editText : textInputEditTexts)
             editText.setEnabled(enable);
     }
+
+    /**
+     * Method to show an error with the {@link Utils#showSnackbar(View, int)} method
+     *
+     * @param index: index of the error tho show
+     */
+    protected abstract void showsError(int index);
 
 }

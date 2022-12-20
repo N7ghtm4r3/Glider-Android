@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -16,7 +17,6 @@ import com.tecknobit.glider.ui.fragments.AccountFragment;
 import com.tecknobit.glider.ui.fragments.CreateFragment;
 import com.tecknobit.glider.ui.fragments.InsertFragment;
 import com.tecknobit.glider.ui.fragments.ListFragment;
-import com.tecknobit.glider.ui.fragments.RemovedFragment;
 
 import static com.tecknobit.glider.R.id.nav_host_fragment_activity_main;
 import static com.tecknobit.glider.R.id.navigation_account;
@@ -31,8 +31,17 @@ import static com.tecknobit.glider.R.id.navigation_removed;
  * <ul>
  *     <li>{@link CreateFragment}</li>
  *     <li>{@link InsertFragment}</li>
- *     <li>{@link ListFragment}</li>
- *     <li>{@link RemovedFragment}</li>
+ *     <li>
+ *         The {@link ListFragment}:
+ *         <ul>
+ *             <li>
+ *                 {@link Fragment} for the current password stored
+ *             </li>
+ *             <li>
+ *                 {@link Fragment} for the deleted password that can be definitely deleted or recovered
+ *             </li>
+ *         </ul>
+ *     </li>
  *     <li>{@link AccountFragment}</li>
  * </ul>
  *
@@ -48,6 +57,12 @@ public class MainActivity extends AppCompatActivity {
     public static Activity MAIN_ACTIVITY;
 
     /**
+     * {@code navController} is the navigation controller of the {@link BottomNavigationView}
+     **/
+    @SuppressLint("StaticFieldLeak")
+    public static NavController navController;
+
+    /**
      * {@inheritDoc}
      * <p>
      * Perform initialization of all fragments.
@@ -60,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(navigation_create,
                 navigation_insert, navigation_list, navigation_removed, navigation_account).build();
-        NavController navController = Navigation.findNavController(this, nav_host_fragment_activity_main);
+        navController = Navigation.findNavController(this, nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
     }

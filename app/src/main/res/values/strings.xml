@@ -31,4 +31,15 @@
     <string name="delete">Delete</string>
     <string name="copy">Copy</string>
     <string name="new_scope">New scope</string>
+    <string name="scope_hint">New scope to add to this password</string>
+    <string name="add_more">Add more</string>
+    <string name="new_scope_is_required">New scope is required</string>
+    <string name="scope_must_be_filled">The edited scope must be filled</string>
+    <string name="edit_the_current_scope">Edit the current scope</string>
+    <string name="the_scope_edited">The edited scope</string>
+    <string name="no_scopes_for_this_password">No scopes for this password</string>
+    <string name="recover">Recover</string>
+    <string name="new_scope_inserted_successfully">New scope inserted successfully</string>
+    <string name="current_scope_edited_successfully">Current scope edited successfully</string>
+    <string name="search_for_tail_or_scopes">Search for the tail or the scopes</string>
 </resources>

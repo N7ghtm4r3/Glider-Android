@@ -25,9 +25,9 @@
 
     <fragment
         android:id="@+id/navigation_removed"
-        android:name="com.tecknobit.glider.ui.fragments.RemovedFragment"
+        android:name="com.tecknobit.glider.ui.fragments.ListFragment"
         android:label="@string/removed"
-        tools:layout="@layout/fragment_removed" />
+        tools:layout="@layout/fragment_list" />
 
     <fragment
         android:id="@+id/navigation_account"

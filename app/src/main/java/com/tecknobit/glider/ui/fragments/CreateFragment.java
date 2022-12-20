@@ -173,17 +173,14 @@ public class CreateFragment extends FormFragment implements OnClickListener {
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (before > 0) {
-                            if (start + count > 0)
-                                textInputLayouts[finalJ].setError(null);
-                            else
-                                textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
-                        }
+                        if (before > 0 && start + count == 0)
+                            textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
                     }
 
                     @Override
                     public void afterTextChanged(Editable s) {
-
+                        if (s.length() > 0)
+                            textInputLayouts[finalJ].setError(null);
                     }
                 });
             }

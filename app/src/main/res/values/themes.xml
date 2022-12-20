@@ -61,4 +61,25 @@
         <item name="android:layout_height">65dp</item>
     </style>
 
+    <!-- Theme for the material-components reverse color button -->
+    <style name="ReverseButtonLayout" parent="ButtonLayout">
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:layout_width">320dp</item>
+        <item name="android:layout_height">65dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <!-- Theme for the material-components auto complete textView -->
+    <style name="PasswordItem" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:inputType">none</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
 </resources>

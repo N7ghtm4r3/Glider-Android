@@ -28,4 +28,7 @@
     <string name="password_is_required">Password is required</string>
     <string name="password_hint">Custom password to insert in Glider</string>
     <string name="password_inserted_successfully">Password inserted successfully</string>
+    <string name="delete">Delete</string>
+    <string name="copy">Copy</string>
+    <string name="new_scope">New scope</string>
 </resources>

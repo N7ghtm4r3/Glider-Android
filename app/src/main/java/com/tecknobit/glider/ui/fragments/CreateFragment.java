@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,8 +21,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.Utils;
-import com.tecknobit.glider.ui.fragments.general.FormFragment;
-import com.tecknobit.glider.ui.fragments.general.GliderFragment;
+import com.tecknobit.glider.ui.fragments.parents.FormFragment;
+import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,14 +53,14 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      * {@code passwordCardView} card view where the password created will appear
      *
      * @apiNote clicking on this will be copied the passowrd with the
-     * {@link Utils#copyText(MaterialTextView, View)}
+     * {@link Utils#copyText(TextView, View)}
      **/
     private MaterialCardView passwordCardView;
 
     /**
      * {@code passwordTextView} text view where the password created will appear
      * @apiNote clicking on this will be copied the passowrd with the
-     * {@link Utils#copyText(MaterialTextView, View)}
+     * {@link Utils#copyText(TextView, View)}
      * **/
     private MaterialTextView passwordTextView;
 
@@ -188,9 +189,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
     }
 
     /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
+     * {@inheritDoc}
      */
     @Override
     @SuppressLint("NonConstantResourceId")
@@ -226,7 +225,6 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      * or null if an error occurred
      */
     @SafeVarargs
-    @Override
     protected final <T> JSONObject getRequestPayload(T... parameters) {
         JSONObject payload = null;
         try {

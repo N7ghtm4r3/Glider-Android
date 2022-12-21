@@ -1,4 +1,4 @@
-package com.tecknobit.glider.ui.fragments.general;
+package com.tecknobit.glider.ui.fragments.parents;
 
 import android.view.View;
 

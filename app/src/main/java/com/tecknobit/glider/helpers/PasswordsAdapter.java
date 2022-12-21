@@ -13,6 +13,7 @@ import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -20,6 +21,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.toImport.Password;
+import com.tecknobit.glider.helpers.toImport.Password.Status;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,12 +45,38 @@ import static com.tecknobit.glider.helpers.Utils.hideKeyBoard;
 import static com.tecknobit.glider.helpers.Utils.showSnackbar;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
-public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.PasswordView> implements Filterable {
+/**
+ * The {@link PasswordsAdapter} is the adapter for the passwords lists
+ *
+ * @author Tecknobit - N7ghtm4r3
+ * @see Adapter
+ * @see Filterable
+ **/
+public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> implements Filterable {
 
+    /**
+     * {@code isRecoveryMode} whether the list of the {@link #passwords} is in a
+     * {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
+     **/
     private static boolean isRecoveryMode;
+    /**
+     * {@code passwords} list of {@link Password} to manage
+     **/
     private final ArrayList<Password> passwords;
-    private final ArrayList<Password> filteredPasswords;
+    /**
+     * {@code filteredPasswords} list of {@link Password} to manage
+     * @apiNote this list is used as main list and is used in {@link #getFilter()} and
+     * {@link #resetPasswordsList()} methods
+     **/
+    private ArrayList<Password> filteredPasswords;
 
+    /**
+     * Constructor to init {@link Password} object
+     *
+     * @param passwords: list of {@link Password} to manage
+     * @param isRecoveryMode: whether the list of the {@link #passwords} is in a
+     * {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
+     * **/
     public PasswordsAdapter(ArrayList<Password> passwords, boolean isRecoveryMode) {
         this.passwords = passwords;
         filteredPasswords = new ArrayList<>(passwords);
@@ -67,6 +95,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
     /**
      * {@inheritDoc}
      **/
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(@NonNull PasswordsAdapter.PasswordView holder, int position) {
         Password password = filteredPasswords.get(position);
@@ -132,7 +161,8 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
                 holder.scopeLayout.setEndIconOnClickListener(v -> {
                     hideKeyBoard(v);
                     clearScopesLayout(holder);
-                    // TODO: 20/12/2022 set selection on first item
+                    holder.scopes.setText(holder.scopes.getAdapter().getItem(0).toString(),
+                            false);
                 });
                 holder.scopeLayout.setStartIconOnClickListener(v -> {
                     hideKeyBoard(v);
@@ -150,6 +180,12 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
         holder.password.setText(password.getPassword());
     }
 
+    /**
+     * Method to clear the {@link PasswordView#scopesLayout} and set it in a initial {@code UI}
+     * state to be reused
+     *
+     * @param holder: view holder where the {@link PasswordView#scopesLayout} has being used
+     */
     private void clearScopesLayout(PasswordsAdapter.PasswordView holder) {
         holder.scope.setText("");
         holder.scopeLayout.setError(null);
@@ -175,15 +211,19 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
-                ArrayList<Password> passwords = new ArrayList<>();
-                for (Password password : filteredPasswords) {
-                    if (password.getTail().contains(constraint) ||
-                            password.getScopes().contains((String) constraint)) {
-                        passwords.add(password);
-                    }
-                }
-                filterResults.values = passwords;
+                ArrayList<Password> filteredPasswords = new ArrayList<>();
+                for (Password password : passwords)
+                    if (password.getTail().contains(constraint) || isInScopes(password, constraint))
+                        filteredPasswords.add(password);
+                filterResults.values = filteredPasswords;
                 return filterResults;
+            }
+
+            private boolean isInScopes(Password password, CharSequence scope) {
+                for (String lScope : password.getScopes())
+                    if (lScope.contains(scope))
+                        return true;
+                return false;
             }
 
             @SuppressLint("NotifyDataSetChanged")
@@ -196,16 +236,75 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
         };
     }
 
+    /**
+     * Method to reset the {@link #filteredPasswords} and filled it with the {@link #passwords}
+     * full list
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    public void resetPasswordsList() {
+        filteredPasswords = new ArrayList<>(passwords);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Method to get {@link #passwords} instance <br>
+     * Any params required
+     *
+     * @return {@link #passwords} instance as {@link Collection} of {@link Password}
+     **/
+    public Collection<Password> getCurrentPasswords() {
+        return passwords;
+    }
+
+    /**
+     * The {@link PasswordView} is the view adapter for the {@link PasswordsAdapter}
+     *
+     * @author Tecknobit - N7ghtm4r3
+     * @see RecyclerView.ViewHolder
+     * @see View.OnClickListener
+     **/
     public static class PasswordView extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        /**
+         * {@code tail} view
+         **/
         private final MaterialTextView tail;
+
+        /**
+         * {@code scopesLayout} view for the scopes layout
+         **/
         private final TextInputLayout scopesLayout;
+
+        /**
+         * {@code scopeLayout} view for the scope layout
+         **/
         private final TextInputLayout scopeLayout;
+
+        /**
+         * {@code scope} view that can be filled with a scope
+         **/
         private final TextInputEditText scope;
+
+        /**
+         * {@code scopes} view for the scopes list
+         **/
         private final AutoCompleteTextView scopes;
+
+        /**
+         * {@code password} view
+         **/
         private final AutoCompleteTextView password;
+
+        /**
+         * {@code actionBtn} the button that can {@code "copy"} or {@code "recover"} a password
+         **/
         private final MaterialButton actionBtn;
 
+        /**
+         * Constructor to init {@link PasswordView} object
+         *
+         * @param itemView: container view
+         * **/
         public PasswordView(@NonNull View itemView) {
             super(itemView);
             tail = itemView.findViewById(R.id.tail);
@@ -219,26 +318,30 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
             itemView.findViewById(R.id.deleteBtn).setOnClickListener(this);
         }
 
-        @SuppressLint("NonConstantResourceId")
+
+        /**
+         * {@inheritDoc}
+         * **/
         @Override
+        @SuppressLint("NonConstantResourceId")
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.deleteBtn -> {
                     if (!isRecoveryMode) {
                         // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "1");
+                        Utils.showSnackbar(v, "DELETE");
                     } else {
                         // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "2");
+                        Utils.showSnackbar(v, "PERMANENTLY DELETED");
                     }
                 }
                 case R.id.actionBtn -> {
                     if (!isRecoveryMode) {
                         // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "3");
+                        Utils.showSnackbar(v, "COPIED");
                     } else {
                         // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "4");
+                        Utils.showSnackbar(v, "RECOVERED");
                     }
                 }
             }

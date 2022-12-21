@@ -1,4 +1,4 @@
-package com.tecknobit.glider.ui.fragments.general;
+package com.tecknobit.glider.ui.fragments.parents;
 
 import android.content.res.ColorStateList;
 import android.text.TextWatcher;

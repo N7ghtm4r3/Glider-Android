@@ -4,10 +4,10 @@ import android.content.ClipboardManager;
 import android.graphics.Color;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.glider.R;
 
@@ -97,7 +97,7 @@ public class Utils {
      * @param textView: the text view from copy the text
      * @param view:     source view from show the {@link Snackbar}
      */
-    public static void copyText(MaterialTextView textView, View view) {
+    public static void copyText(TextView textView, View view) {
         ClipboardManager clipboard = (ClipboardManager) STARTER_ACTIVITY.getSystemService(CLIPBOARD_SERVICE);
         clipboard.setPrimaryClip(newPlainText("Glider-Password", textView.getText().toString()));
         showSnackbar(view, R.string.password_successfully_copied);

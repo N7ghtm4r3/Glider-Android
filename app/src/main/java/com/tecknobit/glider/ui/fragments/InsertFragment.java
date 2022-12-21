@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.ui.fragments.general.FormFragment;
-import com.tecknobit.glider.ui.fragments.general.GliderFragment;
+import com.tecknobit.glider.ui.fragments.parents.FormFragment;
+import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -155,8 +155,8 @@ public class InsertFragment extends FormFragment {
      * @return insertion payload with the parameters inserted in the {@code GUI} as {@link JSONObject}
      * or null if an error occurred
      */
-    @SafeVarargs
     @Override
+    @SafeVarargs
     protected final <T> JSONObject getRequestPayload(T... parameters) {
         JSONObject payload = null;
         try {

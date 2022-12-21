@@ -12,21 +12,52 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
+        <RelativeLayout
+            android:id="@+id/relList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:closeIcon="@drawable/ic_baseline_close_24"
-            app:queryHint="@string/search_for_tail_or_scopes"
-            app:searchIcon="@drawable/ic_baseline_search_24" />
+            android:visibility="visible">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/passwords"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/searchView"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="?actionBarSize" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/passwords"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/searchView"
+                android:layout_marginBottom="?actionBarSize" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchView"
+                style="@style/TextLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="30dp"
+                android:focusableInTouchMode="true"
+                app:counterEnabled="false"
+                app:endIconMode="clear_text"
+                app:startIconDrawable="@drawable/ic_baseline_search_24">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/searchQuery"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/filter_by_tail_or_scopes"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textColor="@color/primary" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </RelativeLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/noPasswords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/no_passwords_available"
+            android:textSize="20sp" />
 
     </RelativeLayout>
 

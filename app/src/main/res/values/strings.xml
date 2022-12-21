@@ -41,5 +41,6 @@
     <string name="recover">Recover</string>
     <string name="new_scope_inserted_successfully">New scope inserted successfully</string>
     <string name="current_scope_edited_successfully">Current scope edited successfully</string>
-    <string name="search_for_tail_or_scopes">Search for the tail or the scopes</string>
+    <string name="filter_by_tail_or_scopes">Filter by tail or scopes</string>
+    <string name="no_passwords_available">No passwords available</string>
 </resources>

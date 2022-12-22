@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -49,8 +51,11 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void run() {
                 super.run();
+                Animation animation = AnimationUtils.loadAnimation(SplashScreen.this, R.anim.fadein);
                 try {
-                    sleep(2500);
+                    for (int id : new int[]{R.id.appName, R.id.byTecknobit})
+                        findViewById(id).startAnimation(animation);
+                    sleep(2000);
                 } catch (InterruptedException ignored) {
                 } finally {
                     if (start)

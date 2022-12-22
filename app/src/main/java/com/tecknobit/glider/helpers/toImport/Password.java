@@ -4,6 +4,7 @@ import com.tecknobit.glider.ui.fragments.ListFragment;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -88,6 +89,18 @@ public class Password {
      **/
     public Collection<String> getScopes() {
         return scopes;
+    }
+
+    /**
+     * Method to get {@link #scopes} instance <br>
+     * Any params required
+     *
+     * @return {@link #scopes} instance as {@link Collection} of {@link String} alphabetically sorted
+     **/
+    public Collection<String> getScopesSorted() {
+        ArrayList<String> sortedScopes = new ArrayList<>(scopes);
+        Collections.sort(sortedScopes);
+        return sortedScopes;
     }
 
     /**

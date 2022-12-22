@@ -167,7 +167,8 @@ public class ListFragment extends RealtimeFragment {
             if (!recoveryMode) {
                 passwords.get(Status.ACTIVE).add(new Password("" +
                         tails[new Random().nextInt(tails.length)],
-                        new ArrayList<>(List.of(tails[new Random().nextInt(tails.length)])),
+                        new ArrayList<>(List.of(tails[new Random().nextInt(tails.length)],
+                                tails[new Random().nextInt(tails.length)])),
                         "gagaa",
                         Status.ACTIVE));
             } else {

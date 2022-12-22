@@ -43,4 +43,5 @@
     <string name="current_scope_edited_successfully">Current scope edited successfully</string>
     <string name="filter_by_tail_or_scopes">Filter by tail or scopes</string>
     <string name="no_passwords_available">No passwords available</string>
+    <string name="by_tecknobit" translatable="false">by Tecknobit</string>
 </resources>

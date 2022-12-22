@@ -24,6 +24,7 @@ import com.tecknobit.glider.helpers.toImport.Password;
 import com.tecknobit.glider.helpers.toImport.Password.Status;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -212,9 +213,18 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults filterResults = new FilterResults();
                 ArrayList<Password> filteredPasswords = new ArrayList<>();
-                for (Password password : passwords)
-                    if (password.getTail().contains(constraint) || isInScopes(password, constraint))
-                        filteredPasswords.add(password);
+                String query = constraint.toString();
+                if (!query.contains(",")) {
+                    for (Password password : passwords)
+                        if (password.getTail().contains(constraint) || isInScopes(password, constraint))
+                            filteredPasswords.add(password);
+                } else {
+                    String[] mScopes = query.replaceAll(" ", "").split(",");
+                    Arrays.sort(mScopes);
+                    for (Password password : passwords)
+                        if (Arrays.toString(mScopes).equals(password.getScopesSorted().toString()))
+                            filteredPasswords.add(password);
+                }
                 filterResults.values = filteredPasswords;
                 return filterResults;
             }

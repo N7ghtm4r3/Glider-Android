@@ -7,13 +7,13 @@ import android.view.View;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.Utils;
+import com.tecknobit.glider.helpers.local.Utils;
 
 import java.util.HashMap;
 
-import static com.tecknobit.glider.helpers.Utils.COLOR_PRIMARY;
-import static com.tecknobit.glider.helpers.Utils.COLOR_RED;
-import static com.tecknobit.glider.helpers.Utils.instantiateViews;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
+import static com.tecknobit.glider.helpers.local.Utils.instantiateViews;
 
 /**
  * The {@link FormFragment} is the super class where a fragment inherit the base methods to get data from a

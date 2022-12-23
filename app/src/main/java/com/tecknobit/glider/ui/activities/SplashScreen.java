@@ -4,12 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.local.User;
+import com.tecknobit.glider.ui.fragments.Connect;
 
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
@@ -47,21 +52,36 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         setDefaultNightMode(MODE_NIGHT_NO);
         STARTER_ACTIVITY = this;
-        new Thread() {
+        Animation animation = AnimationUtils.loadAnimation(SplashScreen.this, R.anim.fadein);
+        for (int id : new int[]{R.id.appName, R.id.byTecknobit})
+            findViewById(id).startAnimation(animation);
+        new CountDownTimer(2000, 1000) {
+
             @Override
-            public void run() {
-                super.run();
-                Animation animation = AnimationUtils.loadAnimation(SplashScreen.this, R.anim.fadein);
-                try {
-                    for (int id : new int[]{R.id.appName, R.id.byTecknobit})
-                        findViewById(id).startAnimation(animation);
-                    sleep(2000);
-                } catch (InterruptedException ignored) {
-                } finally {
-                    if (start)
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if (start) {
+                    // TODO: 23/12/2022 CHANGE WITH THE REAL WORKFLOW
+                    if (User.SECRET_KEY != null)
                         startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                    else {
+                        runOnUiThread(() -> {
+                            findViewById(R.id.container).setVisibility(View.VISIBLE);
+                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                            transaction.add(R.id.container, new Connect());
+                            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN);
+                            transaction.addToBackStack(null);
+                            transaction.commitAllowingStateLoss();
+                            findViewById(R.id.relContainer).setVisibility(View.GONE);
+                        });
+                    }
                 }
             }
+
         }.start();
     }
 

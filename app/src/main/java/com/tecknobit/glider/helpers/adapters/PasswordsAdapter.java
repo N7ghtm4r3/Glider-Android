@@ -20,7 +20,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.Utils;
+import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.helpers.toImport.Password;
 import com.tecknobit.glider.helpers.toImport.Password.Status;
 
@@ -41,10 +41,10 @@ import static com.tecknobit.glider.R.string.recover;
 import static com.tecknobit.glider.R.string.scope_hint;
 import static com.tecknobit.glider.R.string.scope_must_be_filled;
 import static com.tecknobit.glider.R.string.the_scope_edited;
-import static com.tecknobit.glider.helpers.Utils.COLOR_PRIMARY;
-import static com.tecknobit.glider.helpers.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.Utils.hideKeyBoard;
-import static com.tecknobit.glider.helpers.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
+import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.Utils;
+import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.helpers.toImport.Device;
 
 import java.text.DateFormat;

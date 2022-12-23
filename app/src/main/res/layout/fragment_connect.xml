@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragments.Connect">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="50dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/connectBtn"
+            style="@style/ButtonLayout"
+            android:layout_below="@id/passwordLayout"
+            android:layout_marginTop="30dp"
+            android:text="@string/connect" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/logo"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="75dp"
+            android:scaleType="center"
+            android:src="@mipmap/ic_launcher" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/portLayout"
+            style="@style/RequiredTextLayout"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hostLayout"
+            android:layout_marginTop="30dp"
+            app:counterEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/portInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/port_text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordLayout"
+            style="@style/RequiredTextLayout"
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hostLayout"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="30dp"
+            app:counterEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/password" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/hostLayout"
+            style="@style/RequiredTextLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/logo"
+            android:layout_marginTop="30dp"
+            app:counterEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/hostInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/host" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

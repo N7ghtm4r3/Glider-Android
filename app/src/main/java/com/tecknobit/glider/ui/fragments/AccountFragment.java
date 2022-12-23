@@ -19,8 +19,8 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.Utils;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter;
+import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.helpers.toImport.Device;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
@@ -33,14 +33,14 @@ import java.util.Random;
 
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
-import static com.tecknobit.glider.helpers.Utils.COLOR_PRIMARY;
-import static com.tecknobit.glider.helpers.Utils.COLOR_RED;
-import static com.tecknobit.glider.helpers.Utils.HOST_ADDRESS_KEY;
-import static com.tecknobit.glider.helpers.Utils.HOST_PORT_KEY;
-import static com.tecknobit.glider.helpers.Utils.QR_CODE_LOGIN_KEY;
-import static com.tecknobit.glider.helpers.Utils.SERVER_STATUS_KEY;
-import static com.tecknobit.glider.helpers.Utils.SINGLE_USE_MODE_KEY;
-import static com.tecknobit.glider.helpers.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
+import static com.tecknobit.glider.helpers.local.Utils.HOST_ADDRESS_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.HOST_PORT_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.QR_CODE_LOGIN_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.SERVER_STATUS_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.SINGLE_USE_MODE_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.helpers.toImport.Device.devices;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 

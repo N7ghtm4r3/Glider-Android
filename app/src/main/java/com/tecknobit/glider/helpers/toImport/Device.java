@@ -29,22 +29,27 @@ public class Device {
      * {@code name} of the device
      **/
     private final String name;
+
     /**
      * {@code ipAddress} ip address of the device
      **/
     private final String ipAddress;
+
     /**
      * {@code loginDate} date of the device
      **/
     private final String loginDate;
+
     /**
      * {@code lastActivity} last activity of the device
      **/
     private final String lastActivity;
+
     /**
      * {@code type} of the device
      **/
     private final Type type;
+
     /**
      * {@code blacklisted} whether the device has been blacklisted
      **/

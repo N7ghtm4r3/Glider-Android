@@ -20,7 +20,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.Utils;
+import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
 import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
@@ -29,14 +29,14 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import static com.tecknobit.glider.helpers.Utils.PASSWORD_LENGTH_KEY;
-import static com.tecknobit.glider.helpers.Utils.PASSWORD_MAX_LENGTH;
-import static com.tecknobit.glider.helpers.Utils.PASSWORD_MIN_LENGTH;
-import static com.tecknobit.glider.helpers.Utils.SCOPES_KEY;
-import static com.tecknobit.glider.helpers.Utils.TAIL_KEY;
-import static com.tecknobit.glider.helpers.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.Utils.hideKeyBoard;
-import static com.tecknobit.glider.helpers.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_LENGTH_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_MAX_LENGTH;
+import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_MIN_LENGTH;
+import static com.tecknobit.glider.helpers.local.Utils.SCOPES_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.TAIL_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 
 /**
  * The {@link CreateFragment} fragment is the section of the app where the password can be created

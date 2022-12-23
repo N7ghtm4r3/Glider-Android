@@ -20,11 +20,11 @@ import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.tecknobit.glider.helpers.Utils.PASSWORD_KEY;
-import static com.tecknobit.glider.helpers.Utils.TAIL_KEY;
-import static com.tecknobit.glider.helpers.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.Utils.hideKeyBoard;
-import static com.tecknobit.glider.helpers.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.TAIL_KEY;
+import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 
 /**
  * The {@link InsertFragment} fragment is the section of the app where the password can be inserted

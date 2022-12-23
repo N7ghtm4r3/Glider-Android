@@ -1,4 +1,4 @@
-package com.tecknobit.glider.helpers;
+package com.tecknobit.glider.helpers.local;
 
 import android.content.ClipboardManager;
 import android.graphics.Color;

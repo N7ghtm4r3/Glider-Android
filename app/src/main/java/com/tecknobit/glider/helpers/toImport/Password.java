@@ -32,14 +32,17 @@ public class Password {
      * {@code tail} tail of the {@link #password}
      **/
     private final String tail;
+
     /**
      * {@code scopes} list of scopes where the {@link #password} can be used
      **/
     private final ArrayList<String> scopes;
+
     /**
      * {@code password} value
      **/
     private final String password;
+
     /**
      * {@code status} value
      **/

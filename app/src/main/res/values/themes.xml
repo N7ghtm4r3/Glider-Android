@@ -82,4 +82,12 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <!-- Theme for the material-components card view -->
+    <style name="GliderCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/backgroundCardView</item>
+        <item name="cardElevation">5dp</item>
+        <item name="cardCornerRadius">15dp</item>
+        <item name="cardUseCompatPadding">true</item>
+    </style>
+
 </resources>

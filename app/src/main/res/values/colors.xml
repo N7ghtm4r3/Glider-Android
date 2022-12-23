@@ -4,5 +4,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#A81515</color>
+    <color name="green">#198C49</color>
     <color name="background">#FAEDE1E1</color>
+    <color name="backgroundCardView">#FAFAF3F3</color>
 </resources>

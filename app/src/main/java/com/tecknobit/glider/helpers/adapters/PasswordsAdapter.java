@@ -1,4 +1,4 @@
-package com.tecknobit.glider.helpers;
+package com.tecknobit.glider.helpers.adapters;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -20,6 +20,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.Utils;
 import com.tecknobit.glider.helpers.toImport.Password;
 import com.tecknobit.glider.helpers.toImport.Password.Status;
 
@@ -60,24 +61,27 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
      * {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
      **/
     private static boolean isRecoveryMode;
+
     /**
      * {@code passwords} list of {@link Password} to manage
      **/
-    private final ArrayList<Password> passwords;
+    private ArrayList<Password> passwords;
+
     /**
      * {@code filteredPasswords} list of {@link Password} to manage
+     *
      * @apiNote this list is used as main list and is used in {@link #getFilter()} and
      * {@link #resetPasswordsList()} methods
      **/
     private ArrayList<Password> filteredPasswords;
 
     /**
-     * Constructor to init {@link Password} object
+     * Constructor to init {@link PasswordsAdapter} object
      *
-     * @param passwords: list of {@link Password} to manage
+     * @param passwords:      list of {@link Password} to manage
      * @param isRecoveryMode: whether the list of the {@link #passwords} is in a
-     * {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
-     * **/
+     *                        {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
+     **/
     public PasswordsAdapter(ArrayList<Password> passwords, boolean isRecoveryMode) {
         this.passwords = passwords;
         filteredPasswords = new ArrayList<>(passwords);
@@ -229,6 +233,13 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
                 return filterResults;
             }
 
+            /**
+             * Method to check if the scope given is in the password's scopes
+             *
+             * @param password: password from check the existence of the scope
+             * @param scope:    scope to compare
+             * @return whether the scope given is in the list
+             **/
             private boolean isInScopes(Password password, CharSequence scope) {
                 for (String lScope : password.getScopes())
                     if (lScope.contains(scope))
@@ -247,8 +258,19 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
     }
 
     /**
+     * Method to refresh the current {@link #passwords} list with a new list <br>
+     * Any params required
+     */
+    @SuppressLint("NotifyDataSetChanged")
+    public void refreshPasswordsList(ArrayList<Password> passwords) {
+        this.passwords = passwords;
+        resetPasswordsList();
+    }
+
+    /**
      * Method to reset the {@link #filteredPasswords} and filled it with the {@link #passwords}
-     * full list
+     * full list <br>
+     * Any params required
      */
     @SuppressLint("NotifyDataSetChanged")
     public void resetPasswordsList() {

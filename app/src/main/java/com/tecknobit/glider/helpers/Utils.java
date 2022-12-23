@@ -46,6 +46,31 @@ public class Utils {
     public static final String PASSWORD_KEY = "password";
 
     /**
+     * {@code HOST_ADDRESS_KEY} host address key
+     */
+    public static final String HOST_ADDRESS_KEY = "host_address";
+
+    /**
+     * {@code HOST_PORT_KEY} host port key
+     */
+    public static final String HOST_PORT_KEY = "host_port";
+
+    /**
+     * {@code SERVER_STATUS_KEY} server status key
+     */
+    public static final String SERVER_STATUS_KEY = "server_status";
+
+    /**
+     * {@code SINGLE_USE_MODE_KEY} single use mode key
+     */
+    public static final String SINGLE_USE_MODE_KEY = "single_use_mode";
+
+    /**
+     * {@code QR_CODE_LOGIN_KEY} qr code login key
+     */
+    public static final String QR_CODE_LOGIN_KEY = "qr_code_login";
+
+    /**
      * {@code PASSWORD_MAX_LENGTH} password max length
      */
     public static final int PASSWORD_MAX_LENGTH = 32;

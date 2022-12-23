@@ -44,4 +44,20 @@
     <string name="filter_by_tail_or_scopes">Filter by tail or scopes</string>
     <string name="no_passwords_available">No passwords available</string>
     <string name="by_tecknobit" translatable="false">by Tecknobit</string>
+    <string name="address">Address:</string>
+    <string name="server_details">Server details</string>
+    <string name="port">Port:</string>
+    <string name="status">Status:</string>
+    <string name="security">Security</string>
+    <string name="single_use">Single use:</string>
+    <string name="qr_code_login">QR Code loginDate:</string>
+    <string name="devices">Devices</string>
+    <string name="logout">LOGOUT</string>
+    <string name="account_actions">Account actions</string>
+    <string name="blacklist" translatable="false">Blacklist</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="name">Name:</string>
+    <string name="last_activity">Last activity:</string>
+    <string name="login_date">Login date:</string>
+    <string name="ip_address">Ip address:</string>
 </resources>

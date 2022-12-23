@@ -1,6 +1,7 @@
 package com.tecknobit.glider.ui.fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,20 +17,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.PasswordsAdapter;
 import com.tecknobit.glider.helpers.Utils;
+import com.tecknobit.glider.helpers.adapters.PasswordsAdapter;
 import com.tecknobit.glider.helpers.toImport.Password;
 import com.tecknobit.glider.helpers.toImport.Password.Status;
-import com.tecknobit.glider.ui.fragments.parents.RealtimeFragment;
+import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
 import org.json.JSONObject;
 
@@ -50,12 +49,12 @@ import static com.tecknobit.glider.ui.activities.MainActivity.navController;
 
 /**
  * The {@link ListFragment} fragment is the section of the app where there is the list of the
- * passwordsRecycler stored or removed that can be recover or definitely deleted
+ * {@link Password} stored or removed that can be recover or definitely deleted
  *
  * @author Tecknobit - N7ghtm4r3
- * @see RealtimeFragment
+ * @see RealtimeRecyclerFragment
  **/
-public class ListFragment extends RealtimeFragment {
+public class ListFragment extends RealtimeRecyclerFragment {
 
     /**
      * {@code relList} view container to show when {@link #list} is filled
@@ -68,21 +67,10 @@ public class ListFragment extends RealtimeFragment {
     private MaterialTextView noPasswordsText;
 
     /**
-     * {@code passwordsRecycler} the recycler view for {@link #list}
-     **/
-    private RecyclerView passwordsRecycler;
-
-    /**
      * {@code recoveryMode} whether the {@link #list} of the  {@link Password} is in a
      * {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
      **/
     private boolean recoveryMode;
-
-    /**
-     * {@code currentPasswordsSize} the current passwords {@link #list} size to avoid the useless
-     * refreshing of the view
-     **/
-    private int currentPasswordsSize;
 
     /**
      * {@code list} list of the {@link Password}
@@ -90,20 +78,14 @@ public class ListFragment extends RealtimeFragment {
     private ArrayList<Password> list;
 
     /**
-     * {@code search} view to create a query and filter the {@link #passwordsRecycler}
+     * {@code search} view to create a query and filter the {@link #recyclerManager}
      **/
     private TextInputEditText search;
 
     /**
-     * {@code passwordsAdapter} adapter for the {@link #passwordsRecycler}
+     * {@code passwordsAdapter} adapter for the {@link #recyclerManager}
      **/
     private PasswordsAdapter passwordsAdapter;
-
-    /**
-     * {@code swipeRefreshLayout} view to manually refresh the {@link ListFragment}'s view reloading
-     * the {@link #list} data
-     **/
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     /**
      * Required empty public constructor for the normal Android's workflow
@@ -156,9 +138,8 @@ public class ListFragment extends RealtimeFragment {
         recoveryMode = navController.getCurrentDestination().getLabel().equals(getString(R.string.removed));
         noPasswordsText = view.findViewById(R.id.noPasswords);
         relList = view.findViewById(R.id.relList);
-        passwordsRecycler = view.findViewById(R.id.passwords);
         search = view.findViewById(R.id.searchQuery);
-        setRecycler();
+        setRecycler(R.id.passwords, MAIN_ACTIVITY);
         startSearchViewWorkflow();
         swipeRefreshLayout = view.findViewById(R.id.swipe);
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -227,7 +208,7 @@ public class ListFragment extends RealtimeFragment {
     }
 
     /**
-     * Method to set the {@link #passwordsRecycler} and the {@link ItemTouchHelper}'s workflow
+     * Method to set the {@link #recyclerManager} and the {@link ItemTouchHelper}'s workflow
      * with the swiping gestures:
      * <ul>
      *     <li>
@@ -256,11 +237,13 @@ public class ListFragment extends RealtimeFragment {
      *             </li>
      *         </ul>
      *     </li>
-     * </ul> <br>
-     * Any params required
+     * </ul>
+     * @param recyclerId: identifier of the {@link #recyclerManager}
+     * @param context: context where the {@link #recyclerManager} is shown
      **/
-    private void setRecycler() {
-        passwordsRecycler.setLayoutManager(new LinearLayoutManager(MAIN_ACTIVITY));
+    @Override
+    protected void setRecycler(int recyclerId, Context context) {
+        super.setRecycler(recyclerId, context);
         final MaterialButton[] buttons = new MaterialButton[2];
         new ItemTouchHelper(new SimpleCallback(0, LEFT | RIGHT) {
             @Override
@@ -270,8 +253,8 @@ public class ListFragment extends RealtimeFragment {
                 return true;
             }
 
-            @SuppressLint("NotifyDataSetChanged")
             @Override
+            @SuppressLint("NotifyDataSetChanged")
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 swipeRefreshLayout.setEnabled(true);
                 for (MaterialButton button : buttons)
@@ -315,37 +298,39 @@ public class ListFragment extends RealtimeFragment {
                 return makeMovementFlags(0, LEFT | RIGHT);
             }
 
-        }).attachToRecyclerView(passwordsRecycler);
+        }).attachToRecyclerView(recyclerManager);
     }
 
     /**
-     * Method to load the {@link #passwordsRecycler} <br>
-     * Any params required
+     * {@inheritDoc}
      *
      * @apiNote the data will be automatically fetched and refreshed
      * by the {@link Status} of {@link Password} in base of the {@link #recoveryMode} value
      **/
+    @Override
     @SuppressLint("NotifyDataSetChanged")
-    private void loadRecycler() {
-        stopRunnable();
-        currentPasswordsSize = -1;
+    protected void loadRecycler() {
+        super.loadRecycler();
         runnable = () -> {
             if (!recoveryMode)
                 list = passwords.get(Status.ACTIVE);
             else
                 list = passwords.get(Status.DELETED);
             int passwordsSize = list.size();
-            if (currentPasswordsSize != passwordsSize) {
+            if (currentRecyclerSize != passwordsSize) {
                 if (passwordsSize > 0) {
                     noPasswordsText.setVisibility(View.GONE);
                     relList.setVisibility(View.VISIBLE);
-                    passwordsAdapter = new PasswordsAdapter(list, recoveryMode);
-                    passwordsRecycler.setAdapter(passwordsAdapter);
+                    if (passwordsAdapter == null) {
+                        passwordsAdapter = new PasswordsAdapter(list, recoveryMode);
+                        recyclerManager.setAdapter(passwordsAdapter);
+                    } else
+                        passwordsAdapter.refreshPasswordsList(list);
                 } else {
                     noPasswordsText.setVisibility(View.VISIBLE);
                     relList.setVisibility(View.GONE);
                 }
-                currentPasswordsSize = passwordsSize;
+                currentRecyclerSize = passwordsSize;
             } else {
                 if (passwordsSize > 0 && !list.equals(passwordsAdapter.getCurrentPasswords()))
                     passwordsAdapter.notifyDataSetChanged();
@@ -358,7 +343,7 @@ public class ListFragment extends RealtimeFragment {
     /**
      * {@inheritDoc}
      */
-    // TODO: 21/12/2022 LIST THE BEHAVIOURS OF THIS METHOD IN BASE OF THE OPE PASSED AS ARGUMENT
+    // TODO: 21/12/2022 LIST THE BEHAVIOURS OF THIS METHOD IN THE DOCU STRING IN BASE OF THE OPE PASSED AS ARGUMENT
     @Override
     @SafeVarargs
     protected final <T> JSONObject getRequestPayload(T... parameters) {

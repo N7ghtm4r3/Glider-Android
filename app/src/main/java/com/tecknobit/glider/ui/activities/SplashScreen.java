@@ -10,7 +10,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.User;
@@ -18,6 +17,7 @@ import com.tecknobit.glider.ui.fragments.Connect;
 
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
+import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN;
 
 /**
  * The {@link SplashScreen} activity is the first screen of the {@code Glider} app. <br>
@@ -71,11 +71,11 @@ public class SplashScreen extends AppCompatActivity {
                     else {
                         runOnUiThread(() -> {
                             findViewById(R.id.container).setVisibility(View.VISIBLE);
-                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                            transaction.add(R.id.container, new Connect());
-                            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN);
-                            transaction.addToBackStack(null);
-                            transaction.commitAllowingStateLoss();
+                            getSupportFragmentManager().beginTransaction()
+                                    .add(R.id.container, new Connect())
+                                    .setTransition(TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN)
+                                    .addToBackStack(null)
+                                    .commitAllowingStateLoss();
                             findViewById(R.id.relContainer).setVisibility(View.GONE);
                         });
                     }

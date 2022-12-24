@@ -77,10 +77,13 @@ public abstract class FormFragment extends GliderFragment {
      *          {@link TextInputLayout#setStartIconOnClickListener(View.OnClickListener)} for the {@link #textInputLayouts}
      *          to show the hint or not from {@link #inputsHints}
      *     </li>
-     * </ul> <br>
+     * </ul>
+     * @apiNote will be automatically invoked the {@link #loadInputMessagesLists()} method
      * Any params required
      */
-    protected abstract void startInputsListenWorkflow();
+    protected void startInputsListenWorkflow() {
+        loadInputMessagesLists();
+    }
 
     /**
      * Method to set the text helper layout of {@link TextInputLayout}

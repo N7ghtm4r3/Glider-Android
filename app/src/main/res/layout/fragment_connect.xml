@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".ui.fragments.Connect">
 
     <RelativeLayout
@@ -14,7 +15,9 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/connectBtn"
             style="@style/ButtonLayout"
+            android:layout_width="140dp"
             android:layout_below="@id/passwordLayout"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="30dp"
             android:text="@string/connect" />
 
@@ -23,16 +26,27 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="75dp"
+            android:layout_marginTop="55dp"
             android:scaleType="center"
             android:src="@mipmap/ic_launcher" />
+
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/gitIcon"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_below="@id/gitLink"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/git" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/portLayout"
             style="@style/RequiredTextLayout"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/hostLayout"
+            android:layout_below="@id/passwordLayout"
             android:layout_marginTop="30dp"
             app:counterEnabled="false">
 
@@ -40,25 +54,10 @@
                 android:id="@+id/portInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/port_text" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/passwordLayout"
-            style="@style/RequiredTextLayout"
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/hostLayout"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="30dp"
-            app:counterEnabled="false">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passwordInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/password" />
+                android:hint="@string/port_text"
+                android:inputType="number"
+                android:maxLength="5"
+                android:textColor="@color/primary" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -75,10 +74,40 @@
                 android:id="@+id/hostInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/host" />
+                android:hint="@string/host"
+                android:maxLines="1"
+                android:textColor="@color/primary" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordLayout"
+            style="@style/PasswordTextLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hostLayout"
+            android:layout_marginTop="30dp"
+            app:counterEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textColor="@color/primary" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/gitLink"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@id/portLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:text="@string/see_this_project_on"
+            android:textSize="16sp" />
+
     </RelativeLayout>
 
-</RelativeLayout>
+</ScrollView>

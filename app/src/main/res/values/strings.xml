@@ -61,4 +61,11 @@
     <string name="host">Host</string>
     <string name="port_text">Port</string>
     <string name="connect">Connect</string>
+    <string name="host_is_required">Host is required</string>
+    <string name="host_port_is_required">Host port is required</string>
+    <string name="host_hint">Host address where you started the Glider\'s service</string>
+    <string name="host_port_hint">Host port where you started the Glider\'s service</string>
+    <string name="password_connect_hint">Password you choose to connect to the service</string>
+    <string name="invalid_host_address">Invalid host address</string>
+    <string name="see_this_project_on">See this project on</string>
 </resources>

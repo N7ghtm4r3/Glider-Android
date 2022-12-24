@@ -118,7 +118,6 @@ public class CreateFragment extends FormFragment implements OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadInputMessagesLists();
         instantiateInputs(view, new int[]{R.id.tailLayout, R.id.scopesLayout, R.id.lengthLayout},
                 new int[]{R.id.tailInput, R.id.scopesInput, R.id.lengthInput});
         createBtn = view.findViewById(R.id.createBtn);
@@ -148,6 +147,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      **/
     @Override
     protected void startInputsListenWorkflow() {
+        super.startInputsListenWorkflow();
         for (int j = 0; j < textInputEditTexts.length; j++) {
             int finalJ = j;
             textInputLayouts[j].setStartIconOnClickListener(v -> {
@@ -226,30 +226,29 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      */
     @SafeVarargs
     protected final <T> JSONObject getRequestPayload(T... parameters) {
-        JSONObject payload = null;
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
             if (!tail.isEmpty()) {
-                payload = new JSONObject()
-                        .put(TAIL_KEY, tail)
+                JSONObject payload = new JSONObject().put(TAIL_KEY, tail)
                         .put(SCOPES_KEY, List.of(getTextFromEdit(textInputEditTexts[1]).split(",")));
                 try {
                     int length = Integer.parseInt(getTextFromEdit(textInputEditTexts[2]));
                     if (length < PASSWORD_MIN_LENGTH || length > PASSWORD_MAX_LENGTH) {
                         showsError(1);
-                        payload = null;
+                        return null;
                     } else
-                        payload.put(PASSWORD_LENGTH_KEY, length);
+                        return payload.put(PASSWORD_LENGTH_KEY, length);
                 } catch (NumberFormatException e) {
                     showsError(2);
-                    payload = null;
+                    return null;
                 }
-            } else
+            } else {
                 showsError(0);
+                return null;
+            }
         } catch (JSONException e) {
-            payload = null;
+            return null;
         }
-        return payload;
     }
 
     /**

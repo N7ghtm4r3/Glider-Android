@@ -85,7 +85,6 @@ public class InsertFragment extends FormFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadInputMessagesLists();
         instantiateInputs(view, new int[]{R.id.tailLayout, R.id.passwordLayout},
                 new int[]{R.id.tailInput, R.id.passwordInput});
         view.findViewById(R.id.insertBtn).setOnClickListener(v -> {
@@ -118,6 +117,7 @@ public class InsertFragment extends FormFragment {
      **/
     @Override
     protected void startInputsListenWorkflow() {
+        super.startInputsListenWorkflow();
         for (int j = 0; j < textInputLayouts.length; j++) {
             int finalJ = j;
             textInputLayouts[j].setStartIconOnClickListener(v -> {
@@ -158,25 +158,24 @@ public class InsertFragment extends FormFragment {
     @Override
     @SafeVarargs
     protected final <T> JSONObject getRequestPayload(T... parameters) {
-        JSONObject payload = null;
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
             if (!tail.isEmpty()) {
-                payload = new JSONObject()
-                        .put(TAIL_KEY, tail);
+                JSONObject payload = new JSONObject().put(TAIL_KEY, tail);
                 String password = getTextFromEdit(textInputEditTexts[1]);
                 if (!password.isEmpty())
-                    payload.put(PASSWORD_KEY, password);
+                    return payload.put(PASSWORD_KEY, password);
                 else {
                     showsError(1);
-                    payload = null;
+                    return null;
                 }
-            } else
+            } else {
                 showsError(0);
+                return null;
+            }
         } catch (JSONException e) {
-            payload = null;
+            return null;
         }
-        return payload;
     }
 
     /**

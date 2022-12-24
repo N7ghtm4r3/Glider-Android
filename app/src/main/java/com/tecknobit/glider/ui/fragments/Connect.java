@@ -3,12 +3,12 @@ package com.tecknobit.glider.ui.fragments;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -36,6 +36,7 @@ import static com.tecknobit.glider.helpers.local.Utils.HOST_PORT_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.openUrlPage;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
 import static java.lang.Integer.parseInt;
@@ -47,8 +48,9 @@ import static java.lang.Integer.parseInt;
  * @author Tecknobit - N7ghtm4r3
  * @see GliderFragment
  * @see FormFragment
+ * @see OnClickListener
  **/
-public class Connect extends FormFragment implements View.OnClickListener {
+public class Connect extends FormFragment implements OnClickListener {
 
     /**
      * Required empty public constructor for the normal Android's workflow
@@ -203,12 +205,8 @@ public class Connect extends FormFragment implements View.OnClickListener {
                     startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
                 }
             }
-            case R.id.gitLink, R.id.gitIcon -> {
-                Intent intent = new Intent().setAction(Intent.ACTION_VIEW);
-                // TODO: 24/12/2022 CHECK IF LINK IS GLIDER OR GLIDER-ANDROID 
-                intent.setData(Uri.parse("https://github.com/N7ghtm4r3/Glider-Android"));
-                startActivity(intent);
-            }
+            case R.id.gitLink, R.id.gitIcon -> // TODO: 24/12/2022 CHECK IF LINK IS GLIDER OR GLIDER-ANDROID
+                    openUrlPage("https://github.com/N7ghtm4r3/Glider-Android");
         }
     }
 

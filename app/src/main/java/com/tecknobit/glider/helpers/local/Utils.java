@@ -1,7 +1,9 @@
 package com.tecknobit.glider.helpers.local;
 
 import android.content.ClipboardManager;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -20,7 +22,6 @@ import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
  * The {@code Utils} class is a container of static methods useful for the {@code Glider}'s workflow
  *
  * @author Tecknobit - N7ghtm4r3
- * *
  **/
 public class Utils {
 
@@ -172,6 +173,16 @@ public class Utils {
      */
     public static String getTextFromEdit(TextInputEditText editText) {
         return editText.getText().toString();
+    }
+
+    /**
+     * Method to open a page link from {@code Glider}
+     *
+     * @param url: url of the page to open
+     */
+    public static void openUrlPage(String url) {
+        STARTER_ACTIVITY.startActivity(new Intent(Intent.ACTION_VIEW)
+                .setData(Uri.parse(url)));
     }
 
 }

@@ -10,10 +10,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.User;
 import com.tecknobit.glider.ui.fragments.Connect;
+import com.tecknobit.glider.ui.fragments.Update;
 
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
@@ -66,23 +68,35 @@ public class SplashScreen extends AppCompatActivity {
             public void onFinish() {
                 if (start) {
                     // TODO: 23/12/2022 CHANGE WITH THE REAL WORKFLOW
-                    if (User.SECRET_KEY != null)
-                        startActivity(new Intent(SplashScreen.this, MainActivity.class));
-                    else {
-                        runOnUiThread(() -> {
-                            findViewById(R.id.container).setVisibility(View.VISIBLE);
-                            getSupportFragmentManager().beginTransaction()
-                                    .add(R.id.container, new Connect())
-                                    .setTransition(TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN)
-                                    .addToBackStack(null)
-                                    .commitAllowingStateLoss();
-                            findViewById(R.id.relContainer).setVisibility(View.GONE);
-                        });
-                    }
+                    if (User.SECRET_KEY != null) {
+                        if (User.IS_UPDATED)
+                            startActivity(new Intent(SplashScreen.this, MainActivity.class));
+                        else
+                            openFragment(new Update());
+                    } else
+                        openFragment(new Connect());
                 }
             }
 
         }.start();
+    }
+
+    /**
+     * Method to open from {@link SplashScreen} a {@link Fragment}
+     *
+     * @param fragment: fragment to open
+     * @apiNote the transaction will be executed with {@link #runOnUiThread(Runnable)}'s workflow
+     **/
+    private void openFragment(Fragment fragment) {
+        runOnUiThread(() -> {
+            findViewById(R.id.container).setVisibility(View.VISIBLE);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, fragment)
+                    .setTransition(TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN)
+                    .addToBackStack(null)
+                    .commitAllowingStateLoss();
+            findViewById(R.id.relContainer).setVisibility(View.GONE);
+        });
     }
 
     /**

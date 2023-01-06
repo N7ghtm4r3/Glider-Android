@@ -13,11 +13,17 @@
         android:theme="@style/Theme.Glider"
         tools:targetApi="31">
         <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
+            tools:replace="screenOrientation" />
+        <activity
             android:name=".ui.activities.SplashScreen"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Glider.NoActionBar"
             android:windowSoftInputMode="adjustPan"
+            android:hardwareAccelerated="true"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

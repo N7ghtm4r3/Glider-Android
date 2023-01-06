@@ -30,6 +30,14 @@
             android:scaleType="center"
             android:src="@mipmap/ic_launcher" />
 
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/scanner"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/logo"
+            android:scaleType="centerCrop"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_baseline_qr_code_scanner_24" />
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/gitIcon"
@@ -40,6 +48,24 @@
             android:layout_marginTop="10dp"
             android:scaleType="centerCrop"
             android:src="@drawable/git" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/passwordLayout"
+            style="@style/PasswordTextLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hostLayout"
+            android:layout_marginTop="30dp"
+            app:counterEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:textColor="@color/primary" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/portLayout"
@@ -61,13 +87,23 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/gitLink"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_below="@id/portLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:text="@string/see_this_project_on"
+            android:textSize="16sp" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/hostLayout"
             style="@style/RequiredTextLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/logo"
-            android:layout_marginTop="30dp"
+            android:layout_below="@id/scanner"
+            android:layout_marginTop="20dp"
             app:counterEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -79,34 +115,6 @@
                 android:textColor="@color/primary" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/passwordLayout"
-            style="@style/PasswordTextLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/hostLayout"
-            android:layout_marginTop="30dp"
-            app:counterEnabled="false">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passwordInput"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:textColor="@color/primary" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/gitLink"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_below="@id/portLayout"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:text="@string/see_this_project_on"
-            android:textSize="16sp" />
 
     </RelativeLayout>
 

@@ -80,4 +80,8 @@
     <string name="remove">Remove</string>
     <string name="scope">Scope</string>
     <string name="scope_removed_successfully">Scope removed successfully</string>
+    <string name="qrcode_reading_error">Error during the reading of the QRCODE</string>
+    <string name="insert_password">Insert password</string>
+    <string name="insert_password_message">Insert the password to connect to your Glider\'s service</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

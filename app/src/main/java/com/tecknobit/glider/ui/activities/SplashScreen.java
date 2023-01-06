@@ -20,6 +20,9 @@ import com.tecknobit.glider.ui.fragments.Update;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
 import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN;
+import static com.tecknobit.glider.helpers.local.User.IS_UPDATED;
+import static com.tecknobit.glider.helpers.local.User.SECRET_KEY;
+import static com.tecknobit.glider.helpers.local.User.user;
 
 /**
  * The {@link SplashScreen} activity is the first screen of the {@code Glider} app. <br>
@@ -40,12 +43,18 @@ public class SplashScreen extends AppCompatActivity {
     /**
      * {@code start} flag whether start or not with the {@code Glider}'s workflow in those cases
      * when {@link #onBackPressed()} or {@link #onUserLeaveHint()} methods have been called
-     * **/
+     **/
     private static volatile boolean start = true;
 
     /**
+     * {@code executeLeaveHint} flag whether execute the {@link #onUserLeaveHint()} method, this to avoid the
+     * wrong workflow during the QRCode scanning in the {@link Connect} fragment
+     **/
+    private static volatile boolean executeLeaveHint = true;
+
+    /**
      * {@inheritDoc}
-     *
+     * <p>
      * Perform initialization of all fragments.
      */
     @Override
@@ -54,6 +63,7 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         setDefaultNightMode(MODE_NIGHT_NO);
         STARTER_ACTIVITY = this;
+        user = new User();
         Animation animation = AnimationUtils.loadAnimation(SplashScreen.this, R.anim.fadein);
         for (int id : new int[]{R.id.appName, R.id.byTecknobit})
             findViewById(id).startAnimation(animation);
@@ -68,15 +78,16 @@ public class SplashScreen extends AppCompatActivity {
             public void onFinish() {
                 if (start) {
                     // TODO: 23/12/2022 CHANGE WITH THE REAL WORKFLOW
-                    User.SECRET_KEY = "ga";
-                    User.IS_UPDATED = true;
-                    if (User.SECRET_KEY != null) {
-                        if (User.IS_UPDATED)
+                    SECRET_KEY = null;
+                    if (SECRET_KEY != null) {
+                        if (IS_UPDATED)
                             startActivity(new Intent(SplashScreen.this, MainActivity.class));
                         else
                             openFragment(new Update());
-                    } else
+                    } else {
+                        executeLeaveHint = false;
                         openFragment(new Connect());
+                    }
                 }
             }
 
@@ -135,8 +146,10 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        start = false;
-        finishAffinity();
+        if (executeLeaveHint) {
+            start = false;
+            finishAffinity();
+        }
     }
 
 }

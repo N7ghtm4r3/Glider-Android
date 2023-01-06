@@ -1,12 +1,16 @@
 package com.tecknobit.glider.helpers.local;
 
+import android.app.Activity;
 import android.content.ClipboardManager;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog.Builder;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -183,6 +187,50 @@ public class Utils {
     public static void openUrlPage(String url) {
         STARTER_ACTIVITY.startActivity(new Intent(Intent.ACTION_VIEW)
                 .setData(Uri.parse(url)));
+    }
+
+    /**
+     * Method to create an {@link Builder}
+     *
+     * @param title:          title of the alert
+     * @param message:        message of the alert
+     * @param negativeText:   negative text
+     * @param negativeAction: negative action to do
+     * @param positiveText:   positive text
+     * @param positiveAction: positive action to do
+     * @param activity:       activity where is to show
+     * @return an alert as {@link Builder}
+     */
+    @Wrapper
+    public static Builder createAlertDialog(int title, int message, int negativeText,
+                                            OnClickListener negativeAction, int positiveText,
+                                            OnClickListener positiveAction, Activity activity) {
+        return createAlertDialog(STARTER_ACTIVITY.getString(title),
+                STARTER_ACTIVITY.getString(message), STARTER_ACTIVITY.getString(negativeText),
+                negativeAction, STARTER_ACTIVITY.getString(positiveText), positiveAction, activity);
+    }
+
+    /**
+     * Method to create an {@link Builder}
+     *
+     * @param title:          title of the alert
+     * @param message:        message of the alert
+     * @param negativeText:   negative text
+     * @param negativeAction: negative action to do
+     * @param positiveText:   positive text
+     * @param positiveAction: positive action to do
+     * @param activity:       activity where is to show
+     * @return an alert as {@link Builder}
+     */
+    public static Builder createAlertDialog(String title, String message, String negativeText,
+                                            OnClickListener negativeAction, String positiveText,
+                                            OnClickListener positiveAction, Activity activity) {
+        Builder alert = new Builder(activity);
+        alert.setTitle(title);
+        alert.setMessage(message);
+        alert.setNegativeButton(negativeText, negativeAction);
+        alert.setPositiveButton(positiveText, positiveAction);
+        return alert;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.tecknobit.glider.ui.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -11,12 +12,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.ui.activities.MainActivity;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
@@ -29,6 +33,16 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.tecknobit.glider.R.string.host_hint;
+import static com.tecknobit.glider.R.string.host_is_required;
+import static com.tecknobit.glider.R.string.host_port_hint;
+import static com.tecknobit.glider.R.string.host_port_is_required;
+import static com.tecknobit.glider.R.string.invalid_host_address;
+import static com.tecknobit.glider.R.string.password_connect_hint;
+import static com.tecknobit.glider.R.string.password_is_required;
+import static com.tecknobit.glider.R.string.qrcode_reading_error;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.HOST_ADDRESS_KEY;
@@ -53,11 +67,28 @@ import static java.lang.Integer.parseInt;
 public class Connect extends FormFragment implements OnClickListener {
 
     /**
+     * {@code barcodeLauncher} instance to launch a barcode scanning
+     **/
+    private final ActivityResultLauncher<ScanOptions> barcodeLauncher;
+
+    /**
      * Required empty public constructor for the normal Android's workflow
      **/
     public Connect() {
         textInputLayouts = new TextInputLayout[3];
         textInputEditTexts = new TextInputEditText[3];
+        barcodeLauncher = registerForActivityResult(new ScanContract(), result -> {
+            String contents = result.getContents();
+            if (contents == null)
+                showSnackbar(viewContainer, getString(qrcode_reading_error));
+            else {
+                // TODO: 06/01/2023 CUSTOMIZE SCANNER 
+                Dialog dialog = new Dialog(STARTER_ACTIVITY);
+                dialog.setContentView(R.layout.connect_dialog);
+                dialog.getWindow().setLayout(MATCH_PARENT, WRAP_CONTENT);
+                dialog.show();
+            }
+        });
     }
 
     /**
@@ -105,7 +136,7 @@ public class Connect extends FormFragment implements OnClickListener {
         instantiateInputs(view, new int[]{R.id.hostLayout, R.id.passwordLayout, R.id.portLayout},
                 new int[]{R.id.hostInput, R.id.passwordInput, R.id.portInput});
         startInputsListenWorkflow();
-        for (int id : new int[]{R.id.connectBtn, R.id.gitLink, R.id.gitIcon})
+        for (int id : new int[]{R.id.scanner, R.id.connectBtn, R.id.gitLink, R.id.gitIcon})
             view.findViewById(id).setOnClickListener(this);
     }
 
@@ -114,13 +145,13 @@ public class Connect extends FormFragment implements OnClickListener {
      **/
     @Override
     protected void loadInputMessagesLists() {
-        inputsErrors.put(0, getString(R.string.host_is_required));
-        inputsErrors.put(1, getString(R.string.password_is_required));
-        inputsErrors.put(2, getString(R.string.host_port_is_required));
-        inputsErrors.put(4, getString(R.string.invalid_host_address));
-        inputsHints.put(0, getString(R.string.host_hint));
-        inputsHints.put(1, getString(R.string.password_connect_hint));
-        inputsHints.put(2, getString(R.string.host_port_hint));
+        inputsErrors.put(0, getString(host_is_required));
+        inputsErrors.put(1, getString(password_is_required));
+        inputsErrors.put(2, getString(host_port_is_required));
+        inputsErrors.put(4, getString(invalid_host_address));
+        inputsHints.put(0, getString(host_hint));
+        inputsHints.put(1, getString(password_connect_hint));
+        inputsHints.put(2, getString(host_port_hint));
     }
 
     /**
@@ -197,6 +228,12 @@ public class Connect extends FormFragment implements OnClickListener {
     @SuppressLint("NonConstantResourceId")
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.scanner -> {
+                ScanOptions scanOptions = new ScanOptions();
+                scanOptions.setBeepEnabled(false);
+                scanOptions.setOrientationLocked(false);
+                barcodeLauncher.launch(scanOptions);
+            }
             case R.id.connectBtn -> {
                 hideKeyBoard(v);
                 JSONObject payload = getRequestPayload();

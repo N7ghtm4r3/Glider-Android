@@ -88,7 +88,7 @@ public class Update extends Fragment implements View.OnClickListener {
             idsBtn = new int[]{R.id.keepBnt, R.id.updateBnt, R.id.exitBnt};
         for (int btn : idsBtn)
             view.findViewById(btn).setOnClickListener(this);
-        ((MaterialTextView) view.findViewById(R.id.versionText)).setText("v." + User.UPDATE_VERSION);
+        ((MaterialTextView) view.findViewById(R.id.versionText)).setText("v." + User.LATEST_VERSION);
     }
 
     /**

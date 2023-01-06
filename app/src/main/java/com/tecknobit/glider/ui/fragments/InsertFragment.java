@@ -40,8 +40,8 @@ public class InsertFragment extends FormFragment {
      * Required empty public constructor for the normal Android's workflow
      **/
     public InsertFragment() {
-        textInputLayouts = new TextInputLayout[2];
-        textInputEditTexts = new TextInputEditText[2];
+        textInputLayouts = new TextInputLayout[3];
+        textInputEditTexts = new TextInputEditText[3];
     }
 
     /**
@@ -85,8 +85,8 @@ public class InsertFragment extends FormFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        instantiateInputs(view, new int[]{R.id.tailLayout, R.id.passwordLayout},
-                new int[]{R.id.tailInput, R.id.passwordInput});
+        instantiateInputs(view, new int[]{R.id.tailLayout, R.id.passwordLayout, R.id.scopesLayout},
+                new int[]{R.id.tailInput, R.id.passwordInput, R.id.scopesInput});
         view.findViewById(R.id.insertBtn).setOnClickListener(v -> {
             hideKeyBoard(v);
             enableEditTexts(false);
@@ -110,6 +110,7 @@ public class InsertFragment extends FormFragment {
         inputsErrors.put(1, getString(R.string.password_is_required));
         inputsHints.put(0, getString(R.string.tail_hint));
         inputsHints.put(1, getString(R.string.password_hint));
+        inputsHints.put(2, getString(R.string.scopes_hint));
     }
 
     /**
@@ -121,30 +122,40 @@ public class InsertFragment extends FormFragment {
         for (int j = 0; j < textInputLayouts.length; j++) {
             int finalJ = j;
             textInputLayouts[j].setStartIconOnClickListener(v -> {
-                String required = getString(R.string.required);
-                if (textInputLayouts[finalJ].getHelperText().equals(required))
-                    setHelperTextLayout(textInputLayouts[finalJ], inputsHints.get(finalJ));
-                else
-                    setHelperTextLayout(textInputLayouts[finalJ], getString(R.string.required));
-            });
-            textInputEditTexts[finalJ].addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (before > 0 && start + count == 0)
-                        textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (s.length() > 0)
-                        textInputLayouts[finalJ].setError(null);
+                if (finalJ != 2) {
+                    String required = getString(R.string.required);
+                    if (textInputLayouts[finalJ].getHelperText().equals(required))
+                        setHelperTextLayout(textInputLayouts[finalJ], inputsHints.get(finalJ));
+                    else
+                        setHelperTextLayout(textInputLayouts[finalJ], getString(R.string.required));
+                } else {
+                    String defHint = getString(R.string.scopes_must_be_divided_by);
+                    if (textInputLayouts[finalJ].getHelperText().equals(defHint))
+                        textInputLayouts[finalJ].setHelperText(inputsHints.get(finalJ));
+                    else
+                        textInputLayouts[finalJ].setHelperText(defHint);
                 }
             });
+            if (finalJ != 2) {
+                textInputEditTexts[finalJ].addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (before > 0 && start + count == 0)
+                            textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (s.length() > 0)
+                            textInputLayouts[finalJ].setError(null);
+                    }
+                });
+            }
         }
     }
 

@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -124,19 +125,21 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
                 int hintId, helperTextId, errorId, successId;
                 String ope;
                 holder.scopesLayout.setVisibility(View.GONE);
-                holder.scopeLayout.setVisibility(View.VISIBLE);
                 if (sPosition == parent.getLastVisiblePosition()) {
                     hintId = new_scope;
                     helperTextId = scope_hint;
                     errorId = new_scope_is_required;
                     successId = new_scope_inserted_successfully;
                     ope = "add_more"; // TODO: 20/12/2022 TO CHANGE
+                    holder.scopeLayout.setVisibility(View.VISIBLE);
                 } else {
                     hintId = the_scope_edited;
                     helperTextId = edit_the_current_scope;
                     errorId = scope_must_be_filled;
                     successId = current_scope_edited_successfully;
                     ope = "edit_current"; // TODO: 20/12/2022 TO CHANGE
+                    holder.scopeActions.setVisibility(View.VISIBLE);
+                    holder.scopeValue.setText(holder.scopes.getText());
                 }
                 holder.scope.setHint(hintId);
                 holder.scope.setHintTextColor(COLOR_PRIMARY);
@@ -259,7 +262,8 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
 
     /**
      * Method to refresh the current {@link #passwords} list with a new list <br>
-     * Any params required
+     *
+     * @param passwords: new passwords list
      */
     @SuppressLint("NotifyDataSetChanged")
     public void refreshPasswordsList(ArrayList<Password> passwords) {
@@ -323,6 +327,16 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
         private final AutoCompleteTextView scopes;
 
         /**
+         * {@code scopeActions} {@link RelativeLayout} for the scope actions
+         **/
+        private final RelativeLayout scopeActions;
+
+        /**
+         * {@code scopeValue} view of the scope to make an action on
+         **/
+        private final MaterialTextView scopeValue;
+
+        /**
          * {@code password} view
          **/
         private final AutoCompleteTextView password;
@@ -343,13 +357,17 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
             scopesLayout = itemView.findViewById(R.id.scopesLayout);
             scopeLayout = itemView.findViewById(R.id.scopeLayout);
             scope = itemView.findViewById(R.id.scope);
+            scopeActions = itemView.findViewById(R.id.relScopeActions);
+            scopeValue = itemView.findViewById(R.id.scopeText);
             scopes = itemView.findViewById(R.id.scopes);
             password = itemView.findViewById(R.id.password);
             actionBtn = itemView.findViewById(R.id.actionBtn);
             actionBtn.setOnClickListener(this);
-            itemView.findViewById(R.id.deleteBtn).setOnClickListener(this);
+            for (int btn : new int[]{R.id.deleteBtn, R.id.editBtn, R.id.removeBtn,
+                    R.id.closeScopeActions}) {
+                itemView.findViewById(btn).setOnClickListener(this);
+            }
         }
-
 
         /**
          * {@inheritDoc}
@@ -376,7 +394,26 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
                         Utils.showSnackbar(v, "RECOVERED");
                     }
                 }
+                case R.id.editBtn -> {
+                    scopeActions.setVisibility(View.GONE);
+                    scopeLayout.setVisibility(View.VISIBLE);
+                }
+                case R.id.removeBtn -> {
+                    // TODO: 06/01/2023 REQUEST THEN
+                    showSnackbar(v, MAIN_ACTIVITY.getString(R.string.scope_removed_successfully));
+                    restoreScopesLayout();
+                }
+                case R.id.closeScopeActions -> restoreScopesLayout();
             }
+        }
+
+        /**
+         * Method to re-set the {@link #scopesLayout} <br>
+         * Any params required
+         */
+        private void restoreScopesLayout() {
+            scopeActions.setVisibility(View.GONE);
+            scopesLayout.setVisibility(View.VISIBLE);
         }
 
     }

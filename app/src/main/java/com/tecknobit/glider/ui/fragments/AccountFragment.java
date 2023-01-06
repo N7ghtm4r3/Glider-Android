@@ -124,9 +124,9 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
         for (int btn : new int[]{R.id.deleteBtn, R.id.logoutBtn})
             view.findViewById(btn).setOnClickListener(this);
         final String[] keysViews = new String[]{HOST_ADDRESS_KEY, HOST_PORT_KEY, SERVER_STATUS_KEY,
-                SINGLE_USE_MODE_KEY, QR_CODE_LOGIN_KEY};
+                SINGLE_USE_MODE_KEY, QR_CODE_LOGIN_KEY, "run_in_localhost"};
         final int[] idsViews = new int[]{R.id.host_address, R.id.host_port, R.id.server_status,
-                R.id.single_use_mode, R.id.qr_code_login};
+                R.id.single_use_mode, R.id.qr_code_login, R.id.localhostValue};
         for (int j = 0; j < idsViews.length; j++)
             textViews.put(keysViews[j], view.findViewById(idsViews[j]));
         devicesCardView = view.findViewById(R.id.devicesCard);
@@ -224,6 +224,7 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
                 accountPayload.put(SERVER_STATUS_KEY, "prova" + new Random().nextInt());
                 accountPayload.put(SINGLE_USE_MODE_KEY, new Random().nextBoolean());
                 accountPayload.put(QR_CODE_LOGIN_KEY, "prova" + new Random().nextInt());
+                accountPayload.put("run_in_localhost", new Random().nextBoolean());
                 for (Iterator<String> it = accountPayload.keys(); it.hasNext(); ) {
                     String key = it.next();
                     String value = accountPayload.get(key).toString();

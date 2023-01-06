@@ -11,7 +11,7 @@ public class User {
     /**
      * {@code SECRET_KEY} secret key used during the communication with the backend service
      */
-    public static String SECRET_KEY = "null";
+    public static String SECRET_KEY = null;
 
     /**
      * {@code IS_UPDATED} whether the current version of the app is the latest available

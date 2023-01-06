@@ -179,6 +179,32 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:id="@+id/linLocalhost"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/linQRLogin"
+                        android:layout_marginStart="5dp"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/localhost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/only_in_localhost"
+                            android:textColor="@color/red"
+                            android:textSize="20sp" />
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/localhostValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text="TRUE"
+                            android:textSize="18sp" />
+
+                    </LinearLayout>
+
                     <RelativeLayout
                         android:id="@+id/linBtn"
                         android:layout_width="match_parent"
@@ -208,7 +234,7 @@
                         android:id="@+id/divider"
                         android:layout_width="fill_parent"
                         android:layout_height="2dp"
-                        android:layout_below="@id/linQRLogin"
+                        android:layout_below="@id/linLocalhost"
                         android:background="@color/background" />
 
                     <com.google.android.material.textview.MaterialTextView

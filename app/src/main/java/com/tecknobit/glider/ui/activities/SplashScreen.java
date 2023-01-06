@@ -68,6 +68,8 @@ public class SplashScreen extends AppCompatActivity {
             public void onFinish() {
                 if (start) {
                     // TODO: 23/12/2022 CHANGE WITH THE REAL WORKFLOW
+                    User.SECRET_KEY = "ga";
+                    User.IS_UPDATED = true;
                     if (User.SECRET_KEY != null) {
                         if (User.IS_UPDATED)
                             startActivity(new Intent(SplashScreen.this, MainActivity.class));

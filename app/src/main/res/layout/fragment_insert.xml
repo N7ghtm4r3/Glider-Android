@@ -31,9 +31,9 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/insertBtn"
         style="@style/ButtonLayout"
-        android:layout_below="@id/passwordLayout"
+        android:layout_below="@id/scopesLayout"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:text="@string/insert" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tailLayout"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="20dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/passwordInput"
@@ -50,6 +50,29 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:maxLength="32"
+            android:singleLine="true"
+            android:textColor="@color/primary"
+            android:textSize="17sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/scopesLayout"
+        style="@style/TextLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordLayout"
+        android:layout_marginTop="20dp"
+        android:hint="@string/scopes"
+        app:counterEnabled="false"
+        app:helperText="@string/scopes_must_be_divided_by"
+        app:helperTextTextColor="@color/primary">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/scopesInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textAutoComplete"
             android:singleLine="true"
             android:textColor="@color/primary"
             android:textSize="17sp" />

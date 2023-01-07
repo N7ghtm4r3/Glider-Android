@@ -116,7 +116,7 @@ public class Utils {
      *
      * @param view: source view from hide the keyboard
      */
-    public static void hideKeyBoard(View view) {
+    public static void hideKeyboard(View view) {
         ((InputMethodManager) STARTER_ACTIVITY.getSystemService(INPUT_METHOD_SERVICE))
                 .hideSoftInputFromWindow(view.getWindowToken(), 0);
     }

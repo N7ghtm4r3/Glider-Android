@@ -23,7 +23,7 @@ import org.json.JSONObject;
 import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.TAIL_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 
 /**
@@ -88,7 +88,7 @@ public class InsertFragment extends FormFragment {
         instantiateInputs(view, new int[]{R.id.tailLayout, R.id.passwordLayout, R.id.scopesLayout},
                 new int[]{R.id.tailInput, R.id.passwordInput, R.id.scopesInput});
         view.findViewById(R.id.insertBtn).setOnClickListener(v -> {
-            hideKeyBoard(v);
+            hideKeyboard(v);
             enableEditTexts(false);
             JSONObject payload = getRequestPayload();
             if (payload != null) {

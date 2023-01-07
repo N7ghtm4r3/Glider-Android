@@ -42,7 +42,7 @@ import static androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.copyText;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.toImport.Password.passwords;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 import static com.tecknobit.glider.ui.activities.MainActivity.navController;
@@ -158,7 +158,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
                         Status.DELETED));
             }
             // TODO: 21/12/2022 END REMOVE THIS SNIPPET
-            hideKeyBoard(viewContainer);
+            hideKeyboard(viewContainer);
             loadRecycler();
             swipeRefreshLayout.setRefreshing(false);
         });
@@ -172,7 +172,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
     private void startSearchViewWorkflow() {
         ((TextInputLayout) viewContainer.findViewById(R.id.searchView)).setEndIconOnClickListener(v -> {
             search.setText("");
-            hideKeyBoard(v);
+            hideKeyboard(v);
             viewContainer.clearFocus();
             passwordsAdapter.resetPasswordsList();
         });
@@ -199,7 +199,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
         });
         search.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                hideKeyBoard(v);
+                hideKeyboard(v);
                 viewContainer.clearFocus();
                 return true;
             }

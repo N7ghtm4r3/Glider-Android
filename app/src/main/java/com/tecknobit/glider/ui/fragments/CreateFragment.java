@@ -35,7 +35,7 @@ import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_MIN_LENGTH;
 import static com.tecknobit.glider.helpers.local.Utils.SCOPES_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.TAIL_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 
 /**
@@ -197,7 +197,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
         switch (v.getId()) {
             case R.id.createBtn -> {
                 if (createBtn.getText().equals(getString(R.string.create))) {
-                    hideKeyBoard(v);
+                    hideKeyboard(v);
                     enableEditTexts(false);
                     JSONObject payload = getRequestPayload();
                     if (payload != null) {

@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- UI COLORS -->
     <color name="primary">#1E1E8D</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="red">#A81515</color>
-    <color name="green">#198C49</color>
     <color name="background">#FAEDE1E1</color>
     <color name="backgroundCardView">#FAFAF3F3</color>
+
+    <!-- SCANNER COLORS -->
+    <color name="zxing_viewfinder_laser">#FAEDE1E1</color>
+    <color name="zxing_possible_result_points">#A81515</color>
+    <color name="zxing_transparent">#00000000</color>
+    <color name="zxing_viewfinder_mask">#1E1E8D</color>
+
 </resources>

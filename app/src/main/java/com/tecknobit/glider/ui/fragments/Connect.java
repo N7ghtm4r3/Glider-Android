@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -29,17 +31,14 @@ import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
-
+import static android.graphics.Color.TRANSPARENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.tecknobit.glider.R.string.host_hint;
 import static com.tecknobit.glider.R.string.host_is_required;
 import static com.tecknobit.glider.R.string.host_port_hint;
 import static com.tecknobit.glider.R.string.host_port_is_required;
-import static com.tecknobit.glider.R.string.invalid_host_address;
+import static com.tecknobit.glider.R.string.ope_failed;
 import static com.tecknobit.glider.R.string.password_connect_hint;
 import static com.tecknobit.glider.R.string.password_is_required;
 import static com.tecknobit.glider.R.string.qrcode_reading_error;
@@ -49,7 +48,7 @@ import static com.tecknobit.glider.helpers.local.Utils.HOST_ADDRESS_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.HOST_PORT_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.openUrlPage;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
@@ -82,10 +81,52 @@ public class Connect extends FormFragment implements OnClickListener {
             if (contents == null)
                 showSnackbar(viewContainer, getString(qrcode_reading_error));
             else {
-                // TODO: 06/01/2023 CUSTOMIZE SCANNER 
                 Dialog dialog = new Dialog(STARTER_ACTIVITY);
                 dialog.setContentView(R.layout.connect_dialog);
-                dialog.getWindow().setLayout(MATCH_PARENT, WRAP_CONTENT);
+                Window window = dialog.getWindow();
+                window.setBackgroundDrawable(new ColorDrawable(TRANSPARENT));
+                window.setLayout(MATCH_PARENT, WRAP_CONTENT);
+                TextInputLayout lPassword = dialog.findViewById(R.id.passwordLayout);
+                TextInputEditText password = dialog.findViewById(R.id.passwordInput);
+                setStartIconActions(lPassword, 1);
+                password.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (before > 0 && start + count == 0)
+                            lPassword.setError(inputsErrors.get(1));
+                        else
+                            lPassword.setError(null);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (s.length() > 0)
+                            lPassword.setError(null);
+                    }
+                });
+                dialog.findViewById(R.id.dismiss).setOnClickListener(v -> dialog.dismiss());
+                dialog.findViewById(R.id.connect).setOnClickListener(v -> {
+                    try {
+                        JSONObject credentials = new JSONObject(contents);
+                        textInputEditTexts[0].setText(credentials.getString(HOST_ADDRESS_KEY));
+                        textInputEditTexts[1].setText(getTextFromEdit(password));
+                        textInputEditTexts[2].setText(credentials.getString(HOST_PORT_KEY));
+                        JSONObject payload = getRequestPayload();
+                        if (payload != null) {
+                            // TODO: 07/01/2023 REQUEST THEN
+                            startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
+                        } else
+                            dialog.dismiss();
+                    } catch (JSONException e) {
+                        dialog.dismiss();
+                        showSnackbar(viewContainer, ope_failed);
+                    }
+                });
                 dialog.show();
             }
         });
@@ -148,7 +189,6 @@ public class Connect extends FormFragment implements OnClickListener {
         inputsErrors.put(0, getString(host_is_required));
         inputsErrors.put(1, getString(password_is_required));
         inputsErrors.put(2, getString(host_port_is_required));
-        inputsErrors.put(4, getString(invalid_host_address));
         inputsHints.put(0, getString(host_hint));
         inputsHints.put(1, getString(password_connect_hint));
         inputsHints.put(2, getString(host_port_hint));
@@ -162,17 +202,7 @@ public class Connect extends FormFragment implements OnClickListener {
         super.startInputsListenWorkflow();
         for (int j = 0; j < textInputLayouts.length; j++) {
             int finalJ = j;
-            textInputLayouts[j].setStartIconOnClickListener(v -> {
-                String required = getString(R.string.required);
-                hideKeyBoard(viewContainer);
-                if (textInputLayouts[finalJ].getHelperText().equals(required)) {
-                    textInputLayouts[finalJ].setHelperText(inputsHints.get(finalJ));
-                    textInputLayouts[finalJ].setHelperTextColor(ColorStateList.valueOf(COLOR_PRIMARY));
-                } else {
-                    textInputLayouts[finalJ].setHelperText(required);
-                    textInputLayouts[finalJ].setHelperTextColor(ColorStateList.valueOf(COLOR_RED));
-                }
-            });
+            setStartIconActions(textInputLayouts[j], j);
             textInputEditTexts[finalJ].addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -222,6 +252,26 @@ public class Connect extends FormFragment implements OnClickListener {
     }
 
     /**
+     * Method to set the start icon actions of {@link TextInputLayout} when pressed
+     *
+     * @param layout: layout where set the start icon actions
+     * @param index:  index of the hint to show
+     */
+    private void setStartIconActions(TextInputLayout layout, int index) {
+        layout.setStartIconOnClickListener(v -> {
+            String required = getString(R.string.required);
+            hideKeyboard(viewContainer);
+            if (layout.getHelperText().equals(required)) {
+                layout.setHelperText(inputsHints.get(index));
+                layout.setHelperTextColor(ColorStateList.valueOf(COLOR_PRIMARY));
+            } else {
+                layout.setHelperText(required);
+                layout.setHelperTextColor(ColorStateList.valueOf(COLOR_RED));
+            }
+        });
+    }
+
+    /**
      * {@inheritDoc}
      **/
     @Override
@@ -232,10 +282,11 @@ public class Connect extends FormFragment implements OnClickListener {
                 ScanOptions scanOptions = new ScanOptions();
                 scanOptions.setBeepEnabled(false);
                 scanOptions.setOrientationLocked(false);
+                scanOptions.setPrompt(getString(R.string.qrcode_prompt));
                 barcodeLauncher.launch(scanOptions);
             }
             case R.id.connectBtn -> {
-                hideKeyBoard(v);
+                hideKeyboard(v);
                 JSONObject payload = getRequestPayload();
                 if (payload != null) {
                     // TODO: 24/12/2022 REQUEST THEN
@@ -260,24 +311,18 @@ public class Connect extends FormFragment implements OnClickListener {
         String host = getTextFromEdit(textInputEditTexts[0]);
         try {
             if (!host.isEmpty()) {
+                JSONObject payload = new JSONObject().put(HOST_ADDRESS_KEY, host);
+                String password = getTextFromEdit(textInputEditTexts[1]);
+                if (!password.isEmpty())
+                    payload.put(PASSWORD_KEY, password);
+                else {
+                    showsError(1);
+                    return null;
+                }
                 try {
-                    new URL(host).toURI();
-                    JSONObject payload = new JSONObject().put(HOST_ADDRESS_KEY, host);
-                    String password = getTextFromEdit(textInputEditTexts[1]);
-                    if (!password.isEmpty())
-                        payload.put(PASSWORD_KEY, password);
-                    else {
-                        showsError(1);
-                        return null;
-                    }
-                    try {
-                        return payload.put(HOST_PORT_KEY, parseInt(getTextFromEdit(textInputEditTexts[2])));
-                    } catch (NumberFormatException e) {
-                        showsError(2);
-                        return null;
-                    }
-                } catch (MalformedURLException | URISyntaxException e) {
-                    showsError(4);
+                    return payload.put(HOST_PORT_KEY, parseInt(getTextFromEdit(textInputEditTexts[2])));
+                } catch (NumberFormatException e) {
+                    showsError(2);
                     return null;
                 }
             } else {
@@ -295,8 +340,6 @@ public class Connect extends FormFragment implements OnClickListener {
     @Override
     protected void showsError(int index) {
         String error = inputsErrors.get(index);
-        if (index == 4)
-            index = 0;
         textInputLayouts[index].setError(error);
         showSnackbar(viewContainer, error);
     }

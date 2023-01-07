@@ -44,7 +44,7 @@ import static com.tecknobit.glider.R.string.scope_must_be_filled;
 import static com.tecknobit.glider.R.string.the_scope_edited;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyBoard;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
@@ -167,13 +167,13 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
                     }
                 });
                 holder.scopeLayout.setEndIconOnClickListener(v -> {
-                    hideKeyBoard(v);
+                    hideKeyboard(v);
                     clearScopesLayout(holder);
                     holder.scopes.setText(holder.scopes.getAdapter().getItem(0).toString(),
                             false);
                 });
                 holder.scopeLayout.setStartIconOnClickListener(v -> {
-                    hideKeyBoard(v);
+                    hideKeyboard(v);
                     String newScope = getTextFromEdit(holder.scope);
                     if (!newScope.isEmpty()) {
                         // TODO: 20/12/2022 REQUEST THEN

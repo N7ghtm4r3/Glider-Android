@@ -66,10 +66,7 @@
     <string name="host_hint">Host address where you started the Glider\'s service</string>
     <string name="host_port_hint">Host port where you started the Glider\'s service</string>
     <string name="password_connect_hint">Password you choose to connect to the service</string>
-    <string name="invalid_host_address">Invalid host address</string>
     <string name="see_this_project_on">See this project on</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="new_version_available">New version available!</string>
     <string name="keep_this_version">KEEP THIS VERSION</string>
     <string name="update">Update</string>
@@ -84,4 +81,6 @@
     <string name="insert_password">Insert password</string>
     <string name="insert_password_message">Insert the password to connect to your Glider\'s service</string>
     <string name="dismiss">Dismiss</string>
+    <string name="ope_failed">Operation failed</string>
+    <string name="qrcode_prompt">Scan your Glider\'s QRCode to get the credentials</string>
 </resources>

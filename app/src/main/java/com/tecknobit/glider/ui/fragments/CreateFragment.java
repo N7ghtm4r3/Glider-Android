@@ -19,6 +19,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
@@ -47,6 +48,7 @@ import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
  * @see FormFragment
  * @see OnClickListener
  **/
+@SuppressLint("NonConstantResourceId")
 public class CreateFragment extends FormFragment implements OnClickListener {
 
     /**
@@ -55,6 +57,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      * @apiNote clicking on this will be copied the passowrd with the
      * {@link Utils#copyText(TextView, View)}
      **/
+    @ResId(id = R.id.passwordCard)
     private MaterialCardView passwordCardView;
 
     /**
@@ -62,11 +65,13 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      * @apiNote clicking on this will be copied the passowrd with the
      * {@link Utils#copyText(TextView, View)}
      * **/
+    @ResId(id = R.id.passwordCreated)
     private MaterialTextView passwordTextView;
 
     /**
      * {@code createBtn} button to make a request for the password creation
      * **/
+    @ResId(id = R.id.createBtn)
     private MaterialButton createBtn;
 
     /**
@@ -192,7 +197,6 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      * {@inheritDoc}
      */
     @Override
-    @SuppressLint("NonConstantResourceId")
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.createBtn -> {

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.helpers.toImport.Device;
@@ -121,31 +122,37 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      * @see RecyclerView.ViewHolder
      * @see View.OnClickListener
      **/
+    @SuppressLint("NonConstantResourceId")
     public static class DeviceView extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         /**
          * {@code name} of the device -> as view instance type
          **/
+        @ResId(id = R.id.deviceName)
         private final MaterialTextView name;
 
         /**
          * {@code deviceIconType} icon type of the device -> as view instance type
          **/
+        @ResId(id = R.id.deviceIconType)
         private final ShapeableImageView deviceIconType;
 
         /**
          * {@code ip} of the device -> as view instance type
          **/
+        @ResId(id = R.id.ipAddress)
         private final MaterialTextView ip;
 
         /**
          * {@code login} of the device -> as view instance type
          **/
+        @ResId(id = R.id.loginDate)
         private final MaterialTextView login;
 
         /**
          * {@code lastActivity} last activity of the device -> as view instance type
          **/
+        @ResId(id = R.id.lastActivity)
         private final MaterialTextView lastActivity;
 
         /**
@@ -166,7 +173,6 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
          * {@inheritDoc}
          */
         @Override
-        @SuppressLint("NonConstantResourceId")
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.blackListBtn -> {

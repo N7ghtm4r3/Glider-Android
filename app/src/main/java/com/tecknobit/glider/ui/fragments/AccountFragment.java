@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter;
 import com.tecknobit.glider.helpers.local.Utils;
@@ -33,6 +34,19 @@ import java.util.Random;
 
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
+import static com.tecknobit.glider.R.id.blackListBtn;
+import static com.tecknobit.glider.R.id.deleteBtn;
+import static com.tecknobit.glider.R.id.devicesCard;
+import static com.tecknobit.glider.R.id.devicesRecycler;
+import static com.tecknobit.glider.R.id.disconnectBtn;
+import static com.tecknobit.glider.R.id.host_address;
+import static com.tecknobit.glider.R.id.host_port;
+import static com.tecknobit.glider.R.id.localhostValue;
+import static com.tecknobit.glider.R.id.logoutBtn;
+import static com.tecknobit.glider.R.id.qr_code_login;
+import static com.tecknobit.glider.R.id.server_status;
+import static com.tecknobit.glider.R.id.single_use_mode;
+import static com.tecknobit.glider.R.id.swipe;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.HOST_ADDRESS_KEY;
@@ -56,11 +70,13 @@ import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
  * @see RealtimeRecyclerFragment
  * @see OnClickListener
  **/
+@SuppressLint("NonConstantResourceId")
 public class AccountFragment extends RealtimeRecyclerFragment implements OnClickListener {
 
     /**
      * {@code textViews} list of information {@link MaterialTextView} to fill
      **/
+    @ResId(ids = {host_address, host_port, server_status, single_use_mode, qr_code_login, localhostValue})
     private static final HashMap<String, MaterialTextView> textViews = new HashMap<>();
 
     /**
@@ -71,6 +87,7 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
     /**
      * {@code devicesCardView} view to show the {@link Device}'s list
      **/
+    @ResId(id = devicesCard)
     private MaterialCardView devicesCardView;
 
     /**
@@ -121,17 +138,17 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        for (int btn : new int[]{R.id.deleteBtn, R.id.logoutBtn})
+        for (int btn : new int[]{deleteBtn, logoutBtn})
             view.findViewById(btn).setOnClickListener(this);
         final String[] keysViews = new String[]{HOST_ADDRESS_KEY, HOST_PORT_KEY, SERVER_STATUS_KEY,
                 SINGLE_USE_MODE_KEY, QR_CODE_LOGIN_KEY, "run_in_localhost"};
-        final int[] idsViews = new int[]{R.id.host_address, R.id.host_port, R.id.server_status,
-                R.id.single_use_mode, R.id.qr_code_login, R.id.localhostValue};
+        final int[] idsViews = new int[]{host_address, host_port, server_status,
+                single_use_mode, qr_code_login, localhostValue};
         for (int j = 0; j < idsViews.length; j++)
             textViews.put(keysViews[j], view.findViewById(idsViews[j]));
-        devicesCardView = view.findViewById(R.id.devicesCard);
-        setRecycler(R.id.devicesRecycler, MAIN_ACTIVITY);
-        swipeRefreshLayout = view.findViewById(R.id.swipe);
+        devicesCardView = view.findViewById(devicesCard);
+        setRecycler(devicesRecycler, MAIN_ACTIVITY);
+        swipeRefreshLayout = view.findViewById(swipe);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             // TODO: 23/12/2022 REMOVE THIS SNIPPET
             devices.add(new Device("agaga", "111.112.33.11", "24/11/22", "24/11/22", Device.Type.values()[new Random().nextInt(2)]));
@@ -184,8 +201,8 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
                                     int actionState, boolean isCurrentlyActive) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
                 swipeRefreshLayout.setEnabled(false);
-                buttons[0] = viewHolder.itemView.findViewById(R.id.disconnectBtn);
-                buttons[1] = viewHolder.itemView.findViewById(R.id.blackListBtn);
+                buttons[0] = viewHolder.itemView.findViewById(disconnectBtn);
+                buttons[1] = viewHolder.itemView.findViewById(blackListBtn);
                 if (dX > 0) {
                     buttons[0].setTextColor(COLOR_RED);
                     buttons[1].setTextColor(COLOR_PRIMARY);
@@ -263,13 +280,12 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
      * {@inheritDoc}
      **/
     @Override
-    @SuppressLint("NonConstantResourceId")
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.deleteBtn -> {
+            case deleteBtn -> {
                 Utils.showSnackbar(v, "ACCOUNT DELETED");
             }
-            case R.id.logoutBtn -> {
+            case logoutBtn -> {
                 Utils.showSnackbar(v, "LOGOUT");
             }
         }

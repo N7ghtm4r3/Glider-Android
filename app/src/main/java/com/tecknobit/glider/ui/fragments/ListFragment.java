@@ -23,6 +23,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.adapters.PasswordsAdapter;
 import com.tecknobit.glider.helpers.local.Utils;
@@ -54,16 +55,19 @@ import static com.tecknobit.glider.ui.activities.MainActivity.navController;
  * @author Tecknobit - N7ghtm4r3
  * @see RealtimeRecyclerFragment
  **/
+@SuppressLint("NonConstantResourceId")
 public class ListFragment extends RealtimeRecyclerFragment {
 
     /**
      * {@code relList} view container to show when {@link #list} is filled
      **/
+    @ResId(id = R.id.relList)
     private RelativeLayout relList;
 
     /**
      * {@code noPasswordsText} view to show when {@link #list} is empty
      **/
+    @ResId(id = R.id.noPasswords)
     private MaterialTextView noPasswordsText;
 
     /**
@@ -80,6 +84,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
     /**
      * {@code search} view to create a query and filter the {@link #recyclerManager}
      **/
+    @ResId(id = R.id.searchQuery)
     private TextInputEditText search;
 
     /**

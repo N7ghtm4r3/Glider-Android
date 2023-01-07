@@ -23,6 +23,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
+import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.ui.activities.MainActivity;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
@@ -34,6 +35,7 @@ import org.json.JSONObject;
 import static android.graphics.Color.TRANSPARENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.tecknobit.glider.R.string.app_name;
 import static com.tecknobit.glider.R.string.host_hint;
 import static com.tecknobit.glider.R.string.host_is_required;
 import static com.tecknobit.glider.R.string.host_port_hint;
@@ -81,53 +83,61 @@ public class Connect extends FormFragment implements OnClickListener {
             if (contents == null)
                 showSnackbar(viewContainer, getString(qrcode_reading_error));
             else {
-                Dialog dialog = new Dialog(STARTER_ACTIVITY);
-                dialog.setContentView(R.layout.connect_dialog);
-                Window window = dialog.getWindow();
-                window.setBackgroundDrawable(new ColorDrawable(TRANSPARENT));
-                window.setLayout(MATCH_PARENT, WRAP_CONTENT);
-                TextInputLayout lPassword = dialog.findViewById(R.id.passwordLayout);
-                TextInputEditText password = dialog.findViewById(R.id.passwordInput);
-                setStartIconActions(lPassword, 1);
-                password.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                try {
+                    JSONObject credentials = new JSONObject(contents);
+                    if (JsonHelper.getString(credentials, "token", "not-valid")
+                            .equals(getString(app_name))) { // TODO: 07/01/2023 USE THE RIGHT KEY
+                        Dialog dialog = new Dialog(STARTER_ACTIVITY);
+                        dialog.setContentView(R.layout.connect_dialog);
+                        Window window = dialog.getWindow();
+                        window.setBackgroundDrawable(new ColorDrawable(TRANSPARENT));
+                        window.setLayout(MATCH_PARENT, WRAP_CONTENT);
+                        TextInputLayout lPassword = dialog.findViewById(R.id.passwordLayout);
+                        TextInputEditText password = dialog.findViewById(R.id.passwordInput);
+                        setStartIconActions(lPassword, 1);
+                        password.addTextChangedListener(new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                    }
+                            }
 
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (before > 0 && start + count == 0)
-                            lPassword.setError(inputsErrors.get(1));
-                        else
-                            lPassword.setError(null);
-                    }
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                if (before > 0 && start + count == 0)
+                                    lPassword.setError(inputsErrors.get(1));
+                                else
+                                    lPassword.setError(null);
+                            }
 
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (s.length() > 0)
-                            lPassword.setError(null);
-                    }
-                });
-                dialog.findViewById(R.id.dismiss).setOnClickListener(v -> dialog.dismiss());
-                dialog.findViewById(R.id.connect).setOnClickListener(v -> {
-                    try {
-                        JSONObject credentials = new JSONObject(contents);
-                        textInputEditTexts[0].setText(credentials.getString(HOST_ADDRESS_KEY));
-                        textInputEditTexts[1].setText(getTextFromEdit(password));
-                        textInputEditTexts[2].setText(credentials.getString(HOST_PORT_KEY));
-                        JSONObject payload = getRequestPayload();
-                        if (payload != null) {
-                            // TODO: 07/01/2023 REQUEST THEN
-                            startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
-                        } else
-                            dialog.dismiss();
-                    } catch (JSONException e) {
-                        dialog.dismiss();
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                if (s.length() > 0)
+                                    lPassword.setError(null);
+                            }
+                        });
+                        dialog.findViewById(R.id.dismiss).setOnClickListener(v -> dialog.dismiss());
+                        dialog.findViewById(R.id.connect).setOnClickListener(v -> {
+                            try {
+                                textInputEditTexts[0].setText(credentials.getString(HOST_ADDRESS_KEY));
+                                textInputEditTexts[1].setText(getTextFromEdit(password));
+                                textInputEditTexts[2].setText(credentials.getString(HOST_PORT_KEY));
+                                JSONObject payload = getRequestPayload();
+                                if (payload != null) {
+                                    // TODO: 07/01/2023 REQUEST THEN
+                                    startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
+                                } else
+                                    dialog.dismiss();
+                            } catch (JSONException e) {
+                                dialog.dismiss();
+                                showSnackbar(viewContainer, ope_failed);
+                            }
+                        });
+                        dialog.show();
+                    } else
                         showSnackbar(viewContainer, ope_failed);
-                    }
-                });
-                dialog.show();
+                } catch (JSONException e) {
+                    showSnackbar(viewContainer, ope_failed);
+                }
             }
         });
     }

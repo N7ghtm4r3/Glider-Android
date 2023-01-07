@@ -20,6 +20,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.helpers.toImport.Password;
@@ -299,51 +300,61 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
      * @see RecyclerView.ViewHolder
      * @see View.OnClickListener
      **/
+    @SuppressLint("NonConstantResourceId")
     public static class PasswordView extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         /**
          * {@code tail} view
          **/
+        @ResId(id = R.id.tail)
         private final MaterialTextView tail;
 
         /**
          * {@code scopesLayout} view for the scopes layout
          **/
+        @ResId(id = R.id.scopesLayout)
         private final TextInputLayout scopesLayout;
 
         /**
          * {@code scopeLayout} view for the scope layout
          **/
+        @ResId(id = R.id.scopeLayout)
         private final TextInputLayout scopeLayout;
 
         /**
          * {@code scope} view that can be filled with a scope
          **/
+        @ResId(id = R.id.scope)
         private final TextInputEditText scope;
 
         /**
          * {@code scopes} view for the scopes list
          **/
+        @ResId(id = R.id.scopes)
         private final AutoCompleteTextView scopes;
 
         /**
          * {@code scopeActions} {@link RelativeLayout} for the scope actions
          **/
+        @ResId(id = R.id.relScopeActions)
         private final RelativeLayout scopeActions;
 
         /**
          * {@code scopeValue} view of the scope to make an action on
          **/
+        @ResId(id = R.id.scopeText)
         private final MaterialTextView scopeValue;
 
         /**
          * {@code password} view
          **/
+        @ResId(id = R.id.password)
         private final AutoCompleteTextView password;
 
         /**
          * {@code actionBtn} the button that can {@code "copy"} or {@code "recover"} a password
          **/
+        @ResId(id = R.id.actionBtn)
         private final MaterialButton actionBtn;
 
         /**
@@ -373,7 +384,6 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
          * {@inheritDoc}
          * **/
         @Override
-        @SuppressLint("NonConstantResourceId")
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.deleteBtn -> {

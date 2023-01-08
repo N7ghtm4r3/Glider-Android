@@ -151,7 +151,8 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
         swipeRefreshLayout = view.findViewById(swipe);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             // TODO: 23/12/2022 REMOVE THIS SNIPPET
-            devices.add(new Device("agaga", "111.112.33.11", "24/11/22", "24/11/22", Device.Type.values()[new Random().nextInt(2)]));
+            devices.add(new Device("agaga", "111.112.33.11", "24/11/22", "24/11/22", Device.Type.values()[new Random().nextInt(2)],
+                    new Random().nextBoolean()));
             loadRecycler();
             swipeRefreshLayout.setRefreshing(false);
         });
@@ -191,28 +192,32 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 for (MaterialButton button : buttons)
                     button.setTextColor(COLOR_PRIMARY);
-                swipeRefreshLayout.setEnabled(true);
                 devicesAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setEnabled(true);
             }
 
             @Override
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
                                     @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
                                     int actionState, boolean isCurrentlyActive) {
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                swipeRefreshLayout.setEnabled(false);
-                buttons[0] = viewHolder.itemView.findViewById(disconnectBtn);
-                buttons[1] = viewHolder.itemView.findViewById(blackListBtn);
-                if (dX > 0) {
-                    buttons[0].setTextColor(COLOR_RED);
-                    buttons[1].setTextColor(COLOR_PRIMARY);
-                    // TODO: 23/12/2022 REQUEST THEN
-                    showSnackbar(viewContainer, "DISCONNECTED");
-                } else {
-                    buttons[1].setTextColor(COLOR_RED);
-                    buttons[0].setTextColor(COLOR_PRIMARY);
-                    // TODO: 23/12/2022 REQUEST THEN
-                    showSnackbar(viewContainer, "BLACKLISTED");
+                if (viewHolder.itemView.findViewById(R.id.unblacklistBtn).getVisibility() == View.GONE) {
+                    swipeRefreshLayout.setEnabled(false);
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState,
+                            isCurrentlyActive);
+                    buttons[0] = viewHolder.itemView.findViewById(disconnectBtn);
+                    buttons[1] = viewHolder.itemView.findViewById(blackListBtn);
+                    if (dX > 0) {
+                        buttons[0].setTextColor(COLOR_RED);
+                        buttons[1].setTextColor(COLOR_PRIMARY);
+                        // TODO: 23/12/2022 REQUEST THEN
+                        showSnackbar(viewContainer, "DISCONNECTED");
+                    } else {
+                        buttons[1].setTextColor(COLOR_RED);
+                        buttons[0].setTextColor(COLOR_PRIMARY);
+                        // TODO: 23/12/2022 REQUEST THEN
+                        showSnackbar(viewContainer, "BLACKLISTED");
+                        // TODO: 08/01/2023 CHECK WHEN THE DEVICE IS BLACKLISTED IF ITS LAYOUT CHANGE
+                    }
                 }
             }
 

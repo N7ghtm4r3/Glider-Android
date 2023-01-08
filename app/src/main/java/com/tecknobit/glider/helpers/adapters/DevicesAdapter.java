@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filterable;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.apimanager.annotations.android.ResId;
@@ -73,6 +75,10 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
                 getLocaleDate(device.getLoginDateTimestamp()));
         holder.lastActivity.setText(MAIN_ACTIVITY.getString(R.string.last_activity) + " " +
                 getLocaleDate(device.getLastActivityTimestamp()));
+        if (device.isBlacklisted()) {
+            holder.relActions.setVisibility(View.GONE);
+            holder.unblacklistBtn.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -156,6 +162,18 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
         private final MaterialTextView lastActivity;
 
         /**
+         * {@code relActions} view where are contained actions buttons
+         **/
+        @ResId(id = R.id.relActions)
+        private final RelativeLayout relActions;
+
+        /**
+         * {@code unblacklistBtn} button to unblacklist a {@link Device}
+         **/
+        @ResId(id = R.id.unblacklistBtn)
+        private final MaterialButton unblacklistBtn;
+
+        /**
          * {@inheritDoc}
          **/
         public DeviceView(@NonNull View itemView) {
@@ -165,6 +183,9 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
             ip = itemView.findViewById(R.id.ipAddress);
             login = itemView.findViewById(R.id.loginDate);
             lastActivity = itemView.findViewById(R.id.lastActivity);
+            relActions = itemView.findViewById(R.id.relActions);
+            unblacklistBtn = itemView.findViewById(R.id.unblacklistBtn);
+            unblacklistBtn.setOnClickListener(this);
             for (int btn : new int[]{R.id.blackListBtn, R.id.disconnectBtn})
                 itemView.findViewById(btn).setOnClickListener(this);
         }
@@ -178,10 +199,17 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
                 case R.id.blackListBtn -> {
                     // TODO: 23/12/2022 REQUEST THEN
                     Utils.showSnackbar(v, "BLACKLISTED");
+                    relActions.setVisibility(View.GONE);
+                    unblacklistBtn.setVisibility(View.VISIBLE);
                 }
                 case R.id.disconnectBtn -> {
                     // TODO: 23/12/2022 REQUEST THEN
                     Utils.showSnackbar(v, "DISCONNECTED");
+                }
+                case R.id.unblacklistBtn -> {
+                    Utils.showSnackbar(v, "UNBLACKLISTED");
+                    relActions.setVisibility(View.VISIBLE);
+                    unblacklistBtn.setVisibility(View.GONE);
                 }
             }
         }

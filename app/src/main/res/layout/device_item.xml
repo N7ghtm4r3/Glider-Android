@@ -41,7 +41,15 @@
 
         </RelativeLayout>
 
+        <View
+            android:id="@+id/nameDivider"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/relName"
+            android:background="@color/background" />
+
         <RelativeLayout
+            android:id="@+id/relActions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/lastActivity">
@@ -66,44 +74,11 @@
         </RelativeLayout>
 
         <View
-            android:id="@+id/ipDivider"
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:layout_below="@id/ipAddress"
-            android:background="@color/background" />
-
-        <View
             android:id="@+id/loginDateDivider"
             android:layout_width="fill_parent"
             android:layout_height="2dp"
             android:layout_below="@id/loginDate"
             android:background="@color/background" />
-
-        <View
-            android:id="@+id/lastActivityDivider"
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:layout_below="@id/lastActivity"
-            android:background="@color/background" />
-
-        <View
-            android:id="@+id/nameDivider"
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:layout_below="@id/relName"
-            android:background="@color/background" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/lastActivity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/loginDateDivider"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:text="@string/last_activity"
-            android:textSize="18sp" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/loginDate"
@@ -115,6 +90,43 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:text="@string/login_date"
+            android:textSize="18sp" />
+
+        <View
+            android:id="@+id/lastActivityDivider"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/lastActivity"
+            android:background="@color/background" />
+
+        <View
+            android:id="@+id/ipDivider"
+            android:layout_width="fill_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/ipAddress"
+            android:background="@color/background" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/unblacklistBtn"
+            style="@style/ReverseButtonLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="55dp"
+            android:layout_below="@id/lastActivity"
+            android:layout_centerHorizontal="true"
+            android:text="@string/unblacklist"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/lastActivity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/loginDateDivider"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="@string/last_activity"
             android:textSize="18sp" />
 
         <com.google.android.material.textview.MaterialTextView

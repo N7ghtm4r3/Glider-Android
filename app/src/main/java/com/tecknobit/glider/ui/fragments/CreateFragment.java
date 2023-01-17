@@ -14,11 +14,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.Utils;
@@ -38,6 +42,7 @@ import static com.tecknobit.glider.helpers.local.Utils.TAIL_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
  * The {@link CreateFragment} fragment is the section of the app where the password can be created
@@ -212,13 +217,40 @@ public class CreateFragment extends FormFragment implements OnClickListener {
                     } else
                         enableEditTexts(true);
                 } else
-                    clearViews();
+                    writeReview(false);
             }
-            case R.id.passwordCard, R.id.passwordCreated -> {
-                Utils.copyText(passwordTextView, v);
-                clearViews();
-            }
+            case R.id.passwordCard, R.id.passwordCreated -> writeReview(true);
         }
+    }
+
+    /**
+     * Method to get, <b>not every time, but a single one time</b> an user recension about Glider, but
+     * this will be invoke <b>ever</b> the {@link #endCreation(boolean)} method
+     *
+     * @param copyPassword: whether copy the password created
+     */
+    private void writeReview(boolean copyPassword) {
+        ReviewManager manager = ReviewManagerFactory.create(MAIN_ACTIVITY);
+        Task<ReviewInfo> request = manager.requestReviewFlow();
+        request.addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Task<Void> flow = manager.launchReviewFlow(MAIN_ACTIVITY, task.getResult());
+                flow.addOnCompleteListener(task1 -> endCreation(copyPassword));
+                flow.addOnFailureListener(task1 -> endCreation(copyPassword));
+            } else
+                endCreation(copyPassword);
+        });
+    }
+
+    /**
+     * Method to end the creation of the password creation
+     *
+     * @param copyPassword: whether copy the password created
+     */
+    private void endCreation(boolean copyPassword) {
+        if (copyPassword)
+            Utils.copyText(passwordTextView, viewContainer);
+        clearViews();
     }
 
     /**

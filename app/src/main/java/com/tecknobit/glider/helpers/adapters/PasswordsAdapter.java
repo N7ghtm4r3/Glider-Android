@@ -23,8 +23,8 @@ import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.Utils;
-import com.tecknobit.glider.helpers.toImport.Password;
-import com.tecknobit.glider.helpers.toImport.Password.Status;
+import com.tecknobit.glider.helpers.toImport.records.Password;
+import com.tecknobit.glider.helpers.toImport.records.Password.Status;
 
 import java.util.ArrayList;
 import java.util.Arrays;

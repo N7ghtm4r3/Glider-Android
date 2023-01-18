@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment;
 
 import org.json.JSONObject;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * The {@link GliderFragment} is the super class where a fragment inherit the base methods for the normal
  * {@code Glider}'s fragment workflow
@@ -14,6 +17,17 @@ import org.json.JSONObject;
  * @see Fragment
  **/
 public abstract class GliderFragment extends Fragment {
+
+    /**
+     * {@code executor} instance to manage the user communication with the backend with background
+     * process
+     */
+    protected static final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    /**
+     * {@code response} instance to contains the response from the backend
+     */
+    protected JSONObject response;
 
     /**
      * {@code viewContainer} the main view container of the {@link Fragment}

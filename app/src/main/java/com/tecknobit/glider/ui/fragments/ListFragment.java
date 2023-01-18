@@ -27,8 +27,8 @@ import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.adapters.PasswordsAdapter;
 import com.tecknobit.glider.helpers.local.Utils;
-import com.tecknobit.glider.helpers.toImport.Password;
-import com.tecknobit.glider.helpers.toImport.Password.Status;
+import com.tecknobit.glider.helpers.toImport.records.Password;
+import com.tecknobit.glider.helpers.toImport.records.Password.Status;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
 import org.json.JSONObject;
@@ -40,11 +40,11 @@ import java.util.Random;
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
 import static androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
+import static com.tecknobit.glider.helpers.local.User.passwords;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.copyText;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
-import static com.tecknobit.glider.helpers.toImport.Password.passwords;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 import static com.tecknobit.glider.ui.activities.MainActivity.navController;
 
@@ -321,24 +321,26 @@ public class ListFragment extends RealtimeRecyclerFragment {
                 list = passwords.get(Status.ACTIVE);
             else
                 list = passwords.get(Status.DELETED);
-            int passwordsSize = list.size();
-            if (currentRecyclerSize != passwordsSize) {
-                if (passwordsSize > 0) {
-                    noPasswordsText.setVisibility(View.GONE);
-                    relList.setVisibility(View.VISIBLE);
-                    if (passwordsAdapter == null) {
-                        passwordsAdapter = new PasswordsAdapter(list, recoveryMode);
-                        recyclerManager.setAdapter(passwordsAdapter);
-                    } else
-                        passwordsAdapter.refreshPasswordsList(list);
+            if (list != null) {
+                int passwordsSize = list.size();
+                if (currentRecyclerSize != passwordsSize) {
+                    if (passwordsSize > 0) {
+                        noPasswordsText.setVisibility(View.GONE);
+                        relList.setVisibility(View.VISIBLE);
+                        if (passwordsAdapter == null) {
+                            passwordsAdapter = new PasswordsAdapter(list, recoveryMode);
+                            recyclerManager.setAdapter(passwordsAdapter);
+                        } else
+                            passwordsAdapter.refreshPasswordsList(list);
+                    } else {
+                        noPasswordsText.setVisibility(View.VISIBLE);
+                        relList.setVisibility(View.GONE);
+                    }
+                    currentRecyclerSize = passwordsSize;
                 } else {
-                    noPasswordsText.setVisibility(View.VISIBLE);
-                    relList.setVisibility(View.GONE);
+                    if (passwordsSize > 0 && !list.equals(passwordsAdapter.getCurrentPasswords()))
+                        passwordsAdapter.notifyDataSetChanged();
                 }
-                currentRecyclerSize = passwordsSize;
-            } else {
-                if (passwordsSize > 0 && !list.equals(passwordsAdapter.getCurrentPasswords()))
-                    passwordsAdapter.notifyDataSetChanged();
             }
             handler.postDelayed(runnable, 5000);
         };

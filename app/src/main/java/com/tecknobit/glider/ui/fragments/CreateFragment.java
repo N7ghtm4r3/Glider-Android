@@ -34,14 +34,12 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_LENGTH_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_MAX_LENGTH;
-import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_MIN_LENGTH;
-import static com.tecknobit.glider.helpers.local.Utils.SCOPES_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.TAIL_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.toImport.records.Password.PASSWORD_MAX_LENGTH;
+import static com.tecknobit.glider.helpers.toImport.records.Password.PASSWORD_MIN_LENGTH;
+import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
@@ -265,15 +263,16 @@ public class CreateFragment extends FormFragment implements OnClickListener {
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
             if (!tail.isEmpty()) {
-                JSONObject payload = new JSONObject().put(TAIL_KEY, tail)
-                        .put(SCOPES_KEY, List.of(getTextFromEdit(textInputEditTexts[1]).split(",")));
+                JSONObject payload = new JSONObject().put(PasswordKeys.tail.name(), tail)
+                        .put(PasswordKeys.scopes.name(),
+                                List.of(getTextFromEdit(textInputEditTexts[1]).split(",")));
                 try {
                     int length = Integer.parseInt(getTextFromEdit(textInputEditTexts[2]));
                     if (length < PASSWORD_MIN_LENGTH || length > PASSWORD_MAX_LENGTH) {
                         showsError(1);
                         return null;
                     } else
-                        return payload.put(PASSWORD_LENGTH_KEY, length);
+                        return payload.put(PasswordKeys.length.name(), length);
                 } catch (NumberFormatException e) {
                     showsError(2);
                     return null;

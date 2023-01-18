@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.StrictMode;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -21,7 +22,6 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
 import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN;
 import static com.tecknobit.glider.helpers.local.User.IS_UPDATED;
-import static com.tecknobit.glider.helpers.local.User.SECRET_KEY;
 import static com.tecknobit.glider.helpers.local.User.user;
 
 /**
@@ -64,6 +64,8 @@ public class SplashScreen extends AppCompatActivity {
         setDefaultNightMode(MODE_NIGHT_NO);
         STARTER_ACTIVITY = this;
         user = new User();
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         Animation animation = AnimationUtils.loadAnimation(SplashScreen.this, R.anim.fadein);
         for (int id : new int[]{R.id.appName, R.id.byTecknobit})
             findViewById(id).startAnimation(animation);
@@ -77,9 +79,7 @@ public class SplashScreen extends AppCompatActivity {
             @Override
             public void onFinish() {
                 if (start) {
-                    // TODO: 23/12/2022 CHANGE WITH THE REAL WORKFLOW
-                    SECRET_KEY = null;
-                    if (SECRET_KEY != null) {
+                    if (user.getSecretKey() != null) {
                         if (IS_UPDATED)
                             startActivity(new Intent(SplashScreen.this, MainActivity.class));
                         else

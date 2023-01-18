@@ -15,7 +15,7 @@ import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.Utils;
-import com.tecknobit.glider.helpers.toImport.Device;
+import com.tecknobit.glider.helpers.toImport.records.Device;
 
 import java.text.DateFormat;
 import java.util.ArrayList;

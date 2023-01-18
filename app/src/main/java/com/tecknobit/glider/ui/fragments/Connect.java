@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +24,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
+import com.tecknobit.apimanager.apis.SocketManager;
+import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.ui.activities.MainActivity;
@@ -35,6 +38,7 @@ import org.json.JSONObject;
 import static android.graphics.Color.TRANSPARENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.glider.R.string.app_name;
 import static com.tecknobit.glider.R.string.host_hint;
 import static com.tecknobit.glider.R.string.host_is_required;
@@ -44,15 +48,26 @@ import static com.tecknobit.glider.R.string.ope_failed;
 import static com.tecknobit.glider.R.string.password_connect_hint;
 import static com.tecknobit.glider.R.string.password_is_required;
 import static com.tecknobit.glider.R.string.qrcode_reading_error;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
+import static com.tecknobit.glider.helpers.local.User.Operation.CONNECT;
+import static com.tecknobit.glider.helpers.local.User.Operation.GET_PUBLIC_KEYS;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
+import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
-import static com.tecknobit.glider.helpers.local.Utils.HOST_ADDRESS_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.HOST_PORT_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.openUrlPage;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostAddress;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostPort;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.ivSpec;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.secretKey;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.sessionPassword;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.token;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
 import static java.lang.Integer.parseInt;
 
@@ -85,8 +100,8 @@ public class Connect extends FormFragment implements OnClickListener {
             else {
                 try {
                     JSONObject credentials = new JSONObject(contents);
-                    if (JsonHelper.getString(credentials, "token", "not-valid")
-                            .equals(getString(app_name))) { // TODO: 07/01/2023 USE THE RIGHT KEY
+                    if (JsonHelper.getString(credentials, token.name(), "not-valid")
+                            .equals(getString(app_name))) {
                         Dialog dialog = new Dialog(STARTER_ACTIVITY);
                         dialog.setContentView(R.layout.connect_dialog);
                         Window window = dialog.getWindow();
@@ -118,16 +133,11 @@ public class Connect extends FormFragment implements OnClickListener {
                         dialog.findViewById(R.id.dismiss).setOnClickListener(v -> dialog.dismiss());
                         dialog.findViewById(R.id.connect).setOnClickListener(v -> {
                             try {
-                                textInputEditTexts[0].setText(credentials.getString(HOST_ADDRESS_KEY));
+                                textInputEditTexts[0].setText(credentials.getString(hostAddress.name()));
                                 textInputEditTexts[1].setText(getTextFromEdit(password));
-                                textInputEditTexts[2].setText(credentials.getString(HOST_PORT_KEY));
-                                JSONObject payload = getRequestPayload();
-                                if (payload != null) {
-                                    // TODO: 07/01/2023 REQUEST THEN
-                                    startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
-                                } else
-                                    dialog.dismiss();
-                            } catch (JSONException e) {
+                                textInputEditTexts[2].setText(credentials.getString(hostPort.name()));
+                                connect(dialog);
+                            } catch (Exception e) {
                                 dialog.dismiss();
                                 showSnackbar(viewContainer, ope_failed);
                             }
@@ -221,35 +231,8 @@ public class Connect extends FormFragment implements OnClickListener {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    String host = getTextFromEdit(textInputEditTexts[0]);
-                    String port = getTextFromEdit(textInputEditTexts[2]);
                     if (before > 0 && start + count == 0)
                         textInputLayouts[finalJ].setError(inputsErrors.get(finalJ));
-                    if (finalJ == 0) {
-                        if (!host.isEmpty()) {
-                            int k = 0;
-                            for (int j = 0; j < host.length(); j++)
-                                if (host.charAt(j) == ':')
-                                    k++;
-                            if (k == 2) {
-                                host = host.replace("://", "-");
-                                if (!host.endsWith(":")) {
-                                    String aPort = host.split(":")[1];
-                                    if (!port.equals(aPort))
-                                        textInputEditTexts[2].setText(aPort);
-                                }
-                            }
-                        }
-                    } else if (finalJ == 2 && !host.isEmpty()) {
-                        if (!port.isEmpty() && !host.endsWith(port)) {
-                            host = host.replace("://", "_");
-                            if (host.contains(":"))
-                                host = host.replace(host.split(":")[1], port);
-                            else
-                                host = host + ":" + port;
-                            textInputEditTexts[0].setText(host.replace("_", "://"));
-                        }
-                    }
                 }
 
                 @Override
@@ -297,14 +280,49 @@ public class Connect extends FormFragment implements OnClickListener {
             }
             case R.id.connectBtn -> {
                 hideKeyboard(v);
-                JSONObject payload = getRequestPayload();
-                if (payload != null) {
-                    // TODO: 24/12/2022 REQUEST THEN
-                    startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
-                }
+                connect(null);
             }
             case R.id.gitLink, R.id.gitIcon -> // TODO: 24/12/2022 CHECK IF LINK IS GLIDER OR GLIDER-ANDROID
                     openUrlPage("https://github.com/N7ghtm4r3/Glider-Android");
+        }
+    }
+
+    /**
+     * Method to connect the device with the own backend
+     *
+     * @param dialog: the dialog to dismiss if invoked from it
+     */
+    private void connect(Dialog dialog) {
+        try {
+            JSONObject payload = getRequestPayload();
+            socketManager = new SocketManager(payload.getString(hostAddress.name()),
+                    payload.getInt(hostPort.name()));
+            executor.execute(() -> {
+                try {
+                    socketManager.writeContent(payload.put(ope.name(), GET_PUBLIC_KEYS));
+                    response = new JSONObject(socketManager.readContent());
+                    STARTER_ACTIVITY.runOnUiThread(() -> {
+                        try {
+                            socketManager.setCipher(new ClientCipher(response.getString(ivSpec.name()),
+                                    response.getString(secretKey.name()), CBC_ALGORITHM));
+                            socketManager.writeContent(payload.put(name.name(), Build.MANUFACTURER)
+                                    .put(type.name(), MOBILE).put(ope.name(), CONNECT));
+                            String response = socketManager.readContent();
+                            user.saveSessionData(new JSONObject(response));
+                            startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
+                        } catch (Exception e) {
+                            showSnackbar(viewContainer, ope_failed);
+                        }
+                    });
+                } catch (Exception e) {
+                    showSnackbar(viewContainer, ope_failed);
+                }
+            });
+        } catch (Exception e) {
+            showSnackbar(viewContainer, ope_failed);
+        } finally {
+            if (dialog != null)
+                dialog.dismiss();
         }
     }
 
@@ -321,16 +339,16 @@ public class Connect extends FormFragment implements OnClickListener {
         String host = getTextFromEdit(textInputEditTexts[0]);
         try {
             if (!host.isEmpty()) {
-                JSONObject payload = new JSONObject().put(HOST_ADDRESS_KEY, host);
+                JSONObject payload = new JSONObject().put(hostAddress.name(), host);
                 String password = getTextFromEdit(textInputEditTexts[1]);
                 if (!password.isEmpty())
-                    payload.put(PASSWORD_KEY, password);
+                    payload.put(sessionPassword.name(), password);
                 else {
                     showsError(1);
                     return null;
                 }
                 try {
-                    return payload.put(HOST_PORT_KEY, parseInt(getTextFromEdit(textInputEditTexts[2])));
+                    return payload.put(hostPort.name(), parseInt(getTextFromEdit(textInputEditTexts[2])));
                 } catch (NumberFormatException e) {
                     showsError(2);
                     return null;

@@ -21,8 +21,9 @@ import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter;
+import com.tecknobit.glider.helpers.local.User.GliderKeys;
 import com.tecknobit.glider.helpers.local.Utils;
-import com.tecknobit.glider.helpers.toImport.Device;
+import com.tecknobit.glider.helpers.toImport.records.Device;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
 import org.json.JSONException;
@@ -47,15 +48,15 @@ import static com.tecknobit.glider.R.id.qr_code_login;
 import static com.tecknobit.glider.R.id.server_status;
 import static com.tecknobit.glider.R.id.single_use_mode;
 import static com.tecknobit.glider.R.id.swipe;
+import static com.tecknobit.glider.helpers.local.User.devices;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
-import static com.tecknobit.glider.helpers.local.Utils.HOST_ADDRESS_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.HOST_PORT_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.QR_CODE_LOGIN_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.SERVER_STATUS_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.SINGLE_USE_MODE_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
-import static com.tecknobit.glider.helpers.toImport.Device.devices;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostAddress;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostPort;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.qrCodeLogin;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.runInLocalhost;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.singleUseMode;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
@@ -140,8 +141,9 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
         super.onViewCreated(view, savedInstanceState);
         for (int btn : new int[]{deleteBtn, logoutBtn})
             view.findViewById(btn).setOnClickListener(this);
-        final String[] keysViews = new String[]{HOST_ADDRESS_KEY, HOST_PORT_KEY, SERVER_STATUS_KEY,
-                SINGLE_USE_MODE_KEY, QR_CODE_LOGIN_KEY, "run_in_localhost"};
+        final String[] keysViews = new String[]{hostAddress.name(), hostPort.name(),
+                GliderKeys.serverStatus.name(), singleUseMode.name(), qrCodeLogin.name(),
+                runInLocalhost.name()};
         final int[] idsViews = new int[]{host_address, host_port, server_status,
                 single_use_mode, qr_code_login, localhostValue};
         for (int j = 0; j < idsViews.length; j++)
@@ -241,16 +243,16 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
             // TODO: 23/12/2022 MODIFY THIS SNIPPET TO REFRESH ONLY THE CORRECT TEXTVIEW
             try {
                 JSONObject accountPayload = new JSONObject(); // TODO: 23/12/2022 obtained by request
-                accountPayload.put(HOST_ADDRESS_KEY, "prova" + new Random().nextInt());
-                accountPayload.put(HOST_PORT_KEY, "prova" + new Random().nextInt());
-                accountPayload.put(SERVER_STATUS_KEY, "prova" + new Random().nextInt());
-                accountPayload.put(SINGLE_USE_MODE_KEY, new Random().nextBoolean());
-                accountPayload.put(QR_CODE_LOGIN_KEY, "prova" + new Random().nextInt());
+                accountPayload.put(hostAddress.name(), "prova" + new Random().nextInt());
+                accountPayload.put(hostPort.name(), "prova" + new Random().nextInt());
+                accountPayload.put(GliderKeys.serverStatus.name(), "prova" + new Random().nextInt());
+                accountPayload.put(singleUseMode.name(), new Random().nextBoolean());
+                accountPayload.put(qrCodeLogin.name(), "prova" + new Random().nextInt());
                 accountPayload.put("run_in_localhost", new Random().nextBoolean());
                 for (Iterator<String> it = accountPayload.keys(); it.hasNext(); ) {
                     String key = it.next();
                     String value = accountPayload.get(key).toString();
-                    if (key.equals(SINGLE_USE_MODE_KEY)) {
+                    if (key.equals(singleUseMode.name())) {
                         if (Boolean.parseBoolean(value))
                             devicesCardView.setVisibility(View.GONE);
                         else
@@ -262,7 +264,7 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
             } catch (JSONException ignored) {
             }
             // TODO: 23/12/2022 END MODIFY THIS SNIPPET
-            if (textViews.get(SINGLE_USE_MODE_KEY).getVisibility() == View.VISIBLE) {
+            if (textViews.get(singleUseMode.name()).getVisibility() == View.VISIBLE) {
                 int currentSize = devices.size();
                 if (currentRecyclerSize != currentSize) {
                     if (devicesAdapter == null) {

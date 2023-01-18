@@ -14,14 +14,13 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
 import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.tecknobit.glider.helpers.local.Utils.PASSWORD_KEY;
-import static com.tecknobit.glider.helpers.local.Utils.TAIL_KEY;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
@@ -172,10 +171,10 @@ public class InsertFragment extends FormFragment {
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
             if (!tail.isEmpty()) {
-                JSONObject payload = new JSONObject().put(TAIL_KEY, tail);
+                JSONObject payload = new JSONObject().put(PasswordKeys.tail.name(), tail);
                 String password = getTextFromEdit(textInputEditTexts[1]);
                 if (!password.isEmpty())
-                    return payload.put(PASSWORD_KEY, password);
+                    return payload.put(PasswordKeys.password.name(), password);
                 else {
                     showsError(1);
                     return null;

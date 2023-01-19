@@ -31,8 +31,6 @@ import com.tecknobit.glider.helpers.toImport.records.Password;
 import com.tecknobit.glider.helpers.toImport.records.Password.Status;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -40,6 +38,7 @@ import java.util.Random;
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
 import static androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
+import static com.tecknobit.glider.helpers.local.User.Operation;
 import static com.tecknobit.glider.helpers.local.User.passwords;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
@@ -327,6 +326,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
                     if (passwordsSize > 0) {
                         noPasswordsText.setVisibility(View.GONE);
                         relList.setVisibility(View.VISIBLE);
+                        search.setVisibility(View.VISIBLE);
                         if (passwordsAdapter == null) {
                             passwordsAdapter = new PasswordsAdapter(list, recoveryMode);
                             recyclerManager.setAdapter(passwordsAdapter);
@@ -335,6 +335,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
                     } else {
                         noPasswordsText.setVisibility(View.VISIBLE);
                         relList.setVisibility(View.GONE);
+                        search.setVisibility(View.GONE);
                     }
                     currentRecyclerSize = passwordsSize;
                 } else {
@@ -353,8 +354,8 @@ public class ListFragment extends RealtimeRecyclerFragment {
     // TODO: 21/12/2022 LIST THE BEHAVIOURS OF THIS METHOD IN THE DOCU STRING IN BASE OF THE OPE PASSED AS ARGUMENT
     @Override
     @SafeVarargs
-    protected final <T> JSONObject getRequestPayload(T... parameters) {
-        return null;
+    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+        super.setRequestPayload(operation, parameters);
     }
 
 }

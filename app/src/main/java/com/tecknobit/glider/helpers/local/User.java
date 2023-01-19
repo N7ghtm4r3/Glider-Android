@@ -24,6 +24,7 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.content.pm.PackageManager.NameNotFoundException;
 import static com.google.firebase.database.FirebaseDatabase.getInstance;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
+import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.glider.helpers.local.User.GliderKeys.databasePath;
 import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
 import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.qrCodeLogin;
@@ -66,14 +67,23 @@ public class User extends Session {
     public User() {
         super(userShared.getString(SessionKeys.token.name(), null),
                 userShared.getString(SessionKeys.ivSpec.name(), null),
-                userShared.getString(SessionKeys.secretKey.name(), null), null,
+                userShared.getString(SessionKeys.secretKey.name(), null),
+                userShared.getString(SessionKeys.sessionPassword.name(), null),
                 userShared.getString(SessionKeys.hostAddress.name(), null),
                 userShared.getInt(SessionKeys.hostPort.name(), -1),
                 userShared.getBoolean(SessionKeys.singleUseMode.name(), true),
                 userShared.getBoolean(qrCodeLogin.name(), false),
                 userShared.getBoolean(SessionKeys.runInLocalhost.name(), true));
-        if (hostAddress != null)
-            socketManager = new SocketManager(hostAddress, hostPort);
+        if (hostAddress != null) {
+            if (secretKey != null) {
+                try {
+                    socketManager = new SocketManager(hostAddress, hostPort, ivSpec, secretKey, CBC_ALGORITHM);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else
+                socketManager = new SocketManager(hostAddress, hostPort);
+        }
         checkForUpdates();
     }
 
@@ -87,9 +97,6 @@ public class User extends Session {
      * @param sessionData: data of the session to save
      * @throws Exception when an error occurred
      */
-    // TODO: 18/01/2023 CLEAR USELESS DATA TO SAVE
-    //  PASS CORRECT DEVICE NAME
-    //  CREATE A DEFAULT PAYLOAD WITH DEVICE NAME AND OPE TO TO
     public void saveSessionData(JSONObject sessionData) throws Exception {
         if (!sessionData.getString(statusCode.name()).equals(FAILED.name())) {
             JSONObject jSession = sessionData.getJSONObject(session.name());

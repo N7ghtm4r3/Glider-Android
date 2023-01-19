@@ -1,13 +1,24 @@
 package com.tecknobit.glider.ui.fragments.parents;
 
+import android.os.Build;
 import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
+import com.tecknobit.glider.helpers.local.User.Operation;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
+import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.sessionPassword;
 
 /**
  * The {@link GliderFragment} is the super class where a fragment inherit the base methods for the normal
@@ -35,12 +46,49 @@ public abstract class GliderFragment extends Fragment {
     protected View viewContainer;
 
     /**
-     * Method to create the payload for a request <br>
+     * {@code payload} the payload to send with the request
+     **/
+    protected JSONObject payload;
+
+    /**
+     * Constructor to init {@link GliderFragment}
      *
-     * @param parameters: parameters to insert to invoke this method
-     * @return payload with the parameters inserted as {@link JSONObject}
+     * @apiNote will be instantiated the {@link #payload}
+     **/
+    protected GliderFragment() {
+        setBasePayload();
+    }
+
+    /**
+     * Method to create the payload for a request
+     *
+     * @param operation: operation to create the payload
+     * @param parameters : parameters to insert to invoke this method
      */
-    protected abstract <T> JSONObject getRequestPayload(T... parameters);
+    protected <T> void setRequestPayload(Operation operation, T... parameters) {
+        try {
+            if (payload == null)
+                setBasePayload();
+            payload.put(ope.name(), operation);
+        } catch (JSONException e) {
+            payload = null;
+        }
+    }
+
+    /**
+     * Method to set the base payload for a request <br>
+     * Any params required
+     */
+    private void setBasePayload() {
+        try {
+            payload = new JSONObject();
+            payload.put(name.name(), Build.MANUFACTURER + "-" + Build.DEVICE)
+                    .put(type.name(), MOBILE)
+                    .put(sessionPassword.name(), user.getSessionPassword());
+        } catch (JSONException e) {
+            payload = null;
+        }
+    }
 
     /**
      * Method to clear all views and set the {@link GliderFragment} in an initial state <br>

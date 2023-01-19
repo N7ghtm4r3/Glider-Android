@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,6 +27,7 @@ import com.tecknobit.apimanager.apis.SocketManager;
 import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.local.User.Operation;
 import com.tecknobit.glider.ui.activities.MainActivity;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
 import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
@@ -59,9 +59,6 @@ import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.openUrlPage;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
-import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
-import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
-import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
 import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostAddress;
 import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostPort;
 import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.ivSpec;
@@ -282,8 +279,7 @@ public class Connect extends FormFragment implements OnClickListener {
                 hideKeyboard(v);
                 connect(null);
             }
-            case R.id.gitLink, R.id.gitIcon -> // TODO: 24/12/2022 CHECK IF LINK IS GLIDER OR GLIDER-ANDROID
-                    openUrlPage("https://github.com/N7ghtm4r3/Glider-Android");
+            case R.id.gitLink, R.id.gitIcon -> openUrlPage("https://github.com/N7ghtm4r3/Glider-Android");
         }
     }
 
@@ -294,19 +290,18 @@ public class Connect extends FormFragment implements OnClickListener {
      */
     private void connect(Dialog dialog) {
         try {
-            JSONObject payload = getRequestPayload();
+            setRequestPayload(GET_PUBLIC_KEYS);
             socketManager = new SocketManager(payload.getString(hostAddress.name()),
                     payload.getInt(hostPort.name()));
             executor.execute(() -> {
                 try {
-                    socketManager.writeContent(payload.put(ope.name(), GET_PUBLIC_KEYS));
+                    socketManager.writeContent(payload);
                     response = new JSONObject(socketManager.readContent());
                     STARTER_ACTIVITY.runOnUiThread(() -> {
                         try {
                             socketManager.setCipher(new ClientCipher(response.getString(ivSpec.name()),
                                     response.getString(secretKey.name()), CBC_ALGORITHM));
-                            socketManager.writeContent(payload.put(name.name(), Build.MANUFACTURER)
-                                    .put(type.name(), MOBILE).put(ope.name(), CONNECT));
+                            socketManager.writeContent(payload.put(ope.name(), CONNECT));
                             String response = socketManager.readContent();
                             user.saveSessionData(new JSONObject(response));
                             startActivity(new Intent(STARTER_ACTIVITY, MainActivity.class));
@@ -329,36 +324,36 @@ public class Connect extends FormFragment implements OnClickListener {
     /**
      * Method to create the payload for the connection request
      *
-     * @param parameters: parameters to insert to invoke this method
-     * @return connection payload with the parameters inserted in the {@code GUI} as {@link JSONObject}
-     * or null if an error occurred
+     * @param operation: operation to create the payload
+     * @param parameters : parameters to insert to invoke this method
      */
     @Override
     @SafeVarargs
-    protected final <T> JSONObject getRequestPayload(T... parameters) {
+    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+        super.setRequestPayload(operation, parameters);
         String host = getTextFromEdit(textInputEditTexts[0]);
         try {
             if (!host.isEmpty()) {
-                JSONObject payload = new JSONObject().put(hostAddress.name(), host);
+                payload.put(hostAddress.name(), host);
                 String password = getTextFromEdit(textInputEditTexts[1]);
                 if (!password.isEmpty())
                     payload.put(sessionPassword.name(), password);
                 else {
                     showsError(1);
-                    return null;
+                    payload = null;
                 }
                 try {
-                    return payload.put(hostPort.name(), parseInt(getTextFromEdit(textInputEditTexts[2])));
+                    payload.put(hostPort.name(), parseInt(getTextFromEdit(textInputEditTexts[2])));
                 } catch (NumberFormatException e) {
                     showsError(2);
-                    return null;
+                    payload = null;
                 }
             } else {
                 showsError(0);
-                return null;
+                payload = null;
             }
         } catch (JSONException e) {
-            return null;
+            payload = null;
         }
     }
 

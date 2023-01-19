@@ -22,6 +22,7 @@ import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter;
 import com.tecknobit.glider.helpers.local.User.GliderKeys;
+import com.tecknobit.glider.helpers.local.User.Operation;
 import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.helpers.toImport.records.Device;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
@@ -304,8 +305,8 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
     // TODO: 21/12/2022 LIST THE BEHAVIOURS OF THIS METHOD IN THE DOCU STRING IN BASE OF THE OPE PASSED AS ARGUMENT
     @Override
     @SafeVarargs
-    protected final <T> JSONObject getRequestPayload(T... parameters) {
-        return null;
+    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+        super.setRequestPayload(operation, parameters);
     }
 
 }

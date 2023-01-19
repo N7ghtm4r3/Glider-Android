@@ -25,21 +25,28 @@ import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.local.User.Operation;
 import com.tecknobit.glider.helpers.local.Utils;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
 import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
+import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.local.User.Operation.CREATE_PASSWORD;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.helpers.toImport.records.Password.PASSWORD_MAX_LENGTH;
 import static com.tecknobit.glider.helpers.toImport.records.Password.PASSWORD_MIN_LENGTH;
 import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys;
+import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys.password;
+import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys.scopes;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
@@ -206,12 +213,32 @@ public class CreateFragment extends FormFragment implements OnClickListener {
                 if (createBtn.getText().equals(getString(R.string.create))) {
                     hideKeyboard(v);
                     enableEditTexts(false);
-                    JSONObject payload = getRequestPayload();
+                    setRequestPayload(CREATE_PASSWORD);
                     if (payload != null) {
-                        // TODO: 17/12/2022 REQUEST THEN
-                        showSnackbar(v, R.string.password_successfully_created);
-                        passwordCardView.setVisibility(View.VISIBLE);
-                        createBtn.setText(R.string.clear);
+                        executor.execute(() -> {
+                            try {
+                                socketManager.writeContent(payload);
+                                response = new JSONObject(socketManager.readContent());
+                                MAIN_ACTIVITY.runOnUiThread(() -> {
+                                    try {
+                                        if (response.getString(statusCode.name()).equals(SUCCESSFUL.name())) {
+                                            showSnackbar(v, R.string.password_successfully_created);
+                                            passwordTextView.setText(response.getString(password.name()));
+                                            passwordCardView.setVisibility(View.VISIBLE);
+                                            createBtn.setText(R.string.clear);
+                                        } else {
+                                            showSnackbar(viewContainer, ope_failed);
+                                        }
+                                    } catch (JSONException e) {
+                                        showSnackbar(viewContainer, ope_failed);
+                                    } finally {
+                                        enableEditTexts(true);
+                                    }
+                                });
+                            } catch (Exception e) {
+                                showSnackbar(viewContainer, ope_failed);
+                            }
+                        });
                     } else
                         enableEditTexts(true);
                 } else
@@ -254,35 +281,35 @@ public class CreateFragment extends FormFragment implements OnClickListener {
     /**
      * Method to create the payload for the password creation request
      *
-     * @param parameters: parameters to insert to invoke this method
-     * @return creation payload with the parameters inserted in the {@code GUI} as {@link JSONObject}
-     * or null if an error occurred
+     * @param operation: operation to create the payload
+     * @param parameters : parameters to insert to invoke this method
      */
+    @Override
     @SafeVarargs
-    protected final <T> JSONObject getRequestPayload(T... parameters) {
+    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+        super.setRequestPayload(operation, parameters);
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
             if (!tail.isEmpty()) {
-                JSONObject payload = new JSONObject().put(PasswordKeys.tail.name(), tail)
-                        .put(PasswordKeys.scopes.name(),
-                                List.of(getTextFromEdit(textInputEditTexts[1]).split(",")));
+                payload.put(PasswordKeys.tail.name(), tail).put(scopes.name(),
+                        new JSONArray(getTextFromEdit(textInputEditTexts[1]).split(",")));
                 try {
                     int length = Integer.parseInt(getTextFromEdit(textInputEditTexts[2]));
                     if (length < PASSWORD_MIN_LENGTH || length > PASSWORD_MAX_LENGTH) {
                         showsError(1);
-                        return null;
+                        payload = null;
                     } else
-                        return payload.put(PasswordKeys.length.name(), length);
+                        payload.put(PasswordKeys.length.name(), length);
                 } catch (NumberFormatException e) {
                     showsError(2);
-                    return null;
+                    payload = null;
                 }
             } else {
                 showsError(0);
-                return null;
+                payload = null;
             }
         } catch (JSONException e) {
-            return null;
+            payload = null;
         }
     }
 

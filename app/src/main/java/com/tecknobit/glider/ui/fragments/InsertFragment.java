@@ -14,16 +14,24 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.local.User.Operation;
 import com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
 import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
+import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.local.User.Operation.INSERT_PASSWORD;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
  * The {@link InsertFragment} fragment is the section of the app where the password can be inserted
@@ -89,11 +97,30 @@ public class InsertFragment extends FormFragment {
         view.findViewById(R.id.insertBtn).setOnClickListener(v -> {
             hideKeyboard(v);
             enableEditTexts(false);
-            JSONObject payload = getRequestPayload();
+            setRequestPayload(INSERT_PASSWORD);
             if (payload != null) {
-                // TODO: 19/12/2022 MAKE REQUEST THEN
-                showSnackbar(v, R.string.password_inserted_successfully);
-                clearViews();
+                executor.execute(() -> {
+                    try {
+                        socketManager.writeContent(payload);
+                        response = new JSONObject(socketManager.readContent());
+                        MAIN_ACTIVITY.runOnUiThread(() -> {
+                            try {
+                                if (!response.getString(statusCode.name()).equals(FAILED.name())) {
+                                    showSnackbar(v, R.string.password_inserted_successfully);
+                                    clearViews();
+                                } else {
+                                    showSnackbar(viewContainer, ope_failed);
+                                }
+                            } catch (JSONException e) {
+                                showSnackbar(viewContainer, ope_failed);
+                            } finally {
+                                enableEditTexts(true);
+                            }
+                        });
+                    } catch (Exception e) {
+                        showSnackbar(viewContainer, ope_failed);
+                    }
+                });
             } else
                 enableEditTexts(true);
         });
@@ -161,30 +188,32 @@ public class InsertFragment extends FormFragment {
     /**
      * Method to create the payload for the password insertion request
      *
-     * @param parameters: parameters to insert to invoke this method
-     * @return insertion payload with the parameters inserted in the {@code GUI} as {@link JSONObject}
-     * or null if an error occurred
+     * @param operation: operation to create the payload
+     * @param parameters : parameters to insert to invoke this method
      */
     @Override
     @SafeVarargs
-    protected final <T> JSONObject getRequestPayload(T... parameters) {
+    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+        super.setRequestPayload(operation, parameters);
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);
             if (!tail.isEmpty()) {
-                JSONObject payload = new JSONObject().put(PasswordKeys.tail.name(), tail);
+                payload.put(PasswordKeys.scopes.name(),
+                        new JSONArray(getTextFromEdit(textInputEditTexts[2]).split(",")));
+                payload.put(PasswordKeys.tail.name(), tail);
                 String password = getTextFromEdit(textInputEditTexts[1]);
                 if (!password.isEmpty())
-                    return payload.put(PasswordKeys.password.name(), password);
+                    payload.put(PasswordKeys.password.name(), password);
                 else {
                     showsError(1);
-                    return null;
+                    payload = null;
                 }
             } else {
                 showsError(0);
-                return null;
+                payload = null;
             }
         } catch (JSONException e) {
-            return null;
+            payload = null;
         }
     }
 

@@ -20,11 +20,17 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.apimanager.annotations.android.ResId;
+import com.tecknobit.apimanager.apis.SocketManager;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.local.Utils;
+import com.tecknobit.glider.helpers.local.ManageRequest;
 import com.tecknobit.glider.helpers.toImport.records.Password;
+import com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys;
 import com.tecknobit.glider.helpers.toImport.records.Password.Status;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,14 +45,34 @@ import static com.tecknobit.glider.R.string.new_scope;
 import static com.tecknobit.glider.R.string.new_scope_inserted_successfully;
 import static com.tecknobit.glider.R.string.new_scope_is_required;
 import static com.tecknobit.glider.R.string.no_scopes_for_this_password;
+import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.R.string.password_successfully_deleted;
+import static com.tecknobit.glider.R.string.password_successfully_recovered;
 import static com.tecknobit.glider.R.string.recover;
 import static com.tecknobit.glider.R.string.scope_hint;
 import static com.tecknobit.glider.R.string.scope_must_be_filled;
+import static com.tecknobit.glider.R.string.scope_removed_successfully;
 import static com.tecknobit.glider.R.string.the_scope_edited;
+import static com.tecknobit.glider.helpers.local.User.DEVICE_NAME;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.local.User.Operation;
+import static com.tecknobit.glider.helpers.local.User.Operation.ADD_SCOPE;
+import static com.tecknobit.glider.helpers.local.User.Operation.DELETE_PASSWORD;
+import static com.tecknobit.glider.helpers.local.User.Operation.EDIT_SCOPE;
+import static com.tecknobit.glider.helpers.local.User.Operation.RECOVER_PASSWORD;
+import static com.tecknobit.glider.helpers.local.User.Operation.REMOVE_SCOPE;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
+import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
+import static com.tecknobit.glider.helpers.local.Utils.copyText;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.sessionPassword;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
@@ -56,7 +82,7 @@ import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
  * @see Adapter
  * @see Filterable
  **/
-public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> implements Filterable {
+public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.PasswordView> implements Filterable {
 
     /**
      * {@code isRecoveryMode} whether the list of the {@link #passwords} is in a
@@ -123,22 +149,20 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
                 listItems));
         if (!isRecoveryMode) {
             holder.scopes.setOnItemClickListener((parent, view, sPosition, id) -> {
-                int hintId, helperTextId, errorId, successId;
-                String ope;
+                int hintId, helperTextId, errorId;
+                Operation ope;
                 holder.scopesLayout.setVisibility(View.GONE);
                 if (sPosition == parent.getLastVisiblePosition()) {
                     hintId = new_scope;
                     helperTextId = scope_hint;
                     errorId = new_scope_is_required;
-                    successId = new_scope_inserted_successfully;
-                    ope = "add_more"; // TODO: 20/12/2022 TO CHANGE
+                    ope = ADD_SCOPE;
                     holder.scopeLayout.setVisibility(View.VISIBLE);
                 } else {
                     hintId = the_scope_edited;
                     helperTextId = edit_the_current_scope;
                     errorId = scope_must_be_filled;
-                    successId = current_scope_edited_successfully;
-                    ope = "edit_current"; // TODO: 20/12/2022 TO CHANGE
+                    ope = EDIT_SCOPE;
                     holder.scopeActions.setVisibility(View.VISIBLE);
                     holder.scopeValue.setText(holder.scopes.getText());
                 }
@@ -176,9 +200,11 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
                 holder.scopeLayout.setStartIconOnClickListener(v -> {
                     hideKeyboard(v);
                     String newScope = getTextFromEdit(holder.scope);
+                    String oldScope = null;
+                    if (ope.equals(EDIT_SCOPE))
+                        oldScope = holder.scopeValue.getText().toString();
                     if (!newScope.isEmpty()) {
-                        // TODO: 20/12/2022 REQUEST THEN
-                        showSnackbar(v, successId);
+                        holder.executeOperation(ope, holder.tail, newScope, oldScope);
                         clearScopesLayout(holder);
                     } else
                         showSnackbar(v, errorId);
@@ -301,7 +327,17 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
      * @see View.OnClickListener
      **/
     @SuppressLint("NonConstantResourceId")
-    public static class PasswordView extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class PasswordView extends RecyclerView.ViewHolder implements View.OnClickListener, ManageRequest {
+
+        /**
+         * {@code actionBtn} the button that can {@code "copyPassword"} or {@code "recover"} a password
+         **/
+        @ResId(id = R.id.actionBtn)
+        private final MaterialButton actionBtn;
+        /**
+         * {@code response} instance to contains the response from the backend
+         */
+        protected JSONObject response;
 
         /**
          * {@code tail} view
@@ -350,12 +386,10 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
          **/
         @ResId(id = R.id.password)
         private final AutoCompleteTextView password;
-
         /**
-         * {@code actionBtn} the button that can {@code "copy"} or {@code "recover"} a password
+         * {@code payload} the payload to send with the request
          **/
-        @ResId(id = R.id.actionBtn)
-        private final MaterialButton actionBtn;
+        protected JSONObject payload;
 
         /**
          * Constructor to init {@link PasswordView} object
@@ -386,31 +420,19 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.deleteBtn -> {
-                    if (!isRecoveryMode) {
-                        // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "DELETE");
-                    } else {
-                        // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "PERMANENTLY DELETED");
-                    }
-                }
+                case R.id.deleteBtn -> executeOperation(DELETE_PASSWORD);
                 case R.id.actionBtn -> {
-                    if (!isRecoveryMode) {
-                        // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "COPIED");
-                    } else {
-                        // TODO: 20/12/2022 REQUEST THEN
-                        Utils.showSnackbar(v, "RECOVERED");
-                    }
+                    if (!isRecoveryMode)
+                        copyPassword();
+                    else
+                        executeOperation(RECOVER_PASSWORD);
                 }
                 case R.id.editBtn -> {
                     scopeActions.setVisibility(View.GONE);
                     scopeLayout.setVisibility(View.VISIBLE);
                 }
                 case R.id.removeBtn -> {
-                    // TODO: 06/01/2023 REQUEST THEN
-                    showSnackbar(v, MAIN_ACTIVITY.getString(R.string.scope_removed_successfully));
+                    executeOperation(REMOVE_SCOPE, tail, scopeValue.getText().toString());
                     restoreScopesLayout();
                 }
                 case R.id.closeScopeActions -> restoreScopesLayout();
@@ -424,6 +446,133 @@ public class PasswordsAdapter extends Adapter<PasswordsAdapter.PasswordView> imp
         private void restoreScopesLayout() {
             scopeActions.setVisibility(View.GONE);
             scopesLayout.setVisibility(View.VISIBLE);
+            ((ArrayAdapter) scopes.getAdapter()).notifyDataSetChanged();
+        }
+
+        /**
+         * {@inheritDoc}
+         *
+         * @apiNote different payload configurations
+         * <ul>
+         *     <li>
+         *         {@link Operation#DELETE_PASSWORD}, {@link Operation#RECOVER_PASSWORD} ->  will be
+         *         passed the {@code "tail"} {@link View} to get the parameter of the {@link Password}
+         *         to delete or recover
+         *     </li>
+         *     <li>
+         *         {@link Operation#ADD_SCOPE}, {@link Operation#REMOVE_SCOPE} ->  will be
+         *         passed the {@code "tail"} {@link View} to get the parameter of the {@link Password}
+         *         to where manage the scope in index {@code "0"} and the scope to add or remove in index
+         *         {@code "1"}
+         *     </li>
+         *     <li>
+         *         {@link Operation#EDIT_SCOPE} ->  will be
+         *         passed the {@code "tail"} {@link View} to get the parameter of the {@link Password}
+         *         to where manage the scope in index {@code "0"}, the scope edited in index
+         *         {@code "1"} and the old scope to overwrite in index {@code "2"}
+         *     </li>
+         * </ul>
+         */
+        @Override
+        public <T> void setRequestPayload(Operation operation, T... parameters) {
+            try {
+                if (payload == null)
+                    setBasePayload();
+                payload.put(ope.name(), operation);
+                switch (operation) {
+                    case DELETE_PASSWORD, RECOVER_PASSWORD -> {
+                        payload.put(PasswordKeys.tail.name(),
+                                ((MaterialTextView) parameters[0]).getText());
+                    }
+                    case ADD_SCOPE, REMOVE_SCOPE -> {
+                        payload.put(PasswordKeys.tail.name(), ((MaterialTextView) parameters[0]).getText())
+                                .put(PasswordKeys.scope.name(), parameters[1]);
+                    }
+                    case EDIT_SCOPE -> {
+                        payload.put(PasswordKeys.tail.name(), ((MaterialTextView) parameters[0]).getText())
+                                .put(PasswordKeys.scope.name(), parameters[1])
+                                .put(PasswordKeys.oldScope.name(), parameters[2]);
+                    }
+                }
+            } catch (JSONException e) {
+                payload = null;
+            }
+        }
+
+        /**
+         * Method to set the base payload for a request <br>
+         * Any params required
+         */
+        @Override
+        public void setBasePayload() {
+            try {
+                payload = new JSONObject();
+                payload.put(name.name(), DEVICE_NAME)
+                        .put(type.name(), MOBILE)
+                        .put(sessionPassword.name(), user.getSessionPassword());
+            } catch (JSONException e) {
+                payload = null;
+            }
+        }
+
+        /**
+         * Method to manage the {@link Password}
+         *
+         * @param operation: operation to execute
+         **/
+        @Wrapper
+        public void executeOperation(Operation operation) {
+            executeOperation(operation, tail);
+        }
+
+        /**
+         * Method to manage the {@link Password}
+         *
+         * @param operation: operation to execute
+         * @param parameters : parameters to insert to invoke this method
+         **/
+        public <T> void executeOperation(Operation operation, T... parameters) {
+            setRequestPayload(operation, parameters);
+            if (payload != null) {
+                executor.execute(() -> {
+                    try {
+                        socketManager.writeContent(payload);
+                        response = new JSONObject(socketManager.readContent());
+                        MAIN_ACTIVITY.runOnUiThread(() -> {
+                            try {
+                                int message;
+                                switch (operation) {
+                                    case RECOVER_PASSWORD -> message = password_successfully_recovered;
+                                    case ADD_SCOPE -> message = new_scope_inserted_successfully;
+                                    case EDIT_SCOPE -> message = current_scope_edited_successfully;
+                                    case REMOVE_SCOPE -> message = scope_removed_successfully;
+                                    default -> message = password_successfully_deleted;
+                                }
+                                if (operation.equals(DELETE_PASSWORD))
+                                    message = password_successfully_deleted;
+                                if (response.getString(statusCode.name())
+                                        .equals(SocketManager.StandardResponseCode.SUCCESSFUL.name())) {
+                                    showSnackbar(itemView, message);
+                                } else
+                                    showSnackbar(itemView, ope_failed);
+                            } catch (JSONException e) {
+                                showSnackbar(itemView, ope_failed);
+                            }
+                        });
+                    } catch (Exception e) {
+                        showSnackbar(itemView, ope_failed);
+                    }
+                });
+            } else
+                showSnackbar(itemView, ope_failed);
+        }
+
+        /**
+         * Method to copy the password value from {@link #password} <br>
+         * Any params required
+         **/
+        public void copyPassword() {
+            copyText(password, password);
         }
 
     }

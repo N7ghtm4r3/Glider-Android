@@ -1,18 +1,16 @@
 package com.tecknobit.glider.ui.fragments.parents;
 
-import android.os.Build;
 import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
+import com.tecknobit.glider.helpers.local.ManageRequest;
 import com.tecknobit.glider.helpers.local.User.Operation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import static com.tecknobit.glider.helpers.local.User.DEVICE_NAME;
 import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
@@ -26,14 +24,9 @@ import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.
  *
  * @author Tecknobit - N7ghtm4r3
  * @see Fragment
+ * @see ManageRequest
  **/
-public abstract class GliderFragment extends Fragment {
-
-    /**
-     * {@code executor} instance to manage the user communication with the backend with background
-     * process
-     */
-    protected static final ExecutorService executor = Executors.newSingleThreadExecutor();
+public abstract class GliderFragment extends Fragment implements ManageRequest {
 
     /**
      * {@code response} instance to contains the response from the backend
@@ -65,7 +58,8 @@ public abstract class GliderFragment extends Fragment {
      * @param operation: operation to create the payload
      * @param parameters : parameters to insert to invoke this method
      */
-    protected <T> void setRequestPayload(Operation operation, T... parameters) {
+    @Override
+    public <T> void setRequestPayload(Operation operation, T... parameters) {
         try {
             if (payload == null)
                 setBasePayload();
@@ -79,10 +73,11 @@ public abstract class GliderFragment extends Fragment {
      * Method to set the base payload for a request <br>
      * Any params required
      */
-    private void setBasePayload() {
+    @Override
+    public void setBasePayload() {
         try {
             payload = new JSONObject();
-            payload.put(name.name(), Build.MANUFACTURER + "-" + Build.DEVICE)
+            payload.put(name.name(), DEVICE_NAME)
                     .put(type.name(), MOBILE)
                     .put(sessionPassword.name(), user.getSessionPassword());
         } catch (JSONException e) {

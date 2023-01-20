@@ -32,17 +32,16 @@ import com.tecknobit.glider.helpers.toImport.records.Password.Status;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
 import static androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
-import static com.tecknobit.glider.helpers.local.User.Operation;
+import static com.tecknobit.glider.helpers.adapters.PasswordsAdapter.PasswordView;
+import static com.tecknobit.glider.helpers.local.User.Operation.DELETE_PASSWORD;
+import static com.tecknobit.glider.helpers.local.User.Operation.RECOVER_PASSWORD;
 import static com.tecknobit.glider.helpers.local.User.passwords;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
-import static com.tecknobit.glider.helpers.local.Utils.copyText;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 import static com.tecknobit.glider.ui.activities.MainActivity.navController;
@@ -79,6 +78,12 @@ public class ListFragment extends RealtimeRecyclerFragment {
      * {@code list} list of the {@link Password}
      **/
     private ArrayList<Password> list;
+
+    /**
+     * {@code searchView} view to contains the {@link #search}
+     **/
+    @ResId(id = R.id.searchView)
+    private TextInputLayout searchView;
 
     /**
      * {@code search} view to create a query and filter the {@link #recyclerManager}
@@ -142,26 +147,12 @@ public class ListFragment extends RealtimeRecyclerFragment {
         recoveryMode = navController.getCurrentDestination().getLabel().equals(getString(R.string.removed));
         noPasswordsText = view.findViewById(R.id.noPasswords);
         relList = view.findViewById(R.id.relList);
+        searchView = view.findViewById(R.id.searchView);
         search = view.findViewById(R.id.searchQuery);
         setRecycler(R.id.passwords, MAIN_ACTIVITY);
         startSearchViewWorkflow();
         swipeRefreshLayout = view.findViewById(R.id.swipe);
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            // TODO: 21/12/2022 REMOVE THIS SNIPPET -> SIMULATION OF FETCHING PASSWORD
-            final String[] tails = new String[]{"gagaga", "FAF1"};
-            if (!recoveryMode) {
-                passwords.get(Status.ACTIVE).add(new Password("" +
-                        tails[new Random().nextInt(tails.length)],
-                        new ArrayList<>(List.of(tails[new Random().nextInt(tails.length)],
-                                tails[new Random().nextInt(tails.length)])),
-                        "gagaa",
-                        Status.ACTIVE));
-            } else {
-                passwords.get(Status.DELETED).add(new Password("" +
-                        tails[new Random().nextInt(tails.length)], "gaga",
-                        Status.DELETED));
-            }
-            // TODO: 21/12/2022 END REMOVE THIS SNIPPET
             hideKeyboard(viewContainer);
             loadRecycler();
             swipeRefreshLayout.setRefreshing(false);
@@ -263,6 +254,14 @@ public class ListFragment extends RealtimeRecyclerFragment {
                 swipeRefreshLayout.setEnabled(true);
                 for (MaterialButton button : buttons)
                     button.setTextColor(COLOR_PRIMARY);
+                PasswordView password = (PasswordView) viewHolder;
+                if (direction == RIGHT) {
+                    if (!recoveryMode)
+                        password.copyPassword();
+                    else
+                        password.executeOperation(RECOVER_PASSWORD);
+                } else
+                    password.executeOperation(DELETE_PASSWORD);
                 passwordsAdapter.notifyDataSetChanged();
             }
 
@@ -277,22 +276,9 @@ public class ListFragment extends RealtimeRecyclerFragment {
                 if (dX > 0) {
                     buttons[0].setTextColor(COLOR_RED);
                     buttons[1].setTextColor(COLOR_PRIMARY);
-                    if (!recoveryMode) {
-                        copyText(viewHolder.itemView.findViewById(R.id.password), recyclerView);
-                    } else {
-                        // TODO: 21/12/2022 REQUEST TO RECOVER THEN
-                        Utils.showSnackbar(recyclerView, "RECOVERED");
-                    }
                 } else {
                     buttons[0].setTextColor(COLOR_PRIMARY);
                     buttons[1].setTextColor(COLOR_RED);
-                    if (!recoveryMode) {
-                        // TODO: 21/12/2022 REQUEST TO DELETE
-                        Utils.showSnackbar(recyclerView, "DELETED");
-                    } else {
-                        // TODO: 21/12/2022 REQUEST TO PERMANENTLY DELETE
-                        Utils.showSnackbar(recyclerView, "PERMANENTLY DELETED");
-                    }
                 }
             }
 
@@ -326,7 +312,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
                     if (passwordsSize > 0) {
                         noPasswordsText.setVisibility(View.GONE);
                         relList.setVisibility(View.VISIBLE);
-                        search.setVisibility(View.VISIBLE);
+                        searchView.setVisibility(View.VISIBLE);
                         if (passwordsAdapter == null) {
                             passwordsAdapter = new PasswordsAdapter(list, recoveryMode);
                             recyclerManager.setAdapter(passwordsAdapter);
@@ -335,7 +321,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
                     } else {
                         noPasswordsText.setVisibility(View.VISIBLE);
                         relList.setVisibility(View.GONE);
-                        search.setVisibility(View.GONE);
+                        searchView.setVisibility(View.GONE);
                     }
                     currentRecyclerSize = passwordsSize;
                 } else {
@@ -343,19 +329,9 @@ public class ListFragment extends RealtimeRecyclerFragment {
                         passwordsAdapter.notifyDataSetChanged();
                 }
             }
-            handler.postDelayed(runnable, 5000);
+            handler.postDelayed(runnable, 1000);
         };
         runnable.run();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    // TODO: 21/12/2022 LIST THE BEHAVIOURS OF THIS METHOD IN THE DOCU STRING IN BASE OF THE OPE PASSED AS ARGUMENT
-    @Override
-    @SafeVarargs
-    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
-        super.setRequestPayload(operation, parameters);
     }
 
 }

@@ -153,9 +153,6 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
         setRecycler(devicesRecycler, MAIN_ACTIVITY);
         swipeRefreshLayout = view.findViewById(swipe);
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            // TODO: 23/12/2022 REMOVE THIS SNIPPET
-            devices.add(new Device("agaga", "111.112.33.11", "24/11/22", "24/11/22", Device.Type.values()[new Random().nextInt(2)],
-                    new Random().nextBoolean()));
             loadRecycler();
             swipeRefreshLayout.setRefreshing(false);
         });
@@ -305,7 +302,7 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
     // TODO: 21/12/2022 LIST THE BEHAVIOURS OF THIS METHOD IN THE DOCU STRING IN BASE OF THE OPE PASSED AS ARGUMENT
     @Override
     @SafeVarargs
-    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+    public final <T> void setRequestPayload(Operation operation, T... parameters) {
         super.setRequestPayload(operation, parameters);
     }
 

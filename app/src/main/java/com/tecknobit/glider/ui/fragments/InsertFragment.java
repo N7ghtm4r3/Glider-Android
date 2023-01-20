@@ -193,7 +193,7 @@ public class InsertFragment extends FormFragment {
      */
     @Override
     @SafeVarargs
-    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+    public final <T> void setRequestPayload(Operation operation, T... parameters) {
         super.setRequestPayload(operation, parameters);
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);

@@ -1,6 +1,7 @@
 package com.tecknobit.glider.helpers.local;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
@@ -8,28 +9,44 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.tecknobit.apimanager.apis.SocketManager;
+import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.helpers.toImport.records.Device;
 import com.tecknobit.glider.helpers.toImport.records.Password;
+import com.tecknobit.glider.helpers.toImport.records.Password.Status;
 import com.tecknobit.glider.helpers.toImport.records.Session;
 import com.tecknobit.glider.ui.fragments.AccountFragment;
 import com.tecknobit.glider.ui.fragments.ListFragment;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.pm.PackageManager.NameNotFoundException;
 import static com.google.firebase.database.FirebaseDatabase.getInstance;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
 import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.glider.helpers.local.User.GliderKeys.databasePath;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.local.User.Operation.REFRESH_DATA;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys.status;
+import static com.tecknobit.glider.helpers.toImport.records.Password.Status.ACTIVE;
+import static com.tecknobit.glider.helpers.toImport.records.Password.Status.DELETED;
 import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.qrCodeLogin;
 import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.session;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
+import static java.lang.Thread.sleep;
 
 /**
  * The {@code User} class is a useful to manage the user session during the app workflow
@@ -39,29 +56,58 @@ import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
  **/
 public class User extends Session {
 
-    // TODO: 18/01/2023 TO REMOVE WHEN IMPLEMENTED
     /**
-     * {@code passwords} list for the {@link ListFragment} with {@link Password.Status} as key and
+     * {@code DEVICE_NAME} name of the device
+     */
+    public static final String DEVICE_NAME = Build.MANUFACTURER + "-" + Build.DEVICE;
+    /**
+     * {@code passwords} list for the {@link ListFragment} with {@link Status} as key and
      * {@link Password} as value.
      **/
-    public static final HashMap<Password.Status, ArrayList<Password>> passwords = new HashMap<>();
+    public static final HashMap<Status, ArrayList<Password>> passwords = new HashMap<>();
+    /**
+     * {@code IS_UPDATED} whether the current version of the app is the latest available
+     */
+    public static volatile boolean IS_UPDATED;
+    /**
+     * {@code IS_PATCH} whether the update is a simple patch (it can be skipped) or is a mandatory
+     * version update
+     */
+    public static volatile boolean IS_PATCH;
+    /**
+     * {@code LATEST_VERSION} latest version available for {@code Glider}
+     */
+    public static volatile String LATEST_VERSION;
+
     /**
      * {@code devices} list of {@link Device} for the {@link AccountFragment}
      **/
     public static final ArrayList<Device> devices = new ArrayList<>();
+
     /**
      * {@code userShared} instance to manage the user data in app
      */
     private static final SharedPreferences userShared = STARTER_ACTIVITY.getSharedPreferences(databasePath.name(),
             MODE_PRIVATE);
+
     /**
      * {@code socketManager} instance to manage the user communication with the backend
      */
     public static SocketManager socketManager;
+    /**
+     * {@code user} instance to manage the user session in app
+     */
+    public static User user;
+
+    /**
+     * {@code executor} instance to manage the refresh of the user data
+     */
+    private static volatile ExecutorService executor;
 
     /**
      * Constructor to init {@link User} object <br>
      * Any params required
+     *
      * @apiNote this constructor will be invoked during the normal Glider's workflow
      **/
     public User() {
@@ -78,6 +124,7 @@ public class User extends Session {
             if (secretKey != null) {
                 try {
                     socketManager = new SocketManager(hostAddress, hostPort, ivSpec, secretKey, CBC_ALGORITHM);
+                    refreshData();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -86,11 +133,6 @@ public class User extends Session {
         }
         checkForUpdates();
     }
-
-    /**
-     * {@code user} instance to manage the user session in app
-     */
-    public static volatile User user;
 
     /**
      * Method to save a new session data
@@ -116,28 +158,14 @@ public class User extends Session {
     }
 
     /**
-     * {@code IS_UPDATED} whether the current version of the app is the latest available
-     */
-    public static volatile boolean IS_UPDATED;
-
-    /**
-     * {@code IS_PATCH} whether the update is a simple patch (it can be skipped) or is a mandatory
-     * version update
-     */
-    public static volatile boolean IS_PATCH;
-
-    /**
-     * {@code LATEST_VERSION} latest version available for {@code Glider}
-     */
-    public static volatile String LATEST_VERSION;
-
-    /**
      * Method to refresh the {@link User}' session <br>
      * Any params required
      */
     public void refreshUser() {
         user = new User();
     }
+
+    // TODO: 18/01/2023 TO REMOVE WHEN IMPLEMENTED
 
     /**
      * {@code Operation} list of available operations
@@ -265,6 +293,76 @@ public class User extends Session {
 
             }
         });
+    }
+
+    /**
+     * Method to refresh the {@code Glider} data <br>
+     * Any params required
+     */
+    private void refreshData() {
+        if (executor == null) {
+            executor = Executors.newSingleThreadExecutor();
+            try {
+                final JSONObject payload = new JSONObject()
+                        .put(name.name(), DEVICE_NAME)
+                        .put(type.name(), MOBILE)
+                        .put(SessionKeys.sessionPassword.name(), sessionPassword)
+                        .put(ope.name(), REFRESH_DATA);
+                final JSONObject[] actualData = {new JSONObject()};
+                final JSONArray[] actualList = {new JSONArray(), new JSONArray()};
+                final JsonHelper hNewData = new JsonHelper((JSONObject) null);
+                final ArrayList<Password> activePasswords = new ArrayList<>();
+                final ArrayList<Password> deletedPasswords = new ArrayList<>();
+                executor.execute(() -> {
+                    while (true) {
+                        try {
+                            socketManager.writeContent(payload);
+                            JSONObject newData = new JSONObject(socketManager.readContent());
+                            String sNewData = newData.toString();
+                            if (newData.getString(statusCode.name()).equals(SUCCESSFUL.name()) &&
+                                    !sNewData.equals(actualData[0].toString())) {
+                                hNewData.setJSONObjectSource(newData);
+                                JSONArray jDevices = hNewData.getJSONArray("devices", new JSONArray()); // TODO: 20/01/2023 USE THE RIGHT KEY
+                                String sDevices = jDevices.toString();
+                                if (sDevices.equals(actualList[1].toString())) {
+                                    devices.clear();
+                                    for (int j = 0; j < jDevices.length(); j++) {
+                                        JSONObject jDevice = jDevices.getJSONObject(j);
+                                        if (!jDevice.getString(name.name()).equals(DEVICE_NAME))
+                                            devices.add(new Device(jDevice));
+                                    }
+                                    actualList[0] = new JSONArray(sDevices);
+                                }
+                                JSONArray jPasswords = hNewData.getJSONArray("passwords", new JSONArray()); // TODO: 20/01/2023 USE THE RIGHT KEY
+                                String sPasswords = jPasswords.toString();
+                                if (!sPasswords.equals(actualList[1].toString())) {
+                                    passwords.clear();
+                                    activePasswords.clear();
+                                    deletedPasswords.clear();
+                                    for (int j = 0; j < jPasswords.length(); j++) {
+                                        JSONObject jPassword = jPasswords.getJSONObject(j);
+                                        Status pStatus = Status.valueOf(jPassword.getString(status.name()));
+                                        switch (pStatus) {
+                                            case ACTIVE -> activePasswords.add(new Password(jPassword));
+                                            case DELETED -> deletedPasswords.add(new Password(jPassword));
+                                        }
+                                    }
+                                    passwords.put(ACTIVE, activePasswords);
+                                    passwords.put(DELETED, deletedPasswords);
+                                    actualList[1] = new JSONArray(sPasswords);
+                                }
+                                actualData[0] = new JSONObject(sNewData);
+                            }
+                            sleep(5000);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

@@ -84,4 +84,6 @@
     <string name="ope_failed">Operation failed</string>
     <string name="qrcode_prompt">Scan your Glider\'s QRCode to get the credentials</string>
     <string name="unblacklist">UNBLACKLIST</string>
+    <string name="password_successfully_deleted">Password successfully deleted</string>
+    <string name="password_successfully_recovered">Password successfully recovered</string>
 </resources>

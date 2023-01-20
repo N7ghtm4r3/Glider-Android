@@ -66,9 +66,9 @@ public class Utils {
     }
 
     /**
-     * Method to copy a text in the {@link ClipboardManager}
+     * Method to copyPassword a text in the {@link ClipboardManager}
      *
-     * @param textView: the text view from copy the text
+     * @param textView: the text view from copyPassword the text
      * @param view:     source view from show the {@link Snackbar}
      */
     public static void copyText(TextView textView, View view) {

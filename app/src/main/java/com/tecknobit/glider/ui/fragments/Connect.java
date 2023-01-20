@@ -329,7 +329,7 @@ public class Connect extends FormFragment implements OnClickListener {
      */
     @Override
     @SafeVarargs
-    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+    public final <T> void setRequestPayload(Operation operation, T... parameters) {
         super.setRequestPayload(operation, parameters);
         String host = getTextFromEdit(textInputEditTexts[0]);
         try {

@@ -252,7 +252,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      * Method to get, <b>not every time, but a single one time</b> an user recension about Glider, but
      * this will be invoke <b>ever</b> the {@link #endCreation(boolean)} method
      *
-     * @param copyPassword: whether copy the password created
+     * @param copyPassword: whether copyPassword the password created
      */
     private void writeReview(boolean copyPassword) {
         ReviewManager manager = ReviewManagerFactory.create(MAIN_ACTIVITY);
@@ -270,7 +270,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
     /**
      * Method to end the creation of the password creation
      *
-     * @param copyPassword: whether copy the password created
+     * @param copyPassword: whether copyPassword the password created
      */
     private void endCreation(boolean copyPassword) {
         if (copyPassword)
@@ -286,7 +286,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      */
     @Override
     @SafeVarargs
-    protected final <T> void setRequestPayload(Operation operation, T... parameters) {
+    public final <T> void setRequestPayload(Operation operation, T... parameters) {
         super.setRequestPayload(operation, parameters);
         try {
             String tail = getTextFromEdit(textInputEditTexts[0]);

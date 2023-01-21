@@ -66,12 +66,12 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         STARTER_ACTIVITY = this;
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         user = new User();
         setLanguageLocale(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
         setDefaultNightMode(MODE_NIGHT_NO);
         String sStatusCode = getIntent().getStringExtra(statusCode.name());
         if (sStatusCode != null) {

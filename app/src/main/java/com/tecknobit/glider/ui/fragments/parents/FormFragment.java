@@ -62,7 +62,7 @@ public abstract class FormFragment extends GliderFragment {
     /**
      * Method to load the {@link #inputsErrors} and the {@link #inputsHints} lists
      * with the right messages <br>
-     * Any params required
+     * No-any params required
      */
     protected abstract void loadInputMessagesLists();
 
@@ -79,7 +79,7 @@ public abstract class FormFragment extends GliderFragment {
      *     </li>
      * </ul>
      * @apiNote will be automatically invoked the {@link #loadInputMessagesLists()} method
-     * Any params required
+     * No-any params required
      */
     protected void startInputsListenWorkflow() {
         loadInputMessagesLists();

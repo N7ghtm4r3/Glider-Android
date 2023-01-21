@@ -2,8 +2,11 @@ package com.tecknobit.glider.helpers.local;
 
 import android.app.Activity;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.view.View;
@@ -17,9 +20,12 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.glider.R;
 
+import java.util.Locale;
+
 import static android.content.ClipData.newPlainText;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
 
 /**
@@ -29,6 +35,7 @@ import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
  **/
 public class Utils {
 
+    // TODO: 21/01/2023 REMOVE WHEN IMPLEMENTED
     /**
      * {@code COLOR_PRIMARY_HEX} the primary color value as hex {@link String}
      */
@@ -175,6 +182,18 @@ public class Utils {
         alert.setNegativeButton(negativeText, negativeAction);
         alert.setPositiveButton(positiveText, positiveAction);
         return alert;
+    }
+
+    /**
+     * Method to set the locale language
+     *
+     * @param context: context where change the language
+     */
+    public static void setLanguageLocale(Context context) {
+        Resources resources = context.getResources();
+        Configuration configuration = resources.getConfiguration();
+        configuration.setLocale(new Locale(user.getISOLanguage()));
+        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
     }
 
 }

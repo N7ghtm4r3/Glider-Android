@@ -301,7 +301,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
     /**
      * Method to reset the {@link #filteredPasswords} and filled it with the {@link #passwords}
      * full list <br>
-     * Any params required
+     * No-any params required
      */
     @SuppressLint("NotifyDataSetChanged")
     public void resetPasswordsList() {
@@ -311,7 +311,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
     /**
      * Method to get {@link #passwords} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #passwords} instance as {@link Collection} of {@link Password}
      **/
@@ -327,17 +327,24 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      * @see View.OnClickListener
      **/
     @SuppressLint("NonConstantResourceId")
-    public static class PasswordView extends RecyclerView.ViewHolder implements View.OnClickListener, ManageRequest {
+    public static class PasswordView extends RecyclerView.ViewHolder implements View.OnClickListener,
+            ManageRequest {
+
+        /**
+         * {@code payload} the payload to send with the request
+         **/
+        protected JSONObject payload;
+
+        /**
+         * {@code response} instance to contains the response from the backend
+         */
+        protected JSONObject response;
 
         /**
          * {@code actionBtn} the button that can {@code "copyPassword"} or {@code "recover"} a password
          **/
         @ResId(id = R.id.actionBtn)
         private final MaterialButton actionBtn;
-        /**
-         * {@code response} instance to contains the response from the backend
-         */
-        protected JSONObject response;
 
         /**
          * {@code tail} view
@@ -386,10 +393,6 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
          **/
         @ResId(id = R.id.password)
         private final AutoCompleteTextView password;
-        /**
-         * {@code payload} the payload to send with the request
-         **/
-        protected JSONObject payload;
 
         /**
          * Constructor to init {@link PasswordView} object
@@ -441,7 +444,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
         /**
          * Method to re-set the {@link #scopesLayout} <br>
-         * Any params required
+         * No-any params required
          */
         private void restoreScopesLayout() {
             scopeActions.setVisibility(View.GONE);
@@ -501,7 +504,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
         /**
          * Method to set the base payload for a request <br>
-         * Any params required
+         * No-any params required
          */
         @Override
         public void setBasePayload() {
@@ -569,7 +572,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
         /**
          * Method to copy the password value from {@link #password} <br>
-         * Any params required
+         * No-any params required
          **/
         public void copyPassword() {
             copyText(password, password);

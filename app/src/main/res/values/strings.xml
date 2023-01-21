@@ -1,10 +1,18 @@
 <resources>
-    <string name="app_name">Glider</string>
+
+    <array name="languages" translatable="false">
+        <item>ENG</item>
+        <item>ITA</item>
+        <item>ESP</item>
+        <item>FRA</item>
+    </array>
+
+    <string name="app_name" translatable="false">Glider</string>
     <string name="create">Create</string>
     <string name="insert">Insert</string>
-    <string name="list">List</string>
+    <string name="passwords" translatable="false">Passwords</string>
     <string name="removed">Removed</string>
-    <string name="account">Account</string>
+    <string name="account" translatable="false">Account</string>
     <string name="tail">Tail</string>
     <string name="scopes">Scopes</string>
     <string name="length">Length</string>
@@ -45,12 +53,10 @@
     <string name="address">Address:</string>
     <string name="server_details">Server details</string>
     <string name="port">Port:</string>
-    <string name="status">Status:</string>
     <string name="security">Security</string>
     <string name="single_use">Single use:</string>
-    <string name="qr_code_login">QR Code login:</string>
+    <string name="qr_code_login" translatable="false">QR Code login:</string>
     <string name="devices">Devices</string>
-    <string name="logout">LOGOUT</string>
     <string name="account_actions">Account actions</string>
     <string name="blacklist" translatable="false">Blacklist</string>
     <string name="disconnect">Disconnect</string>
@@ -58,7 +64,7 @@
     <string name="last_activity">Last activity:</string>
     <string name="login_date">Login date:</string>
     <string name="ip_address">Ip address:</string>
-    <string name="host">Host</string>
+    <string name="host" translatable="false">Host</string>
     <string name="port_text">Port</string>
     <string name="connect">Connect</string>
     <string name="host_is_required">Host is required</string>
@@ -77,13 +83,22 @@
     <string name="remove">Remove</string>
     <string name="scope">Scope</string>
     <string name="scope_removed_successfully">Scope removed successfully</string>
-    <string name="qrcode_reading_error">Error during the reading of the QRCODE</string>
+    <string name="qrcode_reading_error">Error during the reading of the QR CODE</string>
     <string name="insert_password">Insert password</string>
     <string name="insert_password_message">Insert the password to connect to your Glider\'s service</string>
     <string name="dismiss">Dismiss</string>
     <string name="ope_failed">Operation failed</string>
-    <string name="qrcode_prompt">Scan your Glider\'s QRCode to get the credentials</string>
-    <string name="unblacklist">UNBLACKLIST</string>
+    <string name="qrcode_prompt">Scan your Glider\'s QR Code to get the credentials</string>
+    <string name="unblacklist" translatable="false">UNBLACKLIST</string>
     <string name="password_successfully_deleted">Password successfully deleted</string>
     <string name="password_successfully_recovered">Password successfully recovered</string>
+    <string name="device_blacklisted_successfully">Device blacklisted successfully</string>
+    <string name="device_unblacklisted_successfully">Device unblacklisted successfully</string>
+    <string name="device_disconnected_successfully">Device disconnected successfully</string>
+    <string name="this_device_has_been_disconnected">This device has been disconnected</string>
+    <string name="the_session_has_been_deleted">The session has been deleted</string>
+    <string name="account_deletion">Account deletion</string>
+    <string name="account_deletion_message">This will delete permanently all the data of the account and all the passwords will be unrecoverable, proceed?</string>
+    <string name="proceed">Proceed</string>
+    <string name="change_language">Change language</string>
 </resources>

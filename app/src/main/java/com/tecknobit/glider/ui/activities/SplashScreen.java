@@ -21,8 +21,14 @@ import com.tecknobit.glider.ui.fragments.Update;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
 import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
 import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN;
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.valueOf;
+import static com.tecknobit.glider.R.string.the_session_has_been_deleted;
+import static com.tecknobit.glider.R.string.this_device_has_been_disconnected;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
 import static com.tecknobit.glider.helpers.local.User.IS_UPDATED;
 import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.local.Utils.setLanguageLocale;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 
 /**
  * The {@link SplashScreen} activity is the first screen of the {@code Glider} app. <br>
@@ -59,13 +65,25 @@ public class SplashScreen extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash_screen);
-        setDefaultNightMode(MODE_NIGHT_NO);
         STARTER_ACTIVITY = this;
         user = new User();
+        setLanguageLocale(this);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash_screen);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
+        setDefaultNightMode(MODE_NIGHT_NO);
+        String sStatusCode = getIntent().getStringExtra(statusCode.name());
+        if (sStatusCode != null) {
+            switch (valueOf(sStatusCode)) {
+                case GENERIC_RESPONSE -> {
+                    showSnackbar(findViewById(R.id.appName), this_device_has_been_disconnected);
+                }
+                case FAILED -> {
+                    showSnackbar(findViewById(R.id.appName), the_session_has_been_deleted);
+                }
+            }
+        }
         Animation animation = AnimationUtils.loadAnimation(SplashScreen.this, R.anim.fadein);
         for (int id : new int[]{R.id.appName, R.id.byTecknobit})
             findViewById(id).startAnimation(animation);

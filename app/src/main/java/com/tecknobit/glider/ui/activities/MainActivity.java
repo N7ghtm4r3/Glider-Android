@@ -24,6 +24,7 @@ import static com.tecknobit.glider.R.id.navigation_create;
 import static com.tecknobit.glider.R.id.navigation_insert;
 import static com.tecknobit.glider.R.id.navigation_list;
 import static com.tecknobit.glider.R.id.navigation_removed;
+import static com.tecknobit.glider.helpers.local.Utils.setLanguageLocale;
 
 /**
  * The {@link MainActivity} activity is the container menu for all the fragments of the {@link BottomNavigationView}. <br>
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setLanguageLocale(this);
         super.onCreate(savedInstanceState);
         MAIN_ACTIVITY = this;
         setContentView(R.layout.activity_main);

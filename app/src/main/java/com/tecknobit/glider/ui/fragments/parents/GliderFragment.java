@@ -71,7 +71,7 @@ public abstract class GliderFragment extends Fragment implements ManageRequest {
 
     /**
      * Method to set the base payload for a request <br>
-     * Any params required
+     * No-any params required
      */
     @Override
     public void setBasePayload() {
@@ -87,7 +87,7 @@ public abstract class GliderFragment extends Fragment implements ManageRequest {
 
     /**
      * Method to clear all views and set the {@link GliderFragment} in an initial state <br>
-     * Any params required
+     * No-any params required
      */
     protected abstract void clearViews();
 

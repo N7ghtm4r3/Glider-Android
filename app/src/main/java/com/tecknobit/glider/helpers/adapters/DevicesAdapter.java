@@ -12,12 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.local.Utils;
+import com.tecknobit.glider.helpers.local.ManageRequest;
+import com.tecknobit.glider.helpers.local.User.Operation;
 import com.tecknobit.glider.helpers.toImport.records.Device;
+import com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys;
 
-import java.text.DateFormat;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -25,7 +30,29 @@ import java.util.Locale;
 
 import static android.view.LayoutInflater.from;
 import static androidx.core.content.ContextCompat.getDrawable;
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
+import static com.tecknobit.apimanager.formatters.TimeFormatter.getStringDate;
+import static com.tecknobit.glider.R.string.device_blacklisted_successfully;
+import static com.tecknobit.glider.R.string.device_disconnected_successfully;
+import static com.tecknobit.glider.R.string.device_unblacklisted_successfully;
+import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.helpers.local.User.DEVICE_NAME;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
+import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.local.User.Operation.DISCONNECT;
+import static com.tecknobit.glider.helpers.local.User.Operation.MANAGE_DEVICE_AUTHORIZATION;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
+import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.ipAddress;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.targetDevice;
+import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.sessionPassword;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
+import static java.text.DateFormat.DATE_FIELD;
+import static java.text.DateFormat.getDateInstance;
+import static java.util.Locale.getDefault;
 
 /**
  * The {@link DevicesAdapter} is the adapter for the devices list
@@ -87,10 +114,10 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      * @param date: date as long timestamp to format
      * @return date input with the correct {@link Locale} as {@link String}
      **/
-    // TODO: 23/12/2022 SET ALSO THE SECONDS AND THE MINUTES TO THE TIME AND IF IS BETWEEN 24h PRINT
-    //  FULL DATE IF NOT PRINT ONLY THE DATE VALUE, SEE TRADERBOT IN LAST ACTIVITY SECTION TO DO THIS
     private String getLocaleDate(long date) {
-        return DateFormat.getDateInstance(DateFormat.DATE_FIELD, Locale.getDefault()).format(new Date(date));
+        if ((System.currentTimeMillis() - date) >= (86400 * 1000) / 2)
+            return getDateInstance(DATE_FIELD, getDefault()).format(new Date(date));
+        return getStringDate(date);
     }
 
     /**
@@ -103,7 +130,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
 
     /**
      * Method to refresh the current {@link #devices} list with a new list <br>
-     * Any params required
+     * No-any params required
      */
     @SuppressLint("NotifyDataSetChanged")
     public void refreshDevicesList(ArrayList<Device> devices) {
@@ -113,7 +140,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
 
     /**
      * Method to get {@link #devices} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #devices} instance as {@link Collection} of {@link Device}
      **/
@@ -129,7 +156,18 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      * @see View.OnClickListener
      **/
     @SuppressLint("NonConstantResourceId")
-    public static class DeviceView extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class DeviceView extends RecyclerView.ViewHolder implements View.OnClickListener,
+            ManageRequest {
+
+        /**
+         * {@code payload} the payload to send with the request
+         **/
+        protected JSONObject payload;
+
+        /**
+         * {@code response} instance to contains the response from the backend
+         */
+        protected JSONObject response;
 
         /**
          * {@code name} of the device -> as view instance type
@@ -196,21 +234,105 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.blackListBtn -> {
-                    // TODO: 23/12/2022 REQUEST THEN
-                    Utils.showSnackbar(v, "BLACKLISTED");
-                    relActions.setVisibility(View.GONE);
-                    unblacklistBtn.setVisibility(View.VISIBLE);
-                }
-                case R.id.disconnectBtn -> {
-                    // TODO: 23/12/2022 REQUEST THEN
-                    Utils.showSnackbar(v, "DISCONNECTED");
-                }
-                case R.id.unblacklistBtn -> {
-                    Utils.showSnackbar(v, "UNBLACKLISTED");
-                    relActions.setVisibility(View.VISIBLE);
-                    unblacklistBtn.setVisibility(View.GONE);
-                }
+                case R.id.blackListBtn -> manageDeviceAuthorization(true);
+                case R.id.disconnectBtn -> disconnectDevice();
+                case R.id.unblacklistBtn -> manageDeviceAuthorization(false);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public <T> void setRequestPayload(Operation operation, T... parameters) {
+            try {
+                if (payload == null)
+                    setBasePayload();
+                payload.put(ope.name(), operation);
+            } catch (JSONException e) {
+                payload = null;
+            }
+        }
+
+        /**
+         * Method to set the base payload for a request <br>
+         * No-any params required
+         */
+        @Override
+        public void setBasePayload() {
+            try {
+                payload = new JSONObject();
+                payload.put(DeviceKeys.name.name(), DEVICE_NAME)
+                        .put(type.name(), MOBILE)
+                        .put(sessionPassword.name(), user.getSessionPassword());
+            } catch (JSONException e) {
+                payload = null;
+            }
+        }
+
+        /**
+         * Method to disconnect a device <br>
+         * No-any params required
+         */
+        @Wrapper
+        public void disconnectDevice() {
+            executeRequest(DISCONNECT, false);
+        }
+
+        /**
+         * Method to manage the device authorization
+         *
+         * @param blacklist: whether is to blacklist or unblacklist
+         */
+        @Wrapper
+        public void manageDeviceAuthorization(boolean blacklist) {
+            executeRequest(MANAGE_DEVICE_AUTHORIZATION, blacklist);
+        }
+
+        /**
+         * Method to execute a request on a {@link Device}
+         *
+         * @param ope:       ope to execute, {@link Operation#DISCONNECT} of {@link Operation#MANAGE_DEVICE_AUTHORIZATION}
+         * @param blacklist: whether is to blacklist or unblacklist
+         */
+        private void executeRequest(Operation ope, boolean blacklist) {
+            setRequestPayload(ope);
+            try {
+                payload.put(targetDevice.name(), new JSONObject()
+                        .put(DeviceKeys.name.name(), name.getText().toString().split(" ")[1])
+                        .put(ipAddress.name(), ip.getText().toString().split(" ")[2]));
+                executor.execute(() -> {
+                    try {
+                        socketManager.writeContent(payload);
+                        response = new JSONObject(socketManager.readContent());
+                        MAIN_ACTIVITY.runOnUiThread(() -> {
+                            try {
+                                if (response.getString(statusCode.name()).equals(SUCCESSFUL.name())) {
+                                    if (ope.equals(MANAGE_DEVICE_AUTHORIZATION)) {
+                                        if (blacklist) {
+                                            relActions.setVisibility(View.GONE);
+                                            unblacklistBtn.setVisibility(View.VISIBLE);
+                                            showSnackbar(ip, device_blacklisted_successfully);
+                                        } else {
+                                            relActions.setVisibility(View.VISIBLE);
+                                            unblacklistBtn.setVisibility(View.GONE);
+                                            showSnackbar(ip, device_unblacklisted_successfully);
+                                        }
+                                    } else {
+                                        showSnackbar(ip, device_disconnected_successfully);
+                                    }
+                                } else
+                                    showSnackbar(ip, ope_failed);
+                            } catch (JSONException e) {
+                                showSnackbar(ip, ope_failed);
+                            }
+                        });
+                    } catch (Exception e) {
+                        showSnackbar(ip, ope_failed);
+                    }
+                });
+            } catch (JSONException e) {
+                showSnackbar(ip, ope_failed);
             }
         }
 

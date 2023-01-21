@@ -40,6 +40,7 @@ import static com.tecknobit.glider.helpers.adapters.PasswordsAdapter.PasswordVie
 import static com.tecknobit.glider.helpers.local.User.Operation.DELETE_PASSWORD;
 import static com.tecknobit.glider.helpers.local.User.Operation.RECOVER_PASSWORD;
 import static com.tecknobit.glider.helpers.local.User.passwords;
+import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
@@ -154,6 +155,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
         swipeRefreshLayout = view.findViewById(R.id.swipe);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             hideKeyboard(viewContainer);
+            user.refreshData();
             loadRecycler();
             swipeRefreshLayout.setRefreshing(false);
         });
@@ -162,7 +164,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
 
     /**
      * Method to start the workflow of the {@link #search} view <br>
-     * Any params required
+     * No-any params required
      **/
     private void startSearchViewWorkflow() {
         ((TextInputLayout) viewContainer.findViewById(R.id.searchView)).setEndIconOnClickListener(v -> {

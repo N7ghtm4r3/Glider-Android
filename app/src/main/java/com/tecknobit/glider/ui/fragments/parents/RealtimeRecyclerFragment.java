@@ -56,7 +56,7 @@ public abstract class RealtimeRecyclerFragment extends GliderFragment {
 
     /**
      * Method to load the {@link #recyclerManager} with the data to show <br>
-     * Any params required
+     * No-any params required
      **/
     protected void loadRecycler() {
         stopRunnable();

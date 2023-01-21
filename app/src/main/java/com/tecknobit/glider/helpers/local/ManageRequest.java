@@ -28,7 +28,7 @@ public interface ManageRequest {
 
     /**
      * Method to set the base payload for a request <br>
-     * Any params required
+     * No-any params required
      */
     void setBasePayload();
 

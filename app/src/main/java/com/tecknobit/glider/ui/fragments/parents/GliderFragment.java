@@ -4,19 +4,19 @@ import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
+import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.local.ManageRequest;
-import com.tecknobit.glider.helpers.local.User.Operation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.local.User.DEVICE_NAME;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.local.User.user;
-import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
-import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
-import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
-import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.sessionPassword;
+import static com.tecknobit.glider.records.Device.DeviceKeys.name;
+import static com.tecknobit.glider.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.records.Session.SessionKeys.sessionPassword;
 
 /**
  * The {@link GliderFragment} is the super class where a fragment inherit the base methods for the normal

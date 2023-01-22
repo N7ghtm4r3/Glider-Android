@@ -14,8 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.local.User.Operation;
-import com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys;
+import com.tecknobit.glider.records.Password.PasswordKeys;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
 import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
@@ -25,8 +24,9 @@ import org.json.JSONObject;
 
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
 import static com.tecknobit.glider.R.string.ope_failed;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.local.User.Operation.INSERT_PASSWORD;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.INSERT_PASSWORD;
 import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;

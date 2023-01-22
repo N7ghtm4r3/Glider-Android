@@ -23,10 +23,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter.DeviceView;
-import com.tecknobit.glider.helpers.local.User.Operation;
-import com.tecknobit.glider.helpers.toImport.records.Device;
+import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.ui.activities.SplashScreen;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
@@ -54,9 +54,9 @@ import static com.tecknobit.glider.R.string.account_deletion;
 import static com.tecknobit.glider.R.string.account_deletion_message;
 import static com.tecknobit.glider.R.string.ope_failed;
 import static com.tecknobit.glider.R.string.proceed;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.local.User.Operation.DELETE_ACCOUNT;
-import static com.tecknobit.glider.helpers.local.User.Operation.DISCONNECT;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_ACCOUNT;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DISCONNECT;
 import static com.tecknobit.glider.helpers.local.User.devices;
 import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.User.user;
@@ -64,11 +64,11 @@ import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.createAlertDialog;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
-import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.QRCodeLoginEnabled;
-import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostAddress;
-import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.hostPort;
-import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.runInLocalhost;
-import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.singleUseMode;
+import static com.tecknobit.glider.records.Session.SessionKeys.QRCodeLoginEnabled;
+import static com.tecknobit.glider.records.Session.SessionKeys.hostAddress;
+import static com.tecknobit.glider.records.Session.SessionKeys.hostPort;
+import static com.tecknobit.glider.records.Session.SessionKeys.runInLocalhost;
+import static com.tecknobit.glider.records.Session.SessionKeys.singleUseMode;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
@@ -193,7 +193,6 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
             }
         });
         try {
-            //JSONObject account = new JSONObject(user.toString()); // TODO: 21/01/2023 CHECK IF USE TOJSON();
             JSONObject account = new JSONObject();
             account.put(hostAddress.name(), user.getHostAddress());
             account.put(hostPort.name(), user.getHostPort());
@@ -328,10 +327,10 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
         switch (v.getId()) {
             case deleteBtn -> {
                 createAlertDialog(account_deletion, account_deletion_message,
-                        proceed,
-                        (dialogInterface, i) -> setRequestPayload(DELETE_ACCOUNT),
                         R.string.dismiss,
-                        (dialogInterface, i) -> dialogInterface.dismiss(), MAIN_ACTIVITY).show();
+                        (dialogInterface, i) -> dialogInterface.dismiss(),
+                        proceed,
+                        (dialogInterface, i) -> setRequestPayload(DELETE_ACCOUNT), MAIN_ACTIVITY).show();
             }
             case disconnectBtn -> setRequestPayload(DISCONNECT);
         }

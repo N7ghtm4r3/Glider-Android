@@ -25,8 +25,9 @@ import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.local.User.Operation;
+import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.local.Utils;
+import com.tecknobit.glider.records.Password.PasswordKeys;
 import com.tecknobit.glider.ui.fragments.parents.FormFragment;
 import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 
@@ -36,17 +37,16 @@ import org.json.JSONObject;
 
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
 import static com.tecknobit.glider.R.string.ope_failed;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.local.User.Operation.CREATE_PASSWORD;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.CREATE_PASSWORD;
 import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
-import static com.tecknobit.glider.helpers.toImport.records.Password.PASSWORD_MAX_LENGTH;
-import static com.tecknobit.glider.helpers.toImport.records.Password.PASSWORD_MIN_LENGTH;
-import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys;
-import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys.password;
-import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys.scopes;
+import static com.tecknobit.glider.records.Password.PASSWORD_MAX_LENGTH;
+import static com.tecknobit.glider.records.Password.PASSWORD_MIN_LENGTH;
+import static com.tecknobit.glider.records.Password.PasswordKeys.password;
+import static com.tecknobit.glider.records.Password.PasswordKeys.scopes;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**

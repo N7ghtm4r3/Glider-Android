@@ -27,8 +27,8 @@ import com.tecknobit.apimanager.annotations.android.ResId;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.adapters.PasswordsAdapter;
 import com.tecknobit.glider.helpers.local.Utils;
-import com.tecknobit.glider.helpers.toImport.records.Password;
-import com.tecknobit.glider.helpers.toImport.records.Password.Status;
+import com.tecknobit.glider.records.Password;
+import com.tecknobit.glider.records.Password.Status;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
 import java.util.ArrayList;
@@ -36,14 +36,16 @@ import java.util.ArrayList;
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
 import static androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_PASSWORD;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.RECOVER_PASSWORD;
 import static com.tecknobit.glider.helpers.adapters.PasswordsAdapter.PasswordView;
-import static com.tecknobit.glider.helpers.local.User.Operation.DELETE_PASSWORD;
-import static com.tecknobit.glider.helpers.local.User.Operation.RECOVER_PASSWORD;
 import static com.tecknobit.glider.helpers.local.User.passwords;
 import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
+import static com.tecknobit.glider.records.Password.Status.ACTIVE;
+import static com.tecknobit.glider.records.Password.Status.DELETED;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 import static com.tecknobit.glider.ui.activities.MainActivity.navController;
 
@@ -304,10 +306,10 @@ public class ListFragment extends RealtimeRecyclerFragment {
     protected void loadRecycler() {
         super.loadRecycler();
         runnable = () -> {
-            if (!recoveryMode)
-                list = passwords.get(Status.ACTIVE);
-            else
-                list = passwords.get(Status.DELETED);
+            if (!recoveryMode) {
+                list = passwords.get(ACTIVE);
+            } else
+                list = passwords.get(DELETED);
             if (list != null) {
                 int passwordsSize = list.size();
                 if (currentRecyclerSize != passwordsSize) {

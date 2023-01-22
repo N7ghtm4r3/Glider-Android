@@ -24,7 +24,7 @@ import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_MATCH_A
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.valueOf;
 import static com.tecknobit.glider.R.string.the_session_has_been_deleted;
 import static com.tecknobit.glider.R.string.this_device_has_been_disconnected;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
 import static com.tecknobit.glider.helpers.local.User.IS_UPDATED;
 import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.local.Utils.setLanguageLocale;

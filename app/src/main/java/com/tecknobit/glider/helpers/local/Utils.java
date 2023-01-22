@@ -25,6 +25,8 @@ import java.util.Locale;
 import static android.content.ClipData.newPlainText;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static com.tecknobit.glider.helpers.GliderLauncher.COLOR_PRIMARY_HEX;
+import static com.tecknobit.glider.helpers.GliderLauncher.COLOR_RED_HEX;
 import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
 
@@ -35,21 +37,10 @@ import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
  **/
 public class Utils {
 
-    // TODO: 21/01/2023 REMOVE WHEN IMPLEMENTED
-    /**
-     * {@code COLOR_PRIMARY_HEX} the primary color value as hex {@link String}
-     */
-    public static final String COLOR_PRIMARY_HEX = "#1E1E8D";
-
     /**
      * {@code COLOR_PRIMARY} the primary color value as int
      */
     public static final int COLOR_PRIMARY = Color.parseColor(COLOR_PRIMARY_HEX);
-
-    /**
-     * {@code COLOR_RED_HEX} the red color value as hex {@link String}
-     */
-    public static final String COLOR_RED_HEX = "#A81515";
 
     /**
      * {@code COLOR_RED} the red color value as int

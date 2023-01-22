@@ -1,6 +1,6 @@
 package com.tecknobit.glider.helpers.local;
 
-import com.tecknobit.glider.helpers.local.User.Operation;
+import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

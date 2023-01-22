@@ -13,19 +13,22 @@ import com.google.firebase.database.ValueEventListener;
 import com.tecknobit.apimanager.apis.SocketManager;
 import com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode;
 import com.tecknobit.apimanager.formatters.JsonHelper;
-import com.tecknobit.glider.helpers.toImport.records.Device;
-import com.tecknobit.glider.helpers.toImport.records.Password;
-import com.tecknobit.glider.helpers.toImport.records.Password.Status;
-import com.tecknobit.glider.helpers.toImport.records.Session;
+import com.tecknobit.glider.helpers.DatabaseManager.Table;
+import com.tecknobit.glider.records.Device;
+import com.tecknobit.glider.records.Password;
+import com.tecknobit.glider.records.Password.Status;
+import com.tecknobit.glider.records.Session;
 import com.tecknobit.glider.ui.activities.SplashScreen;
 import com.tecknobit.glider.ui.fragments.AccountFragment;
 import com.tecknobit.glider.ui.fragments.ListFragment;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.SocketException;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,18 +40,17 @@ import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.F
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.GENERIC_RESPONSE;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.valueOf;
 import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.databasePath;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.ope;
-import static com.tecknobit.glider.helpers.local.User.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.local.User.Operation.REFRESH_DATA;
-import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.name;
-import static com.tecknobit.glider.helpers.toImport.records.Device.DeviceKeys.type;
-import static com.tecknobit.glider.helpers.toImport.records.Device.Type.MOBILE;
-import static com.tecknobit.glider.helpers.toImport.records.Password.PasswordKeys.status;
-import static com.tecknobit.glider.helpers.toImport.records.Password.Status.ACTIVE;
-import static com.tecknobit.glider.helpers.toImport.records.Password.Status.DELETED;
-import static com.tecknobit.glider.helpers.toImport.records.Session.SessionKeys.session;
-import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.databasePath;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.REFRESH_DATA;
+import static com.tecknobit.glider.records.Device.DeviceKeys.name;
+import static com.tecknobit.glider.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.records.Password.PasswordKeys.status;
+import static com.tecknobit.glider.records.Password.Status.ACTIVE;
+import static com.tecknobit.glider.records.Password.Status.DELETED;
+import static com.tecknobit.glider.records.Session.SessionKeys.session;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
 
 /**
@@ -142,6 +144,13 @@ public class User extends Session {
         if (hostAddress != null) {
             if (secretKey != null) {
                 try {
+                    try {
+                        final Socket socket = new Socket();
+                        socket.connect(new InetSocketAddress(hostAddress, hostPort), 2000);
+                        socket.close();
+                    } catch (IOException e) {
+                        resetSession(FAILED);
+                    }
                     socketManager = new SocketManager(hostAddress, hostPort, ivSpec, secretKey, CBC_ALGORITHM);
                     refreshData();
                 } catch (Exception e) {
@@ -190,109 +199,11 @@ public class User extends Session {
      */
     public void clearUserData() {
         userShared.edit().clear().apply();
-        handler.removeCallbacks(runnable);
+        if (runnable != null) {
+            handler.removeCallbacks(runnable);
+            runnable = null;
+        }
         refreshUser();
-    }
-
-    // TODO: 18/01/2023 TO REMOVE WHEN IMPLEMENTED
-
-    /**
-     * {@code Operation} list of available operations
-     */
-    public enum Operation {
-
-        /**
-         * {@code GET_PUBLIC_KEYS} get public keys operation
-         */
-        GET_PUBLIC_KEYS,
-
-        /**
-         * {@code CONNECT} connect operation
-         */
-        CONNECT,
-
-        /**
-         * {@code REFRESH_DATA} refresh data operation
-         */
-        REFRESH_DATA,
-
-        /**
-         * {@code CREATE_PASSWORD} create password operation
-         */
-        CREATE_PASSWORD,
-
-        /**
-         * {@code INSERT_PASSWORD} insert password operation
-         */
-        INSERT_PASSWORD,
-
-        /**
-         * {@code DELETE_PASSWORD} delete password operation
-         */
-        DELETE_PASSWORD,
-
-        /**
-         * {@code RECOVER_PASSWORD} recovery password operation
-         */
-        RECOVER_PASSWORD,
-
-        /**
-         * {@code ADD_SCOPE} add scope operation
-         */
-        ADD_SCOPE,
-
-        /**
-         * {@code EDIT_SCOPE} edit scope operation
-         */
-        EDIT_SCOPE,
-
-        /**
-         * {@code REMOVE_SCOPE} remove scope operation
-         */
-        REMOVE_SCOPE,
-
-        /**
-         * {@code DISCONNECT} disconnect operation
-         */
-        DISCONNECT,
-
-        /**
-         * {@code MANAGE_DEVICE_AUTHORIZATION} blacklist / unblacklist device operation
-         */
-        MANAGE_DEVICE_AUTHORIZATION,
-
-        /**
-         * {@code DELETE_ACCOUNT} account deletion operation
-         */
-        DELETE_ACCOUNT,
-
-    }
-
-    /**
-     * {@code GliderKeys} list of available keys
-     */
-    public enum GliderKeys {
-
-        /**
-         * {@code "ope"} key
-         */
-        ope,
-
-        /**
-         * {@code "statusCode"} key
-         */
-        statusCode,
-
-        /**
-         * {@code "serverStatus"} key
-         */
-        serverStatus,
-
-        /**
-         * {@code "databasePath"} key
-         */
-        databasePath
-
     }
 
     /**
@@ -344,14 +255,18 @@ public class User extends Session {
             final ArrayList<Password> deletedPasswords = new ArrayList<>();
             runnable = () -> {
                 try {
-                    socketManager.writeContent(payload);
-                    JSONObject newData = new JSONObject(socketManager.readContent());
+                    final Socket socket = new Socket();
+                    socket.connect(new InetSocketAddress(hostAddress, hostPort), 2000);
+                    socketManager.writeContentTo(socket, payload);
+                    JSONObject newData = new JSONObject(socketManager.readContent(socket));
+                    socket.close();
                     String sNewData = newData.toString();
                     switch (valueOf(newData.getString(statusCode.name()))) {
                         case SUCCESSFUL -> {
                             if (!sNewData.equals(actualData[0].toString())) {
                                 hNewData.setJSONObjectSource(newData);
-                                JSONArray jDevices = hNewData.getJSONArray("devices", new JSONArray()); // TODO: 20/01/2023 USE THE RIGHT KEY
+                                JSONArray jDevices = hNewData.getJSONArray(Table.devices.name(),
+                                        new JSONArray());
                                 String sDevices = jDevices.toString();
                                 if (!sDevices.equals(actualList[0].toString())) {
                                     devices.clear();
@@ -362,7 +277,8 @@ public class User extends Session {
                                     }
                                     actualList[0] = new JSONArray(sDevices);
                                 }
-                                JSONArray jPasswords = hNewData.getJSONArray("passwords", new JSONArray()); // TODO: 20/01/2023 USE THE RIGHT KEY
+                                JSONArray jPasswords = hNewData.getJSONArray(Table.passwords.name(),
+                                        new JSONArray());
                                 String sPasswords = jPasswords.toString();
                                 if (!sPasswords.equals(actualList[1].toString())) {
                                     passwords.clear();
@@ -382,19 +298,19 @@ public class User extends Session {
                                 }
                                 actualData[0] = new JSONObject(sNewData);
                             }
-                            handler.postDelayed(runnable, 5000);
                         }
                         case GENERIC_RESPONSE -> resetSession(GENERIC_RESPONSE);
                         default -> resetSession(FAILED);
                     }
-                } catch (SocketException e) {
+                    handler.postDelayed(runnable, 5000);
+                } catch (SocketTimeoutException e) {
                     resetSession(FAILED);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             };
             runnable.run();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -405,8 +321,8 @@ public class User extends Session {
      * @param code: code of termination
      **/
     private void resetSession(StandardResponseCode code) {
-        user.clearUserData();
-        MAIN_ACTIVITY.startActivity(new Intent(MAIN_ACTIVITY, SplashScreen.class)
+        clearUserData();
+        STARTER_ACTIVITY.startActivity(new Intent(STARTER_ACTIVITY, SplashScreen.class)
                 .putExtra(statusCode.name(), code.name()));
     }
 

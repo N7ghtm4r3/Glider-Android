@@ -67,7 +67,7 @@ Glider application **will not share any personal data of the user with third par
 applications.** <br>
 Only the data about the application performance and session will be tracked
 by <a href="https://analytics.google.com/">Google Analytics's services</a>, will be tracked for
-performance purposes and to manage a possible updates of the **Glider** application Regards and good
-use!
+performance purposes and to manage a possible updates of the **Glider** application<br>
+Regards and good use!
 
 Copyright © 2023 Tecknobit

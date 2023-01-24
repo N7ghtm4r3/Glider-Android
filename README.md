@@ -18,7 +18,7 @@ This project will be constantly developed to reach different platforms to work o
 platforms releases steps:
 
 - Mobile
-  - <a href="https://github.com/N7ghtm4r3/Glider-Android#readme">Android</a> (**coming soon**)
+  - <a href="https://github.com/N7ghtm4r3/Glider-Android#readme">Android</a>
   - iOS
 - Desktop Glider version
 

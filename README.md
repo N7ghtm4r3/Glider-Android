@@ -18,7 +18,7 @@ This project will be constantly developed to reach different platforms to work o
 platforms releases steps:
 
 - Mobile
-  - <a href="https://play.google.com/store/apps/details?id=com.tecknobit.glider">Android</a>
+  - <a href="https://play.google.com/store/apps/details?id=com.tecknobit.glider">Android</a> -> **available!**
   - iOS
 - Desktop Glider version
 

@@ -55,7 +55,7 @@ import static com.tecknobit.glider.R.string.account_deletion_message;
 import static com.tecknobit.glider.R.string.ope_failed;
 import static com.tecknobit.glider.R.string.proceed;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_ACCOUNT;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_SESSION;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DISCONNECT;
 import static com.tecknobit.glider.helpers.local.User.devices;
 import static com.tecknobit.glider.helpers.local.User.socketManager;
@@ -330,7 +330,7 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
                         R.string.dismiss,
                         (dialogInterface, i) -> dialogInterface.dismiss(),
                         proceed,
-                        (dialogInterface, i) -> setRequestPayload(DELETE_ACCOUNT), MAIN_ACTIVITY).show();
+                        (dialogInterface, i) -> setRequestPayload(DELETE_SESSION), MAIN_ACTIVITY).show();
             }
             case disconnectBtn -> setRequestPayload(DISCONNECT);
         }

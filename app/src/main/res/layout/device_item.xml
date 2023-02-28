@@ -30,13 +30,14 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/deviceName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_toStartOf="@id/deviceIconType"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/name"
+                android:maxLines="1"
                 android:textSize="18sp" />
 
         </RelativeLayout>

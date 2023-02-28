@@ -2,7 +2,6 @@ package com.tecknobit.glider.helpers.local;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
@@ -35,6 +34,9 @@ import java.util.Iterator;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.pm.PackageManager.NameNotFoundException;
+import static android.os.Build.DEVICE;
+import static android.os.Build.HOST;
+import static android.os.Build.MANUFACTURER;
 import static com.google.firebase.database.FirebaseDatabase.getInstance;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.GENERIC_RESPONSE;
@@ -64,7 +66,7 @@ public class User extends Session {
     /**
      * {@code DEVICE_NAME} name of the device
      */
-    public static final String DEVICE_NAME = Build.MANUFACTURER + "-" + Build.DEVICE;
+    public static final String DEVICE_NAME = MANUFACTURER + "-" + DEVICE + " " + HOST;
 
     /**
      * {@code passwords} list for the {@link ListFragment} with {@link Status} as key and
@@ -199,6 +201,8 @@ public class User extends Session {
      */
     public void clearUserData() {
         userShared.edit().clear().apply();
+        passwords.clear();
+        devices.clear();
         if (runnable != null) {
             handler.removeCallbacks(runnable);
             runnable = null;

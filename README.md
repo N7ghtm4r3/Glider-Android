@@ -1,11 +1,11 @@
 # Glider
 
-**v1.0.0**
+**v1.0.1**
 
 This is a Java Based open source project useful to manage the creation and the storage of your
 passwords with the **Glider** ecosystem This repository contains the Android version of **Glider**,
-so if you want to customize you can fork it and work on it, if there any errors, fixes to do or some
-idea to upgrade this project, please open a ticket or contact us to discuss about, thanks and good
+so if you want to customize you can fork it and work on it, if there are any errors, fixes to do or
+some idea to upgrade this project, please open a ticket or contact us to talk about, thanks and good
 use!
 
 ## 🛠 Skills
@@ -24,7 +24,8 @@ platforms releases steps:
 
 ## Usages
 
-See how use the **Glider** service reading the <a href="https://github.com/N7ghtm4r3/Glider#readme">
+See how to use the **Glider** service reading
+the <a href="https://github.com/N7ghtm4r3/Glider#readme">
 Glider backend procedures</a>
 
 ## Authors

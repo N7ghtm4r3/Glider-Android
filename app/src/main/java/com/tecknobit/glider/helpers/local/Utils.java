@@ -118,7 +118,7 @@ public class Utils {
      * @return the text contained in the {@link TextInputEditText} as {@link String}
      */
     public static String getTextFromEdit(TextInputEditText editText) {
-        return editText.getText().toString();
+        return editText.getText().toString().replace(" ", "");
     }
 
     /**

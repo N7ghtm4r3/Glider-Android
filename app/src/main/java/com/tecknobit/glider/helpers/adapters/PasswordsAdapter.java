@@ -256,7 +256,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
                     String[] mScopes = query.replaceAll(" ", "").split(",");
                     Arrays.sort(mScopes);
                     for (Password password : passwords)
-                        if (Arrays.toString(mScopes).equals(password.getScopesSorted().toString()))
+                        if (Arrays.toString(mScopes).contains(password.getScopesSorted().toString()))
                             filteredPasswords.add(password);
                 }
                 filterResults.values = filteredPasswords;

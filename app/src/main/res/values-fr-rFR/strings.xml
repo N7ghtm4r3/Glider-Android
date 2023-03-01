@@ -47,7 +47,6 @@
     <string name="devices">Dispositifs</string>
     <string name="account_actions">Actions compte</string>
     <string name="disconnect">Déconnecter</string>
-    <string name="name">Nom:</string>
     <string name="last_activity">Dernière Activité:</string>
     <string name="login_date">Date de connexion :</string>
     <string name="ip_address">Adresse IP:</string>

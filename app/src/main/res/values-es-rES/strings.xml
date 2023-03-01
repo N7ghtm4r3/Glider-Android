@@ -47,7 +47,6 @@
     <string name="devices">Dispositivos</string>
     <string name="account_actions">Acciones de cuenta</string>
     <string name="disconnect">Cerrar</string>
-    <string name="name">Primer nombre:</string>
     <string name="last_activity">Última actividad:</string>
     <string name="login_date">Fecha inicio sesión:</string>
     <string name="ip_address">Dirección IP:</string>

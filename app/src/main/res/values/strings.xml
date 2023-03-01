@@ -60,7 +60,6 @@
     <string name="account_actions">Account actions</string>
     <string name="blacklist" translatable="false">Blacklist</string>
     <string name="disconnect">Disconnect</string>
-    <string name="name">Name:</string>
     <string name="last_activity">Last activity:</string>
     <string name="login_date">Login date:</string>
     <string name="ip_address">Ip address:</string>

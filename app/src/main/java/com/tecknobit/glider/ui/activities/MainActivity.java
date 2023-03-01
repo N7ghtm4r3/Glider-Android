@@ -13,6 +13,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.local.User;
 import com.tecknobit.glider.ui.fragments.AccountFragment;
 import com.tecknobit.glider.ui.fragments.CreateFragment;
 import com.tecknobit.glider.ui.fragments.InsertFragment;
@@ -24,6 +25,7 @@ import static com.tecknobit.glider.R.id.navigation_create;
 import static com.tecknobit.glider.R.id.navigation_insert;
 import static com.tecknobit.glider.R.id.navigation_list;
 import static com.tecknobit.glider.R.id.navigation_removed;
+import static com.tecknobit.glider.helpers.local.User.refreshData;
 import static com.tecknobit.glider.helpers.local.Utils.setLanguageLocale;
 
 /**
@@ -85,11 +87,24 @@ public class MainActivity extends AppCompatActivity {
     /**
      * {@inheritDoc}
      *
+     * @apiNote when called {@link User#refreshData} on {@code "true"} and will be
+     * resumed the normal {@code "Glider"}'s workflow
+     **/
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshData = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @apiNote when called will be invoked the {@link #finishAffinity()} method to exit from this app
      **/
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        refreshData = false;
         finishAffinity();
     }
 
@@ -101,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
+        refreshData = false;
         finishAffinity();
     }
 

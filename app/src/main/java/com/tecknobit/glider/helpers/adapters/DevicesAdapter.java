@@ -93,7 +93,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
     @SuppressLint("SetTextI18n")
     public void onBindViewHolder(@NonNull DeviceView holder, int position) {
         Device device = devices.get(position);
-        holder.name.setText(MAIN_ACTIVITY.getString(R.string.name) + " " + device.getName());
+        holder.name.setText(device.getName());
         Device.Type type = device.getType();
         if (type.equals(Device.Type.DESKTOP))
             holder.deviceIconType.setImageDrawable(getDrawable(MAIN_ACTIVITY, R.drawable.ic_baseline_desktop_24));
@@ -299,7 +299,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
             setRequestPayload(ope);
             try {
                 payload.put(targetDevice.name(), new JSONObject()
-                        .put(DeviceKeys.name.name(), name.getText().toString().split(" ")[1])
+                        .put(DeviceKeys.name.name(), name.getText().toString())
                         .put(ipAddress.name(), ip.getText().toString().split(" ")[2]));
                 executor.execute(() -> {
                     try {

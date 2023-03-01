@@ -26,6 +26,7 @@ import static com.tecknobit.glider.R.string.the_session_has_been_deleted;
 import static com.tecknobit.glider.R.string.this_device_has_been_disconnected;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
 import static com.tecknobit.glider.helpers.local.User.IS_UPDATED;
+import static com.tecknobit.glider.helpers.local.User.refreshData;
 import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.local.Utils.setLanguageLocale;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
@@ -75,6 +76,7 @@ public class SplashScreen extends AppCompatActivity {
         setDefaultNightMode(MODE_NIGHT_NO);
         String sStatusCode = getIntent().getStringExtra(statusCode.name());
         if (sStatusCode != null) {
+            refreshData = true;
             switch (valueOf(sStatusCode)) {
                 case GENERIC_RESPONSE -> {
                     showSnackbar(findViewById(R.id.appName), this_device_has_been_disconnected);
@@ -133,39 +135,42 @@ public class SplashScreen extends AppCompatActivity {
     /**
      * {@inheritDoc}
      *
-     * @apiNote when called {@link #start} will be set on {@code "false"} and will be called
-     * {@link #finishAffinity()} method to exit from this app
-     **/
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        start = false;
-        finishAffinity();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @apiNote when called {@link #start} will be set on {@code "true"} and will be
+     * @apiNote when called {@link #start} and {@link User#refreshData} on {@code "true"} and will be
      * resumed the normal {@code "Glider"}'s workflow
      **/
     @Override
     protected void onResume() {
         super.onResume();
         start = true;
+        refreshData = true;
     }
 
     /**
      * {@inheritDoc}
      *
-     * @apiNote when called {@link #start} will be set on {@code "false"} and will be called
-     * {@link #finishAffinity()} method to exit from this app
+     * @apiNote when called {@link #start} and {@link User#refreshData} will be set on {@code "false"}
+     * and will be called {@link #finishAffinity()} method to exit from this app
+     **/
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        start = false;
+        refreshData = false;
+        finishAffinity();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @apiNote when called {@link #start} and {@link User#refreshData} will be set on {@code "false"}
+     * and will be called {@link #finishAffinity()} method to exit from this app
      **/
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         if (executeLeaveHint) {
             start = false;
+            refreshData = false;
             finishAffinity();
         }
     }

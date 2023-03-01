@@ -91,6 +91,11 @@ public class User extends Session {
     public static volatile String LATEST_VERSION;
 
     /**
+     * {@code refreshData} whether refresh the data
+     **/
+    public static volatile boolean refreshData = true;
+
+    /**
      * {@code devices} list of {@link Device} for the {@link AccountFragment}
      **/
     public static final ArrayList<Device> devices = new ArrayList<>();
@@ -203,6 +208,7 @@ public class User extends Session {
         userShared.edit().clear().apply();
         passwords.clear();
         devices.clear();
+        refreshData = false;
         if (runnable != null) {
             handler.removeCallbacks(runnable);
             runnable = null;
@@ -259,52 +265,54 @@ public class User extends Session {
             final ArrayList<Password> deletedPasswords = new ArrayList<>();
             runnable = () -> {
                 try {
-                    final Socket socket = new Socket();
-                    socket.connect(new InetSocketAddress(hostAddress, hostPort), 2000);
-                    socketManager.writeContentTo(socket, payload);
-                    JSONObject newData = new JSONObject(socketManager.readContent(socket));
-                    socket.close();
-                    String sNewData = newData.toString();
-                    switch (valueOf(newData.getString(statusCode.name()))) {
-                        case SUCCESSFUL -> {
-                            if (!sNewData.equals(actualData[0].toString())) {
-                                hNewData.setJSONObjectSource(newData);
-                                JSONArray jDevices = hNewData.getJSONArray(Table.devices.name(),
-                                        new JSONArray());
-                                String sDevices = jDevices.toString();
-                                if (!sDevices.equals(actualList[0].toString())) {
-                                    devices.clear();
-                                    for (int j = 0; j < jDevices.length(); j++) {
-                                        JSONObject jDevice = jDevices.getJSONObject(j);
-                                        if (!jDevice.getString(name.name()).equals(DEVICE_NAME))
-                                            devices.add(new Device(jDevice));
-                                    }
-                                    actualList[0] = new JSONArray(sDevices);
-                                }
-                                JSONArray jPasswords = hNewData.getJSONArray(Table.passwords.name(),
-                                        new JSONArray());
-                                String sPasswords = jPasswords.toString();
-                                if (!sPasswords.equals(actualList[1].toString())) {
-                                    passwords.clear();
-                                    activePasswords.clear();
-                                    deletedPasswords.clear();
-                                    for (int j = 0; j < jPasswords.length(); j++) {
-                                        JSONObject jPassword = jPasswords.getJSONObject(j);
-                                        Status pStatus = Status.valueOf(jPassword.getString(status.name()));
-                                        switch (pStatus) {
-                                            case ACTIVE -> activePasswords.add(new Password(jPassword));
-                                            case DELETED -> deletedPasswords.add(new Password(jPassword));
+                    if (refreshData) {
+                        final Socket socket = new Socket();
+                        socket.connect(new InetSocketAddress(hostAddress, hostPort), 2000);
+                        socketManager.writeContentTo(socket, payload);
+                        JSONObject newData = new JSONObject(socketManager.readContent(socket));
+                        socket.close();
+                        String sNewData = newData.toString();
+                        switch (valueOf(newData.getString(statusCode.name()))) {
+                            case SUCCESSFUL -> {
+                                if (!sNewData.equals(actualData[0].toString())) {
+                                    hNewData.setJSONObjectSource(newData);
+                                    JSONArray jDevices = hNewData.getJSONArray(Table.devices.name(),
+                                            new JSONArray());
+                                    String sDevices = jDevices.toString();
+                                    if (!sDevices.equals(actualList[0].toString())) {
+                                        devices.clear();
+                                        for (int j = 0; j < jDevices.length(); j++) {
+                                            JSONObject jDevice = jDevices.getJSONObject(j);
+                                            if (!jDevice.getString(name.name()).equals(DEVICE_NAME))
+                                                devices.add(new Device(jDevice));
                                         }
+                                        actualList[0] = new JSONArray(sDevices);
                                     }
-                                    passwords.put(ACTIVE, activePasswords);
-                                    passwords.put(DELETED, deletedPasswords);
-                                    actualList[1] = new JSONArray(sPasswords);
+                                    JSONArray jPasswords = hNewData.getJSONArray(Table.passwords.name(),
+                                            new JSONArray());
+                                    String sPasswords = jPasswords.toString();
+                                    if (!sPasswords.equals(actualList[1].toString())) {
+                                        passwords.clear();
+                                        activePasswords.clear();
+                                        deletedPasswords.clear();
+                                        for (int j = 0; j < jPasswords.length(); j++) {
+                                            JSONObject jPassword = jPasswords.getJSONObject(j);
+                                            Status pStatus = Status.valueOf(jPassword.getString(status.name()));
+                                            switch (pStatus) {
+                                                case ACTIVE -> activePasswords.add(new Password(jPassword));
+                                                case DELETED -> deletedPasswords.add(new Password(jPassword));
+                                            }
+                                        }
+                                        passwords.put(ACTIVE, activePasswords);
+                                        passwords.put(DELETED, deletedPasswords);
+                                        actualList[1] = new JSONArray(sPasswords);
+                                    }
+                                    actualData[0] = new JSONObject(sNewData);
                                 }
-                                actualData[0] = new JSONObject(sNewData);
                             }
+                            case GENERIC_RESPONSE -> resetSession(GENERIC_RESPONSE);
+                            default -> resetSession(FAILED);
                         }
-                        case GENERIC_RESPONSE -> resetSession(GENERIC_RESPONSE);
-                        default -> resetSession(FAILED);
                     }
                     handler.postDelayed(runnable, 5000);
                 } catch (SocketTimeoutException e) {

@@ -85,4 +85,7 @@
     <string name="account_deletion_message">Esto eliminará permanentemente todos los datos de la cuenta y todas las contraseñas serán irrecuperables, ¿continuar?</string>
     <string name="proceed">Para proceder</string>
     <string name="change_language">Cambiar idioma</string>
+    <string name="you_are_not_authorized">Sin los permisos necesarios</string>
+    <string name="permission">Permiso:</string>
+    <string name="permission_for_the_device_changed_successfully">El permiso para el dispositivo cambió con éxito</string>
 </resources>

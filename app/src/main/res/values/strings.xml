@@ -102,4 +102,5 @@
     <string name="change_language">Change language</string>
     <string name="you_are_not_authorized">You are not authorized</string>
     <string name="permission">Permission:</string>
+    <string name="permission_for_the_device_changed_successfully">Permission for the device changed successfully</string>
 </resources>

@@ -90,4 +90,9 @@
         <item name="cardUseCompatPadding">true</item>
     </style>
 
+    <!-- Theme for the spinner -->
+    <style name="GliderSpinner" parent="android:Widget.Spinner">
+        <item name="android:background">@drawable/spinner_background</item>
+    </style>
+
 </resources>

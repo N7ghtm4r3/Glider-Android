@@ -3,8 +3,11 @@ package com.tecknobit.glider.helpers.adapters;
 import android.annotation.SuppressLint;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Filterable;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +22,7 @@ import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.local.ManageRequest;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Device.DeviceKeys;
+import com.tecknobit.glider.records.Device.DevicePermission;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +33,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import static android.view.LayoutInflater.from;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static androidx.core.content.ContextCompat.getDrawable;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
 import static com.tecknobit.apimanager.formatters.TimeFormatter.getStringDate;
@@ -36,18 +42,23 @@ import static com.tecknobit.glider.R.drawable.ic_baseline_desktop_24;
 import static com.tecknobit.glider.R.string.device_blacklisted_successfully;
 import static com.tecknobit.glider.R.string.device_disconnected_successfully;
 import static com.tecknobit.glider.R.string.device_unblacklisted_successfully;
+import static com.tecknobit.glider.R.string.ip_address;
 import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.R.string.permission_for_the_device_changed_successfully;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.CHANGE_DEVICE_PERMISSION;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DISCONNECT;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.MANAGE_DEVICE_AUTHORIZATION;
 import static com.tecknobit.glider.helpers.local.User.DEVICE_NAME;
 import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.records.Device.DeviceKeys.ipAddress;
 import static com.tecknobit.glider.records.Device.DeviceKeys.targetDevice;
 import static com.tecknobit.glider.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.records.Device.DevicePermission.ADMIN;
 import static com.tecknobit.glider.records.Device.Type.MOBILE;
 import static com.tecknobit.glider.records.Session.SessionKeys.sessionPassword;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
@@ -98,18 +109,40 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
         Device.Type type = device.getType();
         if (type.equals(Device.Type.DESKTOP))
             holder.deviceIconType.setImageDrawable(getDrawable(MAIN_ACTIVITY, ic_baseline_desktop_24));
-        holder.ip.setText(MAIN_ACTIVITY.getString(R.string.ip_address) + " " + device.getIpAddress());
+        holder.ip.setText(MAIN_ACTIVITY.getString(ip_address) + " " + device.getIpAddress());
+        DevicePermission vPermission = device.getPermission();
+        holder.permission.setText(vPermission.name());
+        if (vPermission == ADMIN)
+            holder.permission.setTextColor(COLOR_RED);
         holder.login.setText(MAIN_ACTIVITY.getString(R.string.login_date) + " " +
                 getLocaleDate(device.getLoginDateTimestamp()));
         holder.lastActivity.setText(MAIN_ACTIVITY.getString(R.string.last_activity) + " " + getLocaleDate(device.getLastActivityTimestamp()));
         if (user.isAccountManager()) {
             if (device.isBlacklisted()) {
-                holder.relActions.setVisibility(View.GONE);
-                holder.unblacklistBtn.setVisibility(View.VISIBLE);
+                holder.relActions.setVisibility(GONE);
+                holder.unblacklistBtn.setVisibility(VISIBLE);
             }
+            holder.changePermissionSpinner.setAdapter(new ArrayAdapter<>(MAIN_ACTIVITY,
+                    android.R.layout.simple_spinner_dropdown_item, DevicePermission.values()));
+            holder.changePermissionSpinner.setSelected(false);
+            holder.changePermissionSpinner.setSelection(vPermission.ordinal());
+            holder.changePermissionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    DevicePermission sPermission = (DevicePermission) parent.getSelectedItem();
+                    if (vPermission != sPermission)
+                        holder.changePermission(sPermission);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
         } else {
-            holder.relActions.setVisibility(View.GONE);
-            holder.unblacklistBtn.setVisibility(View.GONE);
+            holder.changePermissionSpinner.setVisibility(GONE);
+            holder.relActions.setVisibility(GONE);
+            holder.unblacklistBtn.setVisibility(GONE);
         }
     }
 
@@ -193,6 +226,18 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
         private final MaterialTextView ip;
 
         /**
+         * {@code permission} of the device -> as view instance type
+         */
+        @ResId(id = R.id.permission)
+        private final MaterialTextView permission;
+
+        /**
+         * {@code changePermissionSpinner} spinner to change the permission of the device
+         */
+        @ResId(id = R.id.changePermissionSpinner)
+        private final Spinner changePermissionSpinner;
+
+        /**
          * {@code login} of the device -> as view instance type
          */
         @ResId(id = R.id.loginDate)
@@ -224,6 +269,8 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
             name = itemView.findViewById(R.id.deviceName);
             deviceIconType = itemView.findViewById(R.id.deviceIconType);
             ip = itemView.findViewById(R.id.ipAddress);
+            permission = itemView.findViewById(R.id.permission);
+            changePermissionSpinner = itemView.findViewById(R.id.changePermissionSpinner);
             login = itemView.findViewById(R.id.loginDate);
             lastActivity = itemView.findViewById(R.id.lastActivity);
             relActions = itemView.findViewById(R.id.relActions);
@@ -295,6 +342,40 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
         }
 
         /**
+         * Method to change the permission for a {@link Device}
+         *
+         * @param permission: the new permission to set
+         */
+        public void changePermission(DevicePermission permission) {
+            setRequestPayload(CHANGE_DEVICE_PERMISSION);
+            try {
+                payload.put(targetDevice.name(), new JSONObject()
+                        .put(DeviceKeys.name.name(), name.getText().toString())
+                        .put(DeviceKeys.permission.name(), permission));
+                executor.execute(() -> {
+                    try {
+                        socketManager.writeContent(payload);
+                        response = new JSONObject(socketManager.readContent());
+                        MAIN_ACTIVITY.runOnUiThread(() -> {
+                            try {
+                                if (response.getString(statusCode.name()).equals(SUCCESSFUL.name()))
+                                    showSnackbar(ip, MAIN_ACTIVITY.getString(permission_for_the_device_changed_successfully));
+                                else
+                                    showSnackbar(ip, ope_failed);
+                            } catch (JSONException e) {
+                                showSnackbar(ip, ope_failed);
+                            }
+                        });
+                    } catch (Exception e) {
+                        showSnackbar(ip, ope_failed);
+                    }
+                });
+            } catch (JSONException e) {
+                showSnackbar(ip, ope_failed);
+            }
+        }
+
+        /**
          * Method to execute a request on a {@link Device}
          *
          * @param ope:       ope to execute, {@link Operation#DISCONNECT} of {@link Operation#MANAGE_DEVICE_AUTHORIZATION}
@@ -315,12 +396,12 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
                                 if (response.getString(statusCode.name()).equals(SUCCESSFUL.name())) {
                                     if (ope.equals(MANAGE_DEVICE_AUTHORIZATION)) {
                                         if (blacklist) {
-                                            relActions.setVisibility(View.GONE);
-                                            unblacklistBtn.setVisibility(View.VISIBLE);
+                                            relActions.setVisibility(GONE);
+                                            unblacklistBtn.setVisibility(VISIBLE);
                                             showSnackbar(ip, device_blacklisted_successfully);
                                         } else {
-                                            relActions.setVisibility(View.VISIBLE);
-                                            unblacklistBtn.setVisibility(View.GONE);
+                                            relActions.setVisibility(VISIBLE);
+                                            unblacklistBtn.setVisibility(GONE);
                                             showSnackbar(ip, device_unblacklisted_successfully);
                                         }
                                     } else {

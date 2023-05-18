@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
  * The {@link ManageRequest} is the interface to manage the communication with the backend
  *
  * @author Tecknobit - N7ghtm4r3
- **/
+ */
 public interface ManageRequest {
 
     /**

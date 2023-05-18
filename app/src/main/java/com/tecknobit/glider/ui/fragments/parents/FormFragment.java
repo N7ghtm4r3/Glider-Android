@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.tecknobit.apimanager.annotations.Structure;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.Utils;
 
@@ -21,30 +22,31 @@ import static com.tecknobit.glider.helpers.local.Utils.instantiateViews;
  *
  * @author Tecknobit - N7ghtm4r3
  * @see GliderFragment
- **/
+ */
+@Structure
 public abstract class FormFragment extends GliderFragment {
 
     /**
      * {@code inputsErrors} list of the error messages to show when an error occurred during the insertion
      * of the parameters for the password creation
-     **/
+     */
     protected static final HashMap<Integer, String> inputsErrors = new HashMap<>();
 
     /**
      * {@code inputsHints} list of the hint messages to show when the user trigger the
      * {@link TextInputLayout#setStartIconOnClickListener(View.OnClickListener)}
-     **/
+     */
     protected static final HashMap<Integer, String> inputsHints = new HashMap<>();
 
     /**
      * {@code textInputLayouts} list of the layout for the {@link #textInputEditTexts}
-     **/
+     */
     protected TextInputLayout[] textInputLayouts;
 
     /**
      * {@code textInputEditTexts} list of the text input edit texts from fetch the password's parameters
      * for it creation
-     **/
+     */
     protected TextInputEditText[] textInputEditTexts;
 
     /**

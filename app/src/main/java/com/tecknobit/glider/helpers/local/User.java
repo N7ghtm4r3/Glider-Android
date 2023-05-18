@@ -14,6 +14,8 @@ import com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.helpers.DatabaseManager.Table;
 import com.tecknobit.glider.records.Device;
+import com.tecknobit.glider.records.Device.DeviceKeys;
+import com.tecknobit.glider.records.Device.DevicePermission;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Password.Status;
 import com.tecknobit.glider.records.Session;
@@ -27,7 +29,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,6 +49,9 @@ import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.REFRESH_DATA;
 import static com.tecknobit.glider.records.Device.DeviceKeys.name;
 import static com.tecknobit.glider.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.records.Device.DevicePermission.ACCOUNT_MANAGER;
+import static com.tecknobit.glider.records.Device.DevicePermission.ADMIN;
+import static com.tecknobit.glider.records.Device.DevicePermission.PASSWORD_MANAGER;
 import static com.tecknobit.glider.records.Device.Type.MOBILE;
 import static com.tecknobit.glider.records.Password.PasswordKeys.status;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
@@ -60,7 +64,7 @@ import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
  *
  * @author Tecknobit - N7ghtm4r3
  * @see Session
- **/
+ */
 public class User extends Session {
 
     /**
@@ -71,7 +75,7 @@ public class User extends Session {
     /**
      * {@code passwords} list for the {@link ListFragment} with {@link Status} as key and
      * {@link Password} as value.
-     **/
+     */
     public static final HashMap<Status, ArrayList<Password>> passwords = new HashMap<>();
 
     /**
@@ -92,12 +96,17 @@ public class User extends Session {
 
     /**
      * {@code refreshData} whether refresh the data
-     **/
+     */
     public static volatile boolean refreshData = true;
 
     /**
+     * {@code permission} the current user permission
+     */
+    public static volatile DevicePermission permission;
+
+    /**
      * {@code devices} list of {@link Device} for the {@link AccountFragment}
-     **/
+     */
     public static final ArrayList<Device> devices = new ArrayList<>();
 
     /**
@@ -118,17 +127,17 @@ public class User extends Session {
 
     /**
      * {@code handler} allows to manage the {@link #runnable}'s workflow
-     **/
+     */
     private static final Handler handler = new Handler();
 
     /**
      * {@code runnable} allows to manage the data refreshing workflow
-     **/
+     */
     private Runnable runnable;
 
     /**
      * {@code language} user language selected by the user
-     **/
+     */
     private String language;
 
     /**
@@ -136,7 +145,7 @@ public class User extends Session {
      * No-any params required
      *
      * @apiNote this constructor will be invoked during the normal Glider's workflow
-     **/
+     */
     public User() {
         super(userShared.getString(SessionKeys.token.name(), null),
                 userShared.getString(SessionKeys.ivSpec.name(), null),
@@ -266,57 +275,58 @@ public class User extends Session {
             runnable = () -> {
                 try {
                     if (refreshData) {
-                        final Socket socket = new Socket();
-                        socket.connect(new InetSocketAddress(hostAddress, hostPort), 2000);
-                        socketManager.writeContentTo(socket, payload);
-                        JSONObject newData = new JSONObject(socketManager.readContent(socket));
-                        socket.close();
-                        String sNewData = newData.toString();
-                        switch (valueOf(newData.getString(statusCode.name()))) {
-                            case SUCCESSFUL -> {
-                                if (!sNewData.equals(actualData[0].toString())) {
-                                    hNewData.setJSONObjectSource(newData);
-                                    JSONArray jDevices = hNewData.getJSONArray(Table.devices.name(),
-                                            new JSONArray());
-                                    String sDevices = jDevices.toString();
-                                    if (!sDevices.equals(actualList[0].toString())) {
-                                        devices.clear();
-                                        for (int j = 0; j < jDevices.length(); j++) {
-                                            JSONObject jDevice = jDevices.getJSONObject(j);
-                                            if (!jDevice.getString(name.name()).equals(DEVICE_NAME))
-                                                devices.add(new Device(jDevice));
-                                        }
-                                        actualList[0] = new JSONArray(sDevices);
-                                    }
-                                    JSONArray jPasswords = hNewData.getJSONArray(Table.passwords.name(),
-                                            new JSONArray());
-                                    String sPasswords = jPasswords.toString();
-                                    if (!sPasswords.equals(actualList[1].toString())) {
-                                        passwords.clear();
-                                        activePasswords.clear();
-                                        deletedPasswords.clear();
-                                        for (int j = 0; j < jPasswords.length(); j++) {
-                                            JSONObject jPassword = jPasswords.getJSONObject(j);
-                                            Status pStatus = Status.valueOf(jPassword.getString(status.name()));
-                                            switch (pStatus) {
-                                                case ACTIVE -> activePasswords.add(new Password(jPassword));
-                                                case DELETED -> deletedPasswords.add(new Password(jPassword));
+                        if (socketManager.pingHost(2000)) {
+                            socketManager.writeContent(payload);
+                            JSONObject newData = new JSONObject(socketManager.readContent());
+                            permission = DevicePermission.valueOf(newData.getString(DeviceKeys.permission.name()));
+                            String sNewData = newData.toString();
+                            switch (valueOf(newData.getString(statusCode.name()))) {
+                                case SUCCESSFUL -> {
+                                    if (!sNewData.equals(actualData[0].toString())) {
+                                        hNewData.setJSONObjectSource(newData);
+                                        JSONArray jDevices = hNewData.getJSONArray(Table.devices.name(),
+                                                new JSONArray());
+                                        String sDevices = jDevices.toString();
+                                        if (!sDevices.equals(actualList[0].toString())) {
+                                            devices.clear();
+                                            for (int j = 0; j < jDevices.length(); j++) {
+                                                JSONObject jDevice = jDevices.getJSONObject(j);
+                                                if (!jDevice.getString(name.name()).equals(DEVICE_NAME))
+                                                    devices.add(new Device(jDevice));
                                             }
+                                            actualList[0] = new JSONArray(sDevices);
                                         }
-                                        passwords.put(ACTIVE, activePasswords);
-                                        passwords.put(DELETED, deletedPasswords);
-                                        actualList[1] = new JSONArray(sPasswords);
+                                        JSONArray jPasswords = hNewData.getJSONArray(Table.passwords.name(),
+                                                new JSONArray());
+                                        String sPasswords = jPasswords.toString();
+                                        if (!sPasswords.equals(actualList[1].toString())) {
+                                            passwords.clear();
+                                            activePasswords.clear();
+                                            deletedPasswords.clear();
+                                            for (int j = 0; j < jPasswords.length(); j++) {
+                                                JSONObject jPassword = jPasswords.getJSONObject(j);
+                                                Status pStatus = Status.valueOf(jPassword.getString(status.name()));
+                                                switch (pStatus) {
+                                                    case ACTIVE ->
+                                                            activePasswords.add(new Password(jPassword));
+                                                    case DELETED ->
+                                                            deletedPasswords.add(new Password(jPassword));
+                                                }
+                                            }
+                                            passwords.put(ACTIVE, activePasswords);
+                                            passwords.put(DELETED, deletedPasswords);
+                                            actualList[1] = new JSONArray(sPasswords);
+                                        }
+                                        actualData[0] = new JSONObject(sNewData);
                                     }
-                                    actualData[0] = new JSONObject(sNewData);
                                 }
+                                case GENERIC_RESPONSE -> resetSession(GENERIC_RESPONSE);
+                                default -> resetSession(FAILED);
                             }
-                            case GENERIC_RESPONSE -> resetSession(GENERIC_RESPONSE);
-                            default -> resetSession(FAILED);
-                        }
+                            handler.postDelayed(runnable, 5000);
+                        } else
+                            resetSession(FAILED);
                     }
-                    handler.postDelayed(runnable, 5000);
-                } catch (SocketTimeoutException e) {
-                    resetSession(FAILED);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -331,7 +341,7 @@ public class User extends Session {
      * Method to reset the {@link User}'s session
      *
      * @param code: code of termination
-     **/
+     */
     private void resetSession(StandardResponseCode code) {
         clearUserData();
         STARTER_ACTIVITY.startActivity(new Intent(STARTER_ACTIVITY, SplashScreen.class)
@@ -343,7 +353,7 @@ public class User extends Session {
      * No-any params required
      *
      * @return {@link #language} instance as {@link String}
-     **/
+     */
     public String getLanguage() {
         return language;
     }
@@ -353,7 +363,7 @@ public class User extends Session {
      * No-any params required
      *
      * @return {@link #language} in ISO format instance as {@link String}
-     **/
+     */
     public String getISOLanguage() {
         switch (language) {
             case "ITA" -> {
@@ -375,10 +385,42 @@ public class User extends Session {
      * Method to set and save in the {@link SharedPreferences} the {@link #language} instance
      *
      * @param language: the language to set and save
-     **/
+     */
     public void setLanguage(String language) {
         userShared.edit().putString("language", language).apply();
         this.language = language;
+    }
+
+    /**
+     * Method to check whether a device has the {@link DevicePermission#ADMIN} or
+     * {@link DevicePermission#PASSWORD_MANAGER} permissions <br>
+     * No-any params required
+     *
+     * @return whether a device has the right permission
+     */
+    public boolean isPasswordManager() {
+        return permission == PASSWORD_MANAGER || isAdmin();
+    }
+
+    /**
+     * Method to check whether a device has the {@link DevicePermission#ADMIN} or
+     * {@link DevicePermission#ACCOUNT_MANAGER} permissions <br>
+     * No-any params required
+     *
+     * @return whether a device has the right permission
+     */
+    public boolean isAccountManager() {
+        return permission == ACCOUNT_MANAGER || isAdmin();
+    }
+
+    /**
+     * Method to check whether a device has the {@link DevicePermission#ADMIN} permission <br>
+     * No-any params required
+     *
+     * @return whether a device has the right permission
+     */
+    public boolean isAdmin() {
+        return permission == ADMIN;
     }
 
 }

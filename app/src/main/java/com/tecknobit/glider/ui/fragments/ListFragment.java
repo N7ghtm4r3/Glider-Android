@@ -55,53 +55,53 @@ import static com.tecknobit.glider.ui.activities.MainActivity.navController;
  *
  * @author Tecknobit - N7ghtm4r3
  * @see RealtimeRecyclerFragment
- **/
+ */
 @SuppressLint("NonConstantResourceId")
 public class ListFragment extends RealtimeRecyclerFragment {
 
     /**
      * {@code relList} view container to show when {@link #list} is filled
-     **/
+     */
     @ResId(id = R.id.relList)
     private RelativeLayout relList;
 
     /**
      * {@code noPasswordsText} view to show when {@link #list} is empty
-     **/
+     */
     @ResId(id = R.id.noPasswords)
     private MaterialTextView noPasswordsText;
 
     /**
      * {@code recoveryMode} whether the {@link #list} of the  {@link Password} is in a
      * {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
-     **/
+     */
     private boolean recoveryMode;
 
     /**
      * {@code list} list of the {@link Password}
-     **/
+     */
     private ArrayList<Password> list;
 
     /**
      * {@code searchView} view to contains the {@link #search}
-     **/
+     */
     @ResId(id = R.id.searchView)
     private TextInputLayout searchView;
 
     /**
      * {@code search} view to create a query and filter the {@link #recyclerManager}
-     **/
+     */
     @ResId(id = R.id.searchQuery)
     private TextInputEditText search;
 
     /**
      * {@code passwordsAdapter} adapter for the {@link #recyclerManager}
-     **/
+     */
     private PasswordsAdapter passwordsAdapter;
 
     /**
      * Required empty public constructor for the normal Android's workflow
-     **/
+     */
     public ListFragment() {
         // Required empty public constructor
     }
@@ -167,7 +167,7 @@ public class ListFragment extends RealtimeRecyclerFragment {
     /**
      * Method to start the workflow of the {@link #search} view <br>
      * No-any params required
-     **/
+     */
     private void startSearchViewWorkflow() {
         ((TextInputLayout) viewContainer.findViewById(R.id.searchView)).setEndIconOnClickListener(v -> {
             search.setText("");
@@ -239,12 +239,12 @@ public class ListFragment extends RealtimeRecyclerFragment {
      * </ul>
      * @param recyclerId: identifier of the {@link #recyclerManager}
      * @param context: context where the {@link #recyclerManager} is shown
-     **/
+     */
     @Override
     protected void setRecycler(int recyclerId, Context context) {
         super.setRecycler(recyclerId, context);
         final MaterialButton[] buttons = new MaterialButton[2];
-        new ItemTouchHelper(new SimpleCallback(0, LEFT | RIGHT) {
+        itemTouchHelper = new ItemTouchHelper(new SimpleCallback(0, LEFT | RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView,
                                   @NonNull RecyclerView.ViewHolder viewHolder,
@@ -291,8 +291,8 @@ public class ListFragment extends RealtimeRecyclerFragment {
                                         @NonNull RecyclerView.ViewHolder viewHolder) {
                 return makeMovementFlags(0, LEFT | RIGHT);
             }
-
-        }).attachToRecyclerView(recyclerManager);
+        });
+        itemTouchHelper.attachToRecyclerView(recyclerManager);
     }
 
     /**
@@ -300,17 +300,21 @@ public class ListFragment extends RealtimeRecyclerFragment {
      *
      * @apiNote the data will be automatically fetched and refreshed
      * by the {@link Status} of {@link Password} in base of the {@link #recoveryMode} value
-     **/
+     */
     @Override
     @SuppressLint("NotifyDataSetChanged")
     protected void loadRecycler() {
         super.loadRecycler();
         runnable = () -> {
-            if (!recoveryMode) {
+            if (!recoveryMode)
                 list = passwords.get(ACTIVE);
-            } else
+            else
                 list = passwords.get(DELETED);
             if (list != null) {
+                if (user.isPasswordManager())
+                    itemTouchHelper.attachToRecyclerView(recyclerManager);
+                else
+                    itemTouchHelper.attachToRecyclerView(null);
                 int passwordsSize = list.size();
                 if (currentRecyclerSize != passwordsSize) {
                     if (passwordsSize > 0) {

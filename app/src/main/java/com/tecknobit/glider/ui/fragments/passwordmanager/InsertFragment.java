@@ -1,4 +1,4 @@
-package com.tecknobit.glider.ui.fragments;
+package com.tecknobit.glider.ui.fragments.passwordmanager;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -40,12 +40,13 @@ import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
  * @author Tecknobit - N7ghtm4r3
  * @see GliderFragment
  * @see FormFragment
- **/
-public class InsertFragment extends FormFragment {
+ * @see PasswordManagerFragment
+ */
+public class InsertFragment extends PasswordManagerFragment {
 
     /**
      * Required empty public constructor for the normal Android's workflow
-     **/
+     */
     public InsertFragment() {
         textInputLayouts = new TextInputLayout[3];
         textInputEditTexts = new TextInputEditText[3];
@@ -94,42 +95,45 @@ public class InsertFragment extends FormFragment {
         super.onViewCreated(view, savedInstanceState);
         instantiateInputs(view, new int[]{R.id.tailLayout, R.id.passwordLayout, R.id.scopesLayout},
                 new int[]{R.id.tailInput, R.id.passwordInput, R.id.scopesInput});
+        initManagerLayout(view);
         view.findViewById(R.id.insertBtn).setOnClickListener(v -> {
             hideKeyboard(v);
-            enableEditTexts(false);
-            setRequestPayload(INSERT_PASSWORD);
-            if (payload != null) {
-                executor.execute(() -> {
-                    try {
-                        socketManager.writeContent(payload);
-                        response = new JSONObject(socketManager.readContent());
-                        MAIN_ACTIVITY.runOnUiThread(() -> {
-                            try {
-                                if (!response.getString(statusCode.name()).equals(FAILED.name())) {
-                                    showSnackbar(v, R.string.password_inserted_successfully);
-                                    clearViews();
-                                } else {
+            if (setFragmentBehavior()) {
+                enableEditTexts(false);
+                setRequestPayload(INSERT_PASSWORD);
+                if (payload != null) {
+                    executor.execute(() -> {
+                        try {
+                            socketManager.writeContent(payload);
+                            response = new JSONObject(socketManager.readContent());
+                            MAIN_ACTIVITY.runOnUiThread(() -> {
+                                try {
+                                    if (!response.getString(statusCode.name()).equals(FAILED.name())) {
+                                        showSnackbar(v, R.string.password_inserted_successfully);
+                                        clearViews();
+                                    } else {
+                                        showSnackbar(viewContainer, ope_failed);
+                                    }
+                                } catch (JSONException e) {
                                     showSnackbar(viewContainer, ope_failed);
+                                } finally {
+                                    enableEditTexts(true);
                                 }
-                            } catch (JSONException e) {
-                                showSnackbar(viewContainer, ope_failed);
-                            } finally {
-                                enableEditTexts(true);
-                            }
-                        });
-                    } catch (Exception e) {
-                        showSnackbar(viewContainer, ope_failed);
-                    }
-                });
-            } else
-                enableEditTexts(true);
+                            });
+                        } catch (Exception e) {
+                            showSnackbar(viewContainer, ope_failed);
+                        }
+                    });
+                } else
+                    enableEditTexts(true);
+            }
         });
         startInputsListenWorkflow();
     }
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void loadInputMessagesLists() {
         inputsErrors.put(0, getString(R.string.tail_is_required));
@@ -141,7 +145,7 @@ public class InsertFragment extends FormFragment {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void startInputsListenWorkflow() {
         super.startInputsListenWorkflow();
@@ -219,7 +223,7 @@ public class InsertFragment extends FormFragment {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void showsError(int index) {
         String errorMsg = inputsErrors.get(index);

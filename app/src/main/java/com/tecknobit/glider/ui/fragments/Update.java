@@ -26,12 +26,12 @@ import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
  * @author Tecknobit - N7ghtm4r3
  * @see Fragment
  * @see View.OnClickListener
- **/
+ */
 public class Update extends Fragment implements View.OnClickListener {
 
     /**
      * Required empty public constructor for the normal Android's workflow
-     **/
+     */
     public Update() {
         // Required empty public constructor
     }
@@ -93,7 +93,7 @@ public class Update extends Fragment implements View.OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     @SuppressLint("NonConstantResourceId")
     public void onClick(View v) {

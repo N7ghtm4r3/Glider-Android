@@ -4,6 +4,7 @@ import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
+import com.tecknobit.apimanager.annotations.Structure;
 import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.local.ManageRequest;
 
@@ -25,7 +26,8 @@ import static com.tecknobit.glider.records.Session.SessionKeys.sessionPassword;
  * @author Tecknobit - N7ghtm4r3
  * @see Fragment
  * @see ManageRequest
- **/
+ */
+@Structure
 public abstract class GliderFragment extends Fragment implements ManageRequest {
 
     /**
@@ -35,19 +37,19 @@ public abstract class GliderFragment extends Fragment implements ManageRequest {
 
     /**
      * {@code viewContainer} the main view container of the {@link Fragment}
-     **/
+     */
     protected View viewContainer;
 
     /**
      * {@code payload} the payload to send with the request
-     **/
+     */
     protected JSONObject payload;
 
     /**
      * Constructor to init {@link GliderFragment}
      *
      * @apiNote will be instantiated the {@link #payload}
-     **/
+     */
     protected GliderFragment() {
         setBasePayload();
     }

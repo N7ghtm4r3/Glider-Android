@@ -34,7 +34,7 @@ import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
  * The {@code Utils} class is a container of static methods useful for the {@code Glider}'s workflow
  *
  * @author Tecknobit - N7ghtm4r3
- **/
+ */
 public class Utils {
 
     /**

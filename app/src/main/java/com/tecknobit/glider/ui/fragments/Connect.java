@@ -76,17 +76,17 @@ import static java.lang.Integer.parseInt;
  * @see GliderFragment
  * @see FormFragment
  * @see OnClickListener
- **/
+ */
 public class Connect extends FormFragment implements OnClickListener {
 
     /**
      * {@code barcodeLauncher} instance to launch a barcode scanning
-     **/
+     */
     private final ActivityResultLauncher<ScanOptions> barcodeLauncher;
 
     /**
      * Required empty public constructor for the normal Android's workflow
-     **/
+     */
     public Connect() {
         textInputLayouts = new TextInputLayout[3];
         textInputEditTexts = new TextInputEditText[3];
@@ -200,7 +200,7 @@ public class Connect extends FormFragment implements OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void loadInputMessagesLists() {
         inputsErrors.put(0, getString(host_is_required));
@@ -213,7 +213,7 @@ public class Connect extends FormFragment implements OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void startInputsListenWorkflow() {
         super.startInputsListenWorkflow();
@@ -263,7 +263,7 @@ public class Connect extends FormFragment implements OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     @SuppressLint("NonConstantResourceId")
     public void onClick(View v) {
@@ -359,7 +359,7 @@ public class Connect extends FormFragment implements OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void showsError(int index) {
         String error = inputsErrors.get(index);

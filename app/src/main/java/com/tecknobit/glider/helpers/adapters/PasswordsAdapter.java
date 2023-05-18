@@ -26,6 +26,7 @@ import com.tecknobit.apimanager.apis.SocketManager;
 import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.local.ManageRequest;
+import com.tecknobit.glider.records.Device.DevicePermission;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Password.PasswordKeys;
 import com.tecknobit.glider.records.Password.Status;
@@ -39,6 +40,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static android.view.LayoutInflater.from;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.tecknobit.glider.R.string.add_more;
 import static com.tecknobit.glider.R.string.current_scope_edited_successfully;
 import static com.tecknobit.glider.R.string.edit_the_current_scope;
@@ -54,6 +57,7 @@ import static com.tecknobit.glider.R.string.scope_hint;
 import static com.tecknobit.glider.R.string.scope_must_be_filled;
 import static com.tecknobit.glider.R.string.scope_removed_successfully;
 import static com.tecknobit.glider.R.string.the_scope_edited;
+import static com.tecknobit.glider.R.string.you_are_not_authorized;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.ADD_SCOPE;
@@ -81,18 +85,18 @@ import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
  * @author Tecknobit - N7ghtm4r3
  * @see Adapter
  * @see Filterable
- **/
+ */
 public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.PasswordView> implements Filterable {
 
     /**
      * {@code isRecoveryMode} whether the list of the {@link #passwords} is in a
      * {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
-     **/
+     */
     private static boolean isRecoveryMode;
 
     /**
      * {@code passwords} list of {@link Password} to manage
-     **/
+     */
     private ArrayList<Password> passwords;
 
     /**
@@ -100,7 +104,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      *
      * @apiNote this list is used as main list and is used in {@link #getFilter()} and
      * {@link #resetPasswordsList()} methods
-     **/
+     */
     private ArrayList<Password> filteredPasswords;
 
     /**
@@ -109,7 +113,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      * @param passwords:      list of {@link Password} to manage
      * @param isRecoveryMode: whether the list of the {@link #passwords} is in a
      *                        {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
-     **/
+     */
     public PasswordsAdapter(ArrayList<Password> passwords, boolean isRecoveryMode) {
         this.passwords = passwords;
         filteredPasswords = new ArrayList<>(passwords);
@@ -118,7 +122,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @NonNull
     @Override
     public PasswordsAdapter.PasswordView onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -127,7 +131,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(@NonNull PasswordsAdapter.PasswordView holder, int position) {
@@ -136,83 +140,102 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
         ArrayList<String> scopes = new ArrayList<>(password.getScopes());
         List<String> listItems;
         if (scopes.size() > 0) {
-            if (!isRecoveryMode)
+            if (!isRecoveryMode && user.isPasswordManager())
                 scopes.add(MAIN_ACTIVITY.getString(add_more));
             listItems = List.of(scopes.toArray(new String[0]));
         } else {
-            if (!isRecoveryMode)
-                listItems = List.of(MAIN_ACTIVITY.getString(add_more));
-            else
+            if (!isRecoveryMode) {
+                if (user.isPasswordManager())
+                    listItems = List.of(MAIN_ACTIVITY.getString(add_more));
+                else
+                    listItems = List.of(MAIN_ACTIVITY.getString(you_are_not_authorized));
+            } else
                 listItems = List.of(MAIN_ACTIVITY.getString(no_scopes_for_this_password));
         }
         holder.scopes.setAdapter(new ArrayAdapter<>(MAIN_ACTIVITY, android.R.layout.simple_list_item_1,
                 listItems));
         if (!isRecoveryMode) {
             holder.scopes.setOnItemClickListener((parent, view, sPosition, id) -> {
-                int hintId, helperTextId, errorId;
-                Operation ope;
-                holder.scopesLayout.setVisibility(View.GONE);
-                if (sPosition == parent.getLastVisiblePosition()) {
-                    hintId = new_scope;
-                    helperTextId = scope_hint;
-                    errorId = new_scope_is_required;
-                    ope = ADD_SCOPE;
-                    holder.scopeLayout.setVisibility(View.VISIBLE);
-                } else {
-                    hintId = the_scope_edited;
-                    helperTextId = edit_the_current_scope;
-                    errorId = scope_must_be_filled;
-                    ope = EDIT_SCOPE;
-                    holder.scopeActions.setVisibility(View.VISIBLE);
-                    holder.scopeValue.setText(holder.scopes.getText());
-                }
-                holder.scope.setHint(hintId);
-                holder.scope.setHintTextColor(COLOR_PRIMARY);
-                holder.scopeLayout.setHelperText(MAIN_ACTIVITY.getString(helperTextId));
-                holder.scope.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (user.isPasswordManager()) {
+                    int hintId, helperTextId, errorId;
+                    Operation ope;
+                    holder.scopesLayout.setVisibility(GONE);
+                    if (sPosition == parent.getLastVisiblePosition()) {
+                        hintId = new_scope;
+                        helperTextId = scope_hint;
+                        errorId = new_scope_is_required;
+                        ope = ADD_SCOPE;
+                        holder.scopeLayout.setVisibility(VISIBLE);
+                    } else {
+                        hintId = the_scope_edited;
+                        helperTextId = edit_the_current_scope;
+                        errorId = scope_must_be_filled;
+                        ope = EDIT_SCOPE;
+                        holder.scopeActions.setVisibility(VISIBLE);
+                        holder.scopeValue.setText(holder.scopes.getText());
                     }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (before > 0 && start + count == 0) {
-                            holder.scope.setHintTextColor(Color.TRANSPARENT);
-                            holder.scopeLayout.setError(MAIN_ACTIVITY.getString(errorId));
-                            holder.scopeLayout.setStartIconVisible(false);
+                    holder.scope.setHint(hintId);
+                    holder.scope.setHintTextColor(COLOR_PRIMARY);
+                    holder.scopeLayout.setHelperText(MAIN_ACTIVITY.getString(helperTextId));
+                    holder.scope.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                         }
-                    }
 
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (s.length() > 0) {
-                            holder.scopeLayout.setError(null);
-                            holder.scopeLayout.setStartIconVisible(true);
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            if (before > 0 && start + count == 0) {
+                                holder.scope.setHintTextColor(Color.TRANSPARENT);
+                                holder.scopeLayout.setError(MAIN_ACTIVITY.getString(errorId));
+                                holder.scopeLayout.setStartIconVisible(false);
+                            }
                         }
-                    }
-                });
-                holder.scopeLayout.setEndIconOnClickListener(v -> {
-                    hideKeyboard(v);
-                    clearScopesLayout(holder);
-                    holder.scopes.setText(holder.scopes.getAdapter().getItem(0).toString(),
-                            false);
-                });
-                holder.scopeLayout.setStartIconOnClickListener(v -> {
-                    hideKeyboard(v);
-                    String newScope = getTextFromEdit(holder.scope);
-                    String oldScope = null;
-                    if (ope.equals(EDIT_SCOPE))
-                        oldScope = holder.scopeValue.getText().toString();
-                    if (!newScope.isEmpty()) {
-                        holder.executeOperation(ope, holder.tail, newScope, oldScope);
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            if (s.length() > 0) {
+                                holder.scopeLayout.setError(null);
+                                holder.scopeLayout.setStartIconVisible(true);
+                            }
+                        }
+                    });
+                    holder.scopeLayout.setEndIconOnClickListener(v -> {
+                        hideKeyboard(v);
                         clearScopesLayout(holder);
-                    } else
-                        showSnackbar(v, errorId);
-                });
+                        holder.scopes.setText(holder.scopes.getAdapter().getItem(0).toString(),
+                                false);
+                    });
+                    holder.scopeLayout.setStartIconOnClickListener(v -> {
+                        hideKeyboard(v);
+                        String newScope = getTextFromEdit(holder.scope);
+                        String oldScope = null;
+                        if (ope.equals(EDIT_SCOPE))
+                            oldScope = holder.scopeValue.getText().toString();
+                        if (!newScope.isEmpty()) {
+                            holder.executeOperation(ope, holder.tail, newScope, oldScope);
+                            clearScopesLayout(holder);
+                        } else
+                            showSnackbar(v, errorId);
+                    });
+                }
             });
         } else
             holder.actionBtn.setText(recover);
         holder.password.setText(password.getPassword());
+        if (isRecoveryMode) {
+            if (user.isPasswordManager())
+                holder.relActionButtons.setVisibility(VISIBLE);
+            else
+                holder.relActionButtons.setVisibility(GONE);
+        } else {
+            if (user.isPasswordManager()) {
+                holder.relActionButtons.setVisibility(VISIBLE);
+                holder.copyBtn.setVisibility(GONE);
+            } else {
+                holder.relActionButtons.setVisibility(GONE);
+                holder.copyBtn.setVisibility(VISIBLE);
+            }
+        }
     }
 
     /**
@@ -225,13 +248,13 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
         holder.scope.setText("");
         holder.scopeLayout.setError(null);
         holder.scopeLayout.setStartIconVisible(true);
-        holder.scopesLayout.setVisibility(View.VISIBLE);
-        holder.scopeLayout.setVisibility(View.GONE);
+        holder.scopesLayout.setVisibility(VISIBLE);
+        holder.scopeLayout.setVisibility(GONE);
     }
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     public int getItemCount() {
         return filteredPasswords.size();
@@ -239,7 +262,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -269,7 +292,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
              * @param password: password from check the existence of the scope
              * @param scope:    scope to compare
              * @return whether the scope given is in the list
-             **/
+             */
             private boolean isInScopes(Password password, CharSequence scope) {
                 for (String lScope : password.getScopes())
                     if (lScope.contains(scope))
@@ -314,7 +337,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      * No-any params required
      *
      * @return {@link #passwords} instance as {@link Collection} of {@link Password}
-     **/
+     */
     public Collection<Password> getCurrentPasswords() {
         return passwords;
     }
@@ -325,14 +348,14 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      * @author Tecknobit - N7ghtm4r3
      * @see RecyclerView.ViewHolder
      * @see View.OnClickListener
-     **/
+     */
     @SuppressLint("NonConstantResourceId")
     public static class PasswordView extends RecyclerView.ViewHolder implements View.OnClickListener,
             ManageRequest {
 
         /**
          * {@code payload} the payload to send with the request
-         **/
+         */
         protected JSONObject payload;
 
         /**
@@ -342,63 +365,76 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
 
         /**
          * {@code actionBtn} the button that can {@code "copyPassword"} or {@code "recover"} a password
-         **/
+         */
         @ResId(id = R.id.actionBtn)
         private final MaterialButton actionBtn;
 
         /**
          * {@code tail} view
-         **/
+         */
         @ResId(id = R.id.tail)
         private final MaterialTextView tail;
 
         /**
          * {@code scopesLayout} view for the scopes layout
-         **/
+         */
         @ResId(id = R.id.scopesLayout)
         private final TextInputLayout scopesLayout;
 
         /**
          * {@code scopeLayout} view for the scope layout
-         **/
+         */
         @ResId(id = R.id.scopeLayout)
         private final TextInputLayout scopeLayout;
 
         /**
          * {@code scope} view that can be filled with a scope
-         **/
+         */
         @ResId(id = R.id.scope)
         private final TextInputEditText scope;
 
         /**
          * {@code scopes} view for the scopes list
-         **/
+         */
         @ResId(id = R.id.scopes)
         private final AutoCompleteTextView scopes;
 
         /**
          * {@code scopeActions} {@link RelativeLayout} for the scope actions
-         **/
+         */
         @ResId(id = R.id.relScopeActions)
         private final RelativeLayout scopeActions;
 
         /**
          * {@code scopeValue} view of the scope to make an action on
-         **/
+         */
         @ResId(id = R.id.scopeText)
         private final MaterialTextView scopeValue;
 
         /**
          * {@code password} view
-         **/
+         */
         @ResId(id = R.id.password)
         private final AutoCompleteTextView password;
+
+        /**
+         * {@code relActionButtons} container of the action buttons
+         */
+        @ResId(id = R.id.relActionButtons)
+        private final RelativeLayout relActionButtons;
+
+        /**
+         * {@code copyBtn} button to copy the password when the user does not have the
+         * {@link DevicePermission#PASSWORD_MANAGER}
+         */
+        @ResId(id = R.id.copyBtn)
+        private final MaterialButton copyBtn;
 
         /**
          * Constructor to init {@link PasswordView} object
          *
          * @param itemView: container view
-         * **/
+         */
         public PasswordView(@NonNull View itemView) {
             super(itemView);
             tail = itemView.findViewById(R.id.tail);
@@ -411,15 +447,16 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
             password = itemView.findViewById(R.id.password);
             actionBtn = itemView.findViewById(R.id.actionBtn);
             actionBtn.setOnClickListener(this);
-            for (int btn : new int[]{R.id.deleteBtn, R.id.editBtn, R.id.removeBtn,
-                    R.id.closeScopeActions}) {
+            for (int btn : new int[]{R.id.editBtn, R.id.editBtn, R.id.removeBtn, R.id.closeScopeActions})
                 itemView.findViewById(btn).setOnClickListener(this);
-            }
+            relActionButtons = itemView.findViewById(R.id.relActionButtons);
+            copyBtn = itemView.findViewById(R.id.copyBtn);
+            copyBtn.setOnClickListener(v -> copyPassword());
         }
 
         /**
          * {@inheritDoc}
-         * **/
+         */
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
@@ -431,8 +468,8 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
                         executeOperation(RECOVER_PASSWORD);
                 }
                 case R.id.editBtn -> {
-                    scopeActions.setVisibility(View.GONE);
-                    scopeLayout.setVisibility(View.VISIBLE);
+                    scopeActions.setVisibility(GONE);
+                    scopeLayout.setVisibility(VISIBLE);
                 }
                 case R.id.removeBtn -> {
                     executeOperation(REMOVE_SCOPE, tail, scopeValue.getText().toString());
@@ -447,8 +484,8 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
          * No-any params required
          */
         private void restoreScopesLayout() {
-            scopeActions.setVisibility(View.GONE);
-            scopesLayout.setVisibility(View.VISIBLE);
+            scopeActions.setVisibility(GONE);
+            scopesLayout.setVisibility(VISIBLE);
             ((ArrayAdapter) scopes.getAdapter()).notifyDataSetChanged();
         }
 
@@ -522,7 +559,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
          * Method to manage the {@link Password}
          *
          * @param operation: operation to execute
-         **/
+         */
         @Wrapper
         public void executeOperation(Operation operation) {
             executeOperation(operation, tail);
@@ -533,7 +570,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
          *
          * @param operation: operation to execute
          * @param parameters : parameters to insert to invoke this method
-         **/
+         */
         public <T> void executeOperation(Operation operation, T... parameters) {
             setRequestPayload(operation, parameters);
             if (payload != null) {
@@ -573,7 +610,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
         /**
          * Method to copy the password value from {@link #password} <br>
          * No-any params required
-         **/
+         */
         public void copyPassword() {
             copyText(password, password);
         }

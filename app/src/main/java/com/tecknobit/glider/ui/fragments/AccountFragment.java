@@ -7,15 +7,16 @@ import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
@@ -27,6 +28,8 @@ import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter.DeviceView;
 import com.tecknobit.glider.records.Device;
+import com.tecknobit.glider.records.Device.DevicePermission;
+import com.tecknobit.glider.records.Session;
 import com.tecknobit.glider.ui.activities.SplashScreen;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
@@ -36,14 +39,19 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
+import static android.widget.RelativeLayout.CENTER_IN_PARENT;
+import static android.widget.RelativeLayout.TRUE;
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
 import static com.tecknobit.glider.R.id.blackListBtn;
-import static com.tecknobit.glider.R.id.deleteBtn;
 import static com.tecknobit.glider.R.id.devicesCard;
 import static com.tecknobit.glider.R.id.devicesRecycler;
-import static com.tecknobit.glider.R.id.disconnectBtn;
 import static com.tecknobit.glider.R.id.host_address;
 import static com.tecknobit.glider.R.id.host_port;
 import static com.tecknobit.glider.R.id.localhostValue;
@@ -58,6 +66,7 @@ import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_SESSION;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DISCONNECT;
 import static com.tecknobit.glider.helpers.local.User.devices;
+import static com.tecknobit.glider.helpers.local.User.permission;
 import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.User.user;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
@@ -81,37 +90,54 @@ import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
  *
  * @author Tecknobit - N7ghtm4r3
  * @see RealtimeRecyclerFragment
- * @see OnClickListener
- **/
+ */
 @SuppressLint("NonConstantResourceId")
-public class AccountFragment extends RealtimeRecyclerFragment implements OnClickListener {
+public class AccountFragment extends RealtimeRecyclerFragment {
 
     /**
      * {@code textViews} list of information {@link MaterialTextView} to fill
-     **/
+     */
     @ResId(ids = {host_address, host_port, single_use_mode, qr_code_login, localhostValue})
     private static final HashMap<String, MaterialTextView> textViews = new HashMap<>();
 
     /**
      * {@code devicesAdapter} adapter for the {@link #recyclerManager}
-     **/
+     */
     private DevicesAdapter devicesAdapter;
 
     /**
      * {@code devicesCardView} view to show the {@link Device}'s list
-     **/
+     */
     @ResId(id = devicesCard)
     private MaterialCardView devicesCardView;
 
     /**
      * {@code languages} view to change the language of Glider
-     **/
+     */
     @ResId(id = R.id.languages)
     private AutoCompleteTextView languages;
 
     /**
+     * {@code deleteBtn} the button to delete the {@link Session}
+     */
+    @ResId(id = R.id.deleteBtn)
+    private MaterialButton deleteBtn;
+
+    /**
+     * {@code disconnectBtn} the button to disconnect the device from the {@link Session}
+     */
+    @ResId(id = R.id.disconnectBtn)
+    private MaterialButton disconnectBtn;
+
+    /**
+     * {@code permissionText} the textview to the {@link DevicePermission}
+     */
+    @ResId(id = R.id.permissionValue)
+    private MaterialTextView permissionText;
+
+    /**
      * Required empty public constructor for the normal Android's workflow
-     **/
+     */
     public AccountFragment() {
         // Required empty public constructor
     }
@@ -157,14 +183,21 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        for (int btn : new int[]{deleteBtn, disconnectBtn})
-            view.findViewById(btn).setOnClickListener(this);
+        deleteBtn = view.findViewById(R.id.deleteBtn);
+        deleteBtn.setOnClickListener(v -> createAlertDialog(account_deletion, account_deletion_message,
+                R.string.dismiss,
+                (dialogInterface, i) -> dialogInterface.dismiss(),
+                proceed,
+                (dialogInterface, i) -> setRequestPayload(DELETE_SESSION), MAIN_ACTIVITY).show());
+        disconnectBtn = view.findViewById(R.id.disconnectBtn);
+        disconnectBtn.setOnClickListener(v -> setRequestPayload(DISCONNECT));
         final String[] keysViews = new String[]{hostAddress.name(), hostPort.name(),
                 singleUseMode.name(), QRCodeLoginEnabled.name(), runInLocalhost.name()};
         final int[] idsViews = new int[]{host_address, host_port, single_use_mode, qr_code_login,
                 localhostValue};
         for (int j = 0; j < idsViews.length; j++)
             textViews.put(keysViews[j], view.findViewById(idsViews[j]));
+        permissionText = view.findViewById(R.id.permissionValue);
         devicesCardView = view.findViewById(devicesCard);
         languages = view.findViewById(R.id.languages);
         setRecycler(devicesRecycler, MAIN_ACTIVITY);
@@ -181,7 +214,7 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
     /**
      * Method to set the views of the {@link Fragment}<br>
      * No-any params required
-     **/
+     */
     private void setViews() {
         languages.setAdapter(new ArrayAdapter<>(MAIN_ACTIVITY, android.R.layout.simple_list_item_1,
                 MAIN_ACTIVITY.getResources().getStringArray(R.array.languages)));
@@ -204,9 +237,9 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
                 String value = account.get(key).toString();
                 if (key.equals(singleUseMode.name())) {
                     if (Boolean.parseBoolean(value))
-                        devicesCardView.setVisibility(View.GONE);
+                        devicesCardView.setVisibility(GONE);
                     else
-                        devicesCardView.setVisibility(View.VISIBLE);
+                        devicesCardView.setVisibility(VISIBLE);
                     value = value.toUpperCase();
                 } else if (key.equals(QRCodeLoginEnabled.name()) || key.equals(runInLocalhost.name()))
                     value = value.toUpperCase();
@@ -232,12 +265,12 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
      *
      * @param recyclerId: identifier of the {@link #recyclerManager}
      * @param context:    context where the {@link #recyclerManager} is shown
-     **/
+     */
     @Override
     protected void setRecycler(int recyclerId, Context context) {
         super.setRecycler(recyclerId, context);
         final MaterialButton[] buttons = new MaterialButton[2];
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, LEFT | RIGHT) {
+        itemTouchHelper = new ItemTouchHelper(new SimpleCallback(0, LEFT | RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView,
                                   @NonNull RecyclerView.ViewHolder viewHolder,
@@ -263,11 +296,11 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
             public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
                                     @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY,
                                     int actionState, boolean isCurrentlyActive) {
-                if (viewHolder.itemView.findViewById(R.id.unblacklistBtn).getVisibility() == View.GONE) {
+                if (viewHolder.itemView.findViewById(R.id.unblacklistBtn).getVisibility() == GONE) {
                     swipeRefreshLayout.setEnabled(false);
                     super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState,
                             isCurrentlyActive);
-                    buttons[0] = viewHolder.itemView.findViewById(disconnectBtn);
+                    buttons[0] = viewHolder.itemView.findViewById(R.id.disconnectBtn);
                     buttons[1] = viewHolder.itemView.findViewById(blackListBtn);
                     if (dX > 0) {
                         buttons[0].setTextColor(COLOR_RED);
@@ -285,34 +318,36 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
                 return makeMovementFlags(0, LEFT | RIGHT);
             }
 
-        }).attachToRecyclerView(recyclerManager);
+        });
+        itemTouchHelper.attachToRecyclerView(recyclerManager);
     }
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     @SuppressLint("NotifyDataSetChanged")
     protected void loadRecycler() {
         super.loadRecycler();
         runnable = () -> {
-            if (textViews.get(singleUseMode.name()).getVisibility() == View.VISIBLE) {
+            if (textViews.get(singleUseMode.name()).getVisibility() == VISIBLE) {
                 int currentSize = devices.size();
                 if (currentRecyclerSize != currentSize) {
                     if (currentSize > 0) {
-                        devicesCardView.setVisibility(View.VISIBLE);
+                        devicesCardView.setVisibility(VISIBLE);
                         if (devicesAdapter == null) {
                             devicesAdapter = new DevicesAdapter(devices);
                             recyclerManager.setAdapter(devicesAdapter);
                         } else
                             devicesAdapter.refreshDevicesList(devices);
                     } else
-                        devicesCardView.setVisibility(View.GONE);
+                        devicesCardView.setVisibility(GONE);
                     currentRecyclerSize = currentSize;
                 } else {
                     if (currentSize > 0 && !devices.equals(devicesAdapter.getCurrentDevicesList()))
                         devicesAdapter.notifyDataSetChanged();
                 }
+                setManagerLayout();
                 handler.postDelayed(runnable, 1000);
             }
         };
@@ -320,20 +355,29 @@ public class AccountFragment extends RealtimeRecyclerFragment implements OnClick
     }
 
     /**
-     * {@inheritDoc}
-     **/
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case deleteBtn -> {
-                createAlertDialog(account_deletion, account_deletion_message,
-                        R.string.dismiss,
-                        (dialogInterface, i) -> dialogInterface.dismiss(),
-                        proceed,
-                        (dialogInterface, i) -> setRequestPayload(DELETE_SESSION), MAIN_ACTIVITY).show();
+     * Method to set the {@link DevicePermission#ACCOUNT_MANAGER} layout <br>
+     * No-any params required
+     */
+    // TODO: 18/05/2023 AUTO REFRESH DEVICESADAPTER WHEN CHANGED THE PERMISSION
+    private void setManagerLayout() {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(410, 123);
+        permissionText.setText(permission.name());
+        if (user.isAdmin()) {
+            params.addRule(ALIGN_PARENT_RIGHT, TRUE);
+            if (deleteBtn.getVisibility() == GONE) {
+                deleteBtn.setVisibility(VISIBLE);
+                itemTouchHelper.attachToRecyclerView(recyclerManager);
             }
-            case disconnectBtn -> setRequestPayload(DISCONNECT);
+        } else {
+            if (user.isAccountManager())
+                itemTouchHelper.attachToRecyclerView(recyclerManager);
+            else
+                itemTouchHelper.attachToRecyclerView(null);
+            params = new RelativeLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+            params.addRule(CENTER_IN_PARENT, TRUE);
+            deleteBtn.setVisibility(GONE);
         }
+        disconnectBtn.setLayoutParams(params);
     }
 
     /**

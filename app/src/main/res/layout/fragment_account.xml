@@ -27,6 +27,13 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp">
 
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/detailsTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/server_details"
+                        android:textSize="22sp" />
+
                     <LinearLayout
                         android:id="@+id/linServerAddress"
                         android:layout_width="match_parent"
@@ -78,21 +85,29 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/linServerStatus"
+                        android:id="@+id/linServerPermission"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/linServerPort"
                         android:layout_marginStart="5dp"
                         android:orientation="horizontal">
 
-                    </LinearLayout>
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/permission"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/permission"
+                            android:textColor="@color/red"
+                            android:textSize="20sp" />
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/detailsTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/server_details"
-                        android:textSize="22sp" />
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/permissionValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:textSize="18sp" />
+
+                    </LinearLayout>
 
                 </RelativeLayout>
 
@@ -235,6 +250,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/languagesLayout"
                         android:layout_marginTop="10dp"
+                        android:layout_marginEnd="5dp"
                         android:layout_marginStart="5dp">
 
                         <com.google.android.material.button.MaterialButton
@@ -248,11 +264,8 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/disconnectBtn"
                             style="@style/ButtonLayout"
-                            android:layout_width="155dp"
-                            android:layout_height="50dp"
                             android:textSize="16sp"
                             android:layout_alignParentEnd="true"
-                            android:layout_marginEnd="5dp"
                             android:text="@string/disconnect" />
 
                     </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.tecknobit.glider.ui.fragments;
+package com.tecknobit.glider.ui.fragments.passwordmanager;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -56,17 +56,18 @@ import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
  * @author Tecknobit - N7ghtm4r3
  * @see GliderFragment
  * @see FormFragment
+ * @see PasswordManagerFragment
  * @see OnClickListener
- **/
+ */
 @SuppressLint("NonConstantResourceId")
-public class CreateFragment extends FormFragment implements OnClickListener {
+public class CreateFragment extends PasswordManagerFragment implements OnClickListener {
 
     /**
      * {@code passwordCardView} card view where the password created will appear
      *
      * @apiNote clicking on this will be copied the passowrd with the
      * {@link Utils#copyText(TextView, View)}
-     **/
+     */
     @ResId(id = R.id.passwordCard)
     private MaterialCardView passwordCardView;
 
@@ -74,19 +75,19 @@ public class CreateFragment extends FormFragment implements OnClickListener {
      * {@code passwordTextView} text view where the password created will appear
      * @apiNote clicking on this will be copied the passowrd with the
      * {@link Utils#copyText(TextView, View)}
-     * **/
+     */
     @ResId(id = R.id.passwordCreated)
     private MaterialTextView passwordTextView;
 
     /**
      * {@code createBtn} button to make a request for the password creation
-     * **/
+     */
     @ResId(id = R.id.createBtn)
     private MaterialButton createBtn;
 
     /**
      * Required empty public constructor for the normal Android's workflow
-     * **/
+     */
     public CreateFragment() {
         textInputLayouts = new TextInputLayout[3];
         textInputEditTexts = new TextInputEditText[3];
@@ -135,6 +136,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         instantiateInputs(view, new int[]{R.id.tailLayout, R.id.scopesLayout, R.id.lengthLayout},
                 new int[]{R.id.tailInput, R.id.scopesInput, R.id.lengthInput});
+        initManagerLayout(view);
         createBtn = view.findViewById(R.id.createBtn);
         createBtn.setOnClickListener(this);
         passwordCardView = view.findViewById(R.id.passwordCard);
@@ -146,7 +148,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void loadInputMessagesLists() {
         inputsErrors.put(0, getString(R.string.tail_is_required));
@@ -159,7 +161,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void startInputsListenWorkflow() {
         super.startInputsListenWorkflow();
@@ -210,39 +212,41 @@ public class CreateFragment extends FormFragment implements OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.createBtn -> {
-                if (createBtn.getText().equals(getString(R.string.create))) {
-                    hideKeyboard(v);
-                    enableEditTexts(false);
-                    setRequestPayload(CREATE_PASSWORD);
-                    if (payload != null) {
-                        executor.execute(() -> {
-                            try {
-                                socketManager.writeContent(payload);
-                                response = new JSONObject(socketManager.readContent());
-                                MAIN_ACTIVITY.runOnUiThread(() -> {
-                                    try {
-                                        if (response.getString(statusCode.name()).equals(SUCCESSFUL.name())) {
-                                            showSnackbar(v, R.string.password_successfully_created);
-                                            passwordTextView.setText(response.getString(password.name()));
-                                            passwordCardView.setVisibility(View.VISIBLE);
-                                            createBtn.setText(R.string.clear);
-                                        } else {
+                if (setFragmentBehavior()) {
+                    if (createBtn.getText().equals(getString(R.string.create))) {
+                        hideKeyboard(v);
+                        enableEditTexts(false);
+                        setRequestPayload(CREATE_PASSWORD);
+                        if (payload != null) {
+                            executor.execute(() -> {
+                                try {
+                                    socketManager.writeContent(payload);
+                                    response = new JSONObject(socketManager.readContent());
+                                    MAIN_ACTIVITY.runOnUiThread(() -> {
+                                        try {
+                                            if (response.getString(statusCode.name()).equals(SUCCESSFUL.name())) {
+                                                showSnackbar(v, R.string.password_successfully_created);
+                                                passwordTextView.setText(response.getString(password.name()));
+                                                passwordCardView.setVisibility(View.VISIBLE);
+                                                createBtn.setText(R.string.clear);
+                                            } else {
+                                                showSnackbar(viewContainer, ope_failed);
+                                            }
+                                        } catch (JSONException e) {
                                             showSnackbar(viewContainer, ope_failed);
+                                        } finally {
+                                            enableEditTexts(true);
                                         }
-                                    } catch (JSONException e) {
-                                        showSnackbar(viewContainer, ope_failed);
-                                    } finally {
-                                        enableEditTexts(true);
-                                    }
-                                });
-                            } catch (Exception e) {
-                                showSnackbar(viewContainer, ope_failed);
-                            }
-                        });
+                                    });
+                                } catch (Exception e) {
+                                    showSnackbar(viewContainer, ope_failed);
+                                }
+                            });
+                        } else
+                            enableEditTexts(true);
                     } else
-                        enableEditTexts(true);
-                } else
-                    writeReview(false);
+                        writeReview(false);
+                }
             }
             case R.id.passwordCard, R.id.passwordCreated -> writeReview(true);
         }
@@ -315,7 +319,7 @@ public class CreateFragment extends FormFragment implements OnClickListener {
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     protected void showsError(int index) {
         String errorMsg = inputsErrors.get(index);

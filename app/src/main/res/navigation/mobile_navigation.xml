@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/navigation_create"
-        android:name="com.tecknobit.glider.ui.fragments.CreateFragment"
+        android:name="com.tecknobit.glider.ui.fragments.passwordmanager.CreateFragment"
         android:label="@string/create"
         tools:layout="@layout/fragment_create" />
 
     <fragment
         android:id="@+id/navigation_insert"
-        android:name="com.tecknobit.glider.ui.fragments.InsertFragment"
+        android:name="com.tecknobit.glider.ui.fragments.passwordmanager.InsertFragment"
         android:label="@string/insert"
         tools:layout="@layout/fragment_insert" />
 

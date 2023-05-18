@@ -32,6 +32,7 @@ import static android.view.LayoutInflater.from;
 import static androidx.core.content.ContextCompat.getDrawable;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
 import static com.tecknobit.apimanager.formatters.TimeFormatter.getStringDate;
+import static com.tecknobit.glider.R.drawable.ic_baseline_desktop_24;
 import static com.tecknobit.glider.R.string.device_blacklisted_successfully;
 import static com.tecknobit.glider.R.string.device_disconnected_successfully;
 import static com.tecknobit.glider.R.string.device_unblacklisted_successfully;
@@ -60,26 +61,26 @@ import static java.util.Locale.getDefault;
  * @author Tecknobit - N7ghtm4r3
  * @see RecyclerView.Adapter
  * @see Filterable
- **/
+ */
 public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceView> {
 
     /**
      * {@code devices} list of {@link Device} to manage
-     **/
+     */
     private ArrayList<Device> devices;
 
     /**
      * Constructor to init {@link DevicesAdapter} object
      *
      * @param devices: list of {@link Device} to manage
-     **/
+     */
     public DevicesAdapter(ArrayList<Device> devices) {
         this.devices = devices;
     }
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @NonNull
     @Override
     public DeviceView onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -88,7 +89,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     @SuppressLint("SetTextI18n")
     public void onBindViewHolder(@NonNull DeviceView holder, int position) {
@@ -96,15 +97,19 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
         holder.name.setText(device.getName());
         Device.Type type = device.getType();
         if (type.equals(Device.Type.DESKTOP))
-            holder.deviceIconType.setImageDrawable(getDrawable(MAIN_ACTIVITY, R.drawable.ic_baseline_desktop_24));
+            holder.deviceIconType.setImageDrawable(getDrawable(MAIN_ACTIVITY, ic_baseline_desktop_24));
         holder.ip.setText(MAIN_ACTIVITY.getString(R.string.ip_address) + " " + device.getIpAddress());
         holder.login.setText(MAIN_ACTIVITY.getString(R.string.login_date) + " " +
                 getLocaleDate(device.getLoginDateTimestamp()));
-        holder.lastActivity.setText(MAIN_ACTIVITY.getString(R.string.last_activity) + " " +
-                getLocaleDate(device.getLastActivityTimestamp()));
-        if (device.isBlacklisted()) {
+        holder.lastActivity.setText(MAIN_ACTIVITY.getString(R.string.last_activity) + " " + getLocaleDate(device.getLastActivityTimestamp()));
+        if (user.isAccountManager()) {
+            if (device.isBlacklisted()) {
+                holder.relActions.setVisibility(View.GONE);
+                holder.unblacklistBtn.setVisibility(View.VISIBLE);
+            }
+        } else {
             holder.relActions.setVisibility(View.GONE);
-            holder.unblacklistBtn.setVisibility(View.VISIBLE);
+            holder.unblacklistBtn.setVisibility(View.GONE);
         }
     }
 
@@ -113,7 +118,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      *
      * @param date: date as long timestamp to format
      * @return date input with the correct {@link Locale} as {@link String}
-     **/
+     */
     private String getLocaleDate(long date) {
         if ((System.currentTimeMillis() - date) >= (86400 * 1000) / 2)
             return getDateInstance(DATE_FIELD, getDefault()).format(new Date(date));
@@ -122,7 +127,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
 
     /**
      * {@inheritDoc}
-     **/
+     */
     @Override
     public int getItemCount() {
         return devices.size();
@@ -143,7 +148,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      * No-any params required
      *
      * @return {@link #devices} instance as {@link Collection} of {@link Device}
-     **/
+     */
     public Collection<Device> getCurrentDevicesList() {
         return devices;
     }
@@ -154,14 +159,14 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      * @author Tecknobit - N7ghtm4r3
      * @see RecyclerView.ViewHolder
      * @see View.OnClickListener
-     **/
+     */
     @SuppressLint("NonConstantResourceId")
     public static class DeviceView extends RecyclerView.ViewHolder implements View.OnClickListener,
             ManageRequest {
 
         /**
          * {@code payload} the payload to send with the request
-         **/
+         */
         protected JSONObject payload;
 
         /**
@@ -171,49 +176,49 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
 
         /**
          * {@code name} of the device -> as view instance type
-         **/
+         */
         @ResId(id = R.id.deviceName)
         private final MaterialTextView name;
 
         /**
          * {@code deviceIconType} icon type of the device -> as view instance type
-         **/
+         */
         @ResId(id = R.id.deviceIconType)
         private final ShapeableImageView deviceIconType;
 
         /**
          * {@code ip} of the device -> as view instance type
-         **/
+         */
         @ResId(id = R.id.ipAddress)
         private final MaterialTextView ip;
 
         /**
          * {@code login} of the device -> as view instance type
-         **/
+         */
         @ResId(id = R.id.loginDate)
         private final MaterialTextView login;
 
         /**
          * {@code lastActivity} last activity of the device -> as view instance type
-         **/
+         */
         @ResId(id = R.id.lastActivity)
         private final MaterialTextView lastActivity;
 
         /**
          * {@code relActions} view where are contained actions buttons
-         **/
+         */
         @ResId(id = R.id.relActions)
         private final RelativeLayout relActions;
 
         /**
          * {@code unblacklistBtn} button to unblacklist a {@link Device}
-         **/
+         */
         @ResId(id = R.id.unblacklistBtn)
         private final MaterialButton unblacklistBtn;
 
         /**
          * {@inheritDoc}
-         **/
+         */
         public DeviceView(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.deviceName);

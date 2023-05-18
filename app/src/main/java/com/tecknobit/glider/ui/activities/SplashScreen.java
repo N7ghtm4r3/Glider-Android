@@ -37,26 +37,26 @@ import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
  *
  * @author Tecknobit - N7ghtm4r3
  * @see AppCompatActivity
- **/
+ */
 @SuppressLint("CustomSplashScreen")
 public class SplashScreen extends AppCompatActivity {
 
     /**
      * {@code STARTER_ACTIVITY} is the global context for the {@code Glider}'s workflow
-     * **/
+     */
     @SuppressLint("StaticFieldLeak")
     public static Activity STARTER_ACTIVITY;
 
     /**
      * {@code start} flag whether start or not with the {@code Glider}'s workflow in those cases
      * when {@link #onBackPressed()} or {@link #onUserLeaveHint()} methods have been called
-     **/
+     */
     private static volatile boolean start = true;
 
     /**
      * {@code executeLeaveHint} flag whether execute the {@link #onUserLeaveHint()} method, this to avoid the
      * wrong workflow during the QRCode scanning in the {@link Connect} fragment
-     **/
+     */
     private static volatile boolean executeLeaveHint = true;
 
     /**
@@ -119,7 +119,7 @@ public class SplashScreen extends AppCompatActivity {
      *
      * @param fragment: fragment to open
      * @apiNote the transaction will be executed with {@link #runOnUiThread(Runnable)}'s workflow
-     **/
+     */
     private void openFragment(Fragment fragment) {
         runOnUiThread(() -> {
             findViewById(R.id.container).setVisibility(View.VISIBLE);
@@ -137,7 +137,7 @@ public class SplashScreen extends AppCompatActivity {
      *
      * @apiNote when called {@link #start} and {@link User#refreshData} on {@code "true"} and will be
      * resumed the normal {@code "Glider"}'s workflow
-     **/
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -150,7 +150,7 @@ public class SplashScreen extends AppCompatActivity {
      *
      * @apiNote when called {@link #start} and {@link User#refreshData} will be set on {@code "false"}
      * and will be called {@link #finishAffinity()} method to exit from this app
-     **/
+     */
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -164,7 +164,7 @@ public class SplashScreen extends AppCompatActivity {
      *
      * @apiNote when called {@link #start} and {@link User#refreshData} will be set on {@code "false"}
      * and will be called {@link #finishAffinity()} method to exit from this app
-     **/
+     */
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();

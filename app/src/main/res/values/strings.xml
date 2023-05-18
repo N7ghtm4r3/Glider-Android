@@ -100,4 +100,6 @@
     <string name="account_deletion_message">This will delete permanently all the data of the account and all the passwords will be unrecoverable, proceed?</string>
     <string name="proceed">Proceed</string>
     <string name="change_language">Change language</string>
+    <string name="you_are_not_authorized">You are not authorized</string>
+    <string name="permission">Permission:</string>
 </resources>

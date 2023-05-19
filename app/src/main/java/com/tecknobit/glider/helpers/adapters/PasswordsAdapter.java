@@ -115,7 +115,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      *                        {@link Status#DELETED} status and can be recovered or is in an {@link Status#ACTIVE} status
      */
     public PasswordsAdapter(ArrayList<Password> passwords, boolean isRecoveryMode) {
-        this.passwords = passwords;
+        this.passwords = new ArrayList<>(passwords);
         filteredPasswords = new ArrayList<>(passwords);
         PasswordsAdapter.isRecoveryMode = isRecoveryMode;
     }
@@ -317,7 +317,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      */
     @SuppressLint("NotifyDataSetChanged")
     public void refreshPasswordsList(ArrayList<Password> passwords) {
-        this.passwords = passwords;
+        this.passwords = new ArrayList<>(passwords);
         resetPasswordsList();
     }
 
@@ -340,6 +340,16 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
      */
     public Collection<Password> getCurrentPasswords() {
         return passwords;
+    }
+
+    /**
+     * Method to check whether the current {@link #passwords} list match with an other list
+     *
+     * @param checkList: list of {@link Password} to check
+     * @return {@code "true"} if the list match, {@code "false"} if they don't match
+     */
+    public boolean passwordsMatch(ArrayList<Password> checkList) {
+        return checkList.hashCode() == passwords.hashCode();
     }
 
     /**

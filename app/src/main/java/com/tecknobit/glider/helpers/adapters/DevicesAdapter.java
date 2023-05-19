@@ -86,7 +86,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      * @param devices: list of {@link Device} to manage
      */
     public DevicesAdapter(ArrayList<Device> devices) {
-        this.devices = devices;
+        this.devices = new ArrayList<>(devices);
     }
 
     /**
@@ -172,7 +172,7 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      */
     @SuppressLint("NotifyDataSetChanged")
     public void refreshDevicesList(ArrayList<Device> devices) {
-        this.devices = devices;
+        this.devices = new ArrayList<>(devices);
         notifyDataSetChanged();
     }
 
@@ -184,6 +184,16 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
      */
     public Collection<Device> getCurrentDevicesList() {
         return devices;
+    }
+
+    /**
+     * Method to check whether the current {@link #devices} list match with an other list
+     *
+     * @param checkList: list of {@link Device} to check
+     * @return {@code "true"} if the list match, {@code "false"} if they don't match
+     */
+    public boolean devicesMatch(ArrayList<Device> checkList) {
+        return checkList.hashCode() == devices.hashCode();
     }
 
     /**

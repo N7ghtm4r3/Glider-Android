@@ -26,9 +26,6 @@ import com.tecknobit.glider.ui.fragments.ListFragment;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -42,6 +39,7 @@ import static com.google.firebase.database.FirebaseDatabase.getInstance;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.GENERIC_RESPONSE;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.valueOf;
+import static com.tecknobit.apimanager.apis.SocketManager.pingHost;
 import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.databasePath;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
@@ -160,15 +158,12 @@ public class User extends Session {
         if (hostAddress != null) {
             if (secretKey != null) {
                 try {
-                    try {
-                        final Socket socket = new Socket();
-                        socket.connect(new InetSocketAddress(hostAddress, hostPort), 2000);
-                        socket.close();
-                    } catch (IOException e) {
+                    if (pingHost(hostAddress, hostPort, 2000)) {
+                        socketManager = new SocketManager(hostAddress, hostPort, ivSpec, secretKey,
+                                CBC_ALGORITHM);
+                        refreshData();
+                    } else
                         resetSession(FAILED);
-                    }
-                    socketManager = new SocketManager(hostAddress, hostPort, ivSpec, secretKey, CBC_ALGORITHM);
-                    refreshData();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

@@ -344,8 +344,8 @@ public class AccountFragment extends RealtimeRecyclerFragment {
                         devicesCardView.setVisibility(GONE);
                     currentRecyclerSize = currentSize;
                 } else {
-                    if (currentSize > 0 && !devices.equals(devicesAdapter.getCurrentDevicesList()))
-                        devicesAdapter.notifyDataSetChanged();
+                    if (currentSize > 0 && !devicesAdapter.devicesMatch(devices))
+                        devicesAdapter.refreshDevicesList(devices);
                 }
                 setManagerLayout();
                 handler.postDelayed(runnable, 1000);
@@ -358,7 +358,6 @@ public class AccountFragment extends RealtimeRecyclerFragment {
      * Method to set the {@link DevicePermission#ACCOUNT_MANAGER} layout <br>
      * No-any params required
      */
-    // TODO: 18/05/2023 AUTO REFRESH DEVICESADAPTER WHEN CHANGED THE PERMISSION
     private void setManagerLayout() {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(410, 123);
         permissionText.setText(permission.name());

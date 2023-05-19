@@ -307,9 +307,9 @@ public class ListFragment extends RealtimeRecyclerFragment {
         super.loadRecycler();
         runnable = () -> {
             if (!recoveryMode)
-                list = passwords.get(ACTIVE);
+                list = new ArrayList<>(passwords.get(ACTIVE));
             else
-                list = passwords.get(DELETED);
+                list = new ArrayList<>(passwords.get(DELETED));
             if (list != null) {
                 if (user.isPasswordManager())
                     itemTouchHelper.attachToRecyclerView(recyclerManager);
@@ -333,8 +333,8 @@ public class ListFragment extends RealtimeRecyclerFragment {
                     }
                     currentRecyclerSize = passwordsSize;
                 } else {
-                    if (passwordsSize > 0 && !list.equals(passwordsAdapter.getCurrentPasswords()))
-                        passwordsAdapter.notifyDataSetChanged();
+                    if (passwordsSize > 0 && !passwordsAdapter.passwordsMatch(list))
+                        passwordsAdapter.refreshPasswordsList(list);
                 }
             }
             handler.postDelayed(runnable, 1000);

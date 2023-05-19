@@ -53,6 +53,7 @@ import static com.tecknobit.glider.helpers.GliderLauncher.Operation.MANAGE_DEVIC
 import static com.tecknobit.glider.helpers.local.User.DEVICE_NAME;
 import static com.tecknobit.glider.helpers.local.User.socketManager;
 import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
 import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
 import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 import static com.tecknobit.glider.records.Device.DeviceKeys.ipAddress;
@@ -114,31 +115,38 @@ public class DevicesAdapter extends RecyclerView.Adapter<DevicesAdapter.DeviceVi
         holder.permission.setText(vPermission.name());
         if (vPermission == ADMIN)
             holder.permission.setTextColor(COLOR_RED);
+        else
+            holder.permission.setTextColor(COLOR_PRIMARY);
         holder.login.setText(MAIN_ACTIVITY.getString(R.string.login_date) + " " +
                 getLocaleDate(device.getLoginDateTimestamp()));
-        holder.lastActivity.setText(MAIN_ACTIVITY.getString(R.string.last_activity) + " " + getLocaleDate(device.getLastActivityTimestamp()));
+        holder.lastActivity.setText(MAIN_ACTIVITY.getString(R.string.last_activity) + " "
+                + getLocaleDate(device.getLastActivityTimestamp()));
         if (user.isAccountManager()) {
             if (device.isBlacklisted()) {
                 holder.relActions.setVisibility(GONE);
                 holder.unblacklistBtn.setVisibility(VISIBLE);
             }
-            holder.changePermissionSpinner.setAdapter(new ArrayAdapter<>(MAIN_ACTIVITY,
-                    android.R.layout.simple_spinner_dropdown_item, DevicePermission.values()));
-            holder.changePermissionSpinner.setSelected(false);
-            holder.changePermissionSpinner.setSelection(vPermission.ordinal());
-            holder.changePermissionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    DevicePermission sPermission = (DevicePermission) parent.getSelectedItem();
-                    if (vPermission != sPermission)
-                        holder.changePermission(sPermission);
-                }
+            if (user.isAdmin() || !device.isAdmin()) {
+                holder.changePermissionSpinner.setVisibility(VISIBLE);
+                holder.changePermissionSpinner.setAdapter(new ArrayAdapter<>(MAIN_ACTIVITY,
+                        android.R.layout.simple_spinner_dropdown_item, DevicePermission.values()));
+                holder.changePermissionSpinner.setSelected(false);
+                holder.changePermissionSpinner.setSelection(vPermission.ordinal());
+                holder.changePermissionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        DevicePermission sPermission = (DevicePermission) parent.getSelectedItem();
+                        if (vPermission != sPermission)
+                            holder.changePermission(sPermission);
+                    }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
 
-                }
-            });
+                    }
+                });
+            } else
+                holder.changePermissionSpinner.setVisibility(GONE);
         } else {
             holder.changePermissionSpinner.setVisibility(GONE);
             holder.relActions.setVisibility(GONE);

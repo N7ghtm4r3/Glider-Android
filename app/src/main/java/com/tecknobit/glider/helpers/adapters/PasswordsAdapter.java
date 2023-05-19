@@ -457,7 +457,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
             password = itemView.findViewById(R.id.password);
             actionBtn = itemView.findViewById(R.id.actionBtn);
             actionBtn.setOnClickListener(this);
-            for (int btn : new int[]{R.id.editBtn, R.id.editBtn, R.id.removeBtn, R.id.closeScopeActions})
+            for (int btn : new int[]{R.id.deleteBtn, R.id.editBtn, R.id.removeBtn, R.id.closeScopeActions})
                 itemView.findViewById(btn).setOnClickListener(this);
             relActionButtons = itemView.findViewById(R.id.relActionButtons);
             copyBtn = itemView.findViewById(R.id.copyBtn);

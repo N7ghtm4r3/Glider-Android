@@ -253,20 +253,38 @@
                         android:layout_marginEnd="5dp"
                         android:layout_marginStart="5dp">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/deleteBtn"
-                            style="@style/ButtonLayout"
-                            android:layout_width="145dp"
-                            android:layout_height="50dp"
-                            android:textSize="16sp"
-                            android:text="@string/delete" />
+                        <RelativeLayout
+                            android:id="@+id/adminRelBtn"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/deleteBtn"
+                                style="@style/ButtonLayout"
+                                android:layout_width="145dp"
+                                android:layout_height="50dp"
+                                android:textSize="16sp"
+                                android:text="@string/delete" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/disconnectBtn"
+                                style="@style/ButtonLayout"
+                                android:layout_width="145dp"
+                                android:layout_height="50dp"
+                                android:textSize="16sp"
+                                android:layout_alignParentEnd="true"
+                                android:text="@string/disconnect" />
+
+                        </RelativeLayout>
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/disconnectBtn"
+                            android:id="@+id/looseDisconnectBtn"
                             style="@style/ButtonLayout"
-                            android:textSize="16sp"
-                            android:layout_alignParentEnd="true"
-                            android:text="@string/disconnect" />
+                            android:visibility="gone"
+                            android:layout_centerInParent="true"
+                            android:text="@string/disconnect"
+                            android:textSize="16sp" />
 
                     </RelativeLayout>
 

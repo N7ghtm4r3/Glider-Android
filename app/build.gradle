@@ -13,8 +13,8 @@ android {
         applicationId "com.tecknobit.glider"
         minSdk 26
         targetSdk 33
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 4
+        versionName "1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -56,8 +56,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    implementation 'androidx.navigation:navigation-fragment:2.5.3'
-    implementation 'androidx.navigation:navigation-ui:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment:2.6.0'
+    implementation 'androidx.navigation:navigation-ui:2.6.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-perf'
@@ -65,8 +65,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'com.google.android.play:review:2.0.1'
-    implementation 'com.github.N7ghtm4r3:APIManager:2.1.2'
-    implementation 'com.github.N7ghtm4r3:Glider:1.0.3'
+    implementation 'com.github.N7ghtm4r3:APIManager:2.1.4'
+    implementation 'com.github.N7ghtm4r3:Glider:1.0.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'

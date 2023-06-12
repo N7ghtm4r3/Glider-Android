@@ -1,6 +1,6 @@
 # Glider
 
-**v1.0.2**
+**v1.0.3**
 
 This is a Java Based open source project useful to manage the creation and the storage of your
 passwords with the **Glider** ecosystem This repository contains the Android version of **Glider**,

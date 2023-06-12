@@ -27,6 +27,7 @@ import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.GliderLauncher.Operation;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter;
 import com.tecknobit.glider.helpers.adapters.DevicesAdapter.DeviceView;
+import com.tecknobit.glider.helpers.local.User;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Device.DevicePermission;
 import com.tecknobit.glider.records.Session;
@@ -41,11 +42,6 @@ import java.util.Iterator;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static android.widget.RelativeLayout.ALIGN_PARENT_RIGHT;
-import static android.widget.RelativeLayout.CENTER_IN_PARENT;
-import static android.widget.RelativeLayout.TRUE;
 import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
 import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
@@ -136,6 +132,20 @@ public class AccountFragment extends RealtimeRecyclerFragment {
     private MaterialTextView permissionText;
 
     /**
+     * {@code adminRelativeLayout} the layout for the session buttons operation when the {@link User#user}
+     * is a {@link DevicePermission#ADMIN}
+     */
+    @ResId(id = R.id.adminRelBtn)
+    private RelativeLayout adminRelativeLayout;
+
+    /**
+     * {@code looseDisconnectBtn} the button to disconnect the device from the {@link Session}
+     * when the {@link User#user} is only a {@link DevicePermission#ACCOUNT_MANAGER}
+     */
+    @ResId(id = R.id.looseDisconnectBtn)
+    private MaterialButton looseDisconnectBtn;
+
+    /**
      * Required empty public constructor for the normal Android's workflow
      */
     public AccountFragment() {
@@ -191,6 +201,9 @@ public class AccountFragment extends RealtimeRecyclerFragment {
                 (dialogInterface, i) -> setRequestPayload(DELETE_SESSION), MAIN_ACTIVITY).show());
         disconnectBtn = view.findViewById(R.id.disconnectBtn);
         disconnectBtn.setOnClickListener(v -> setRequestPayload(DISCONNECT));
+        adminRelativeLayout = view.findViewById(R.id.adminRelBtn);
+        looseDisconnectBtn = view.findViewById(R.id.looseDisconnectBtn);
+        looseDisconnectBtn.setOnClickListener(v -> setRequestPayload(DISCONNECT));
         final String[] keysViews = new String[]{hostAddress.name(), hostPort.name(),
                 singleUseMode.name(), QRCodeLoginEnabled.name(), runInLocalhost.name()};
         final int[] idsViews = new int[]{host_address, host_port, single_use_mode, qr_code_login,
@@ -359,24 +372,21 @@ public class AccountFragment extends RealtimeRecyclerFragment {
      * No-any params required
      */
     private void setManagerLayout() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(410, 123);
         permissionText.setText(permission.name());
         if (user.isAdmin()) {
-            params.addRule(ALIGN_PARENT_RIGHT, TRUE);
-            if (deleteBtn.getVisibility() == GONE) {
-                deleteBtn.setVisibility(VISIBLE);
+            if (adminRelativeLayout.getVisibility() == GONE) {
+                adminRelativeLayout.setVisibility(VISIBLE);
                 itemTouchHelper.attachToRecyclerView(recyclerManager);
+                looseDisconnectBtn.setVisibility(GONE);
             }
         } else {
             if (user.isAccountManager())
                 itemTouchHelper.attachToRecyclerView(recyclerManager);
             else
                 itemTouchHelper.attachToRecyclerView(null);
-            params = new RelativeLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
-            params.addRule(CENTER_IN_PARENT, TRUE);
-            deleteBtn.setVisibility(GONE);
+            looseDisconnectBtn.setVisibility(VISIBLE);
+            adminRelativeLayout.setVisibility(GONE);
         }
-        disconnectBtn.setLayoutParams(params);
     }
 
     /**

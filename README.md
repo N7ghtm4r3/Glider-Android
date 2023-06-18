@@ -52,7 +52,7 @@ Thank you for your help!
 [![](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)](https://www.oracle.com/java/)
 [![](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://play.google.com/store/apps/details?id=com.tecknobit.glider)
 
-## Busisness contact
+## Business contact
 
 If you need to contact me for a project 
 

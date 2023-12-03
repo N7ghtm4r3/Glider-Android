@@ -1,5 +1,41 @@
 package com.tecknobit.glider.ui.fragments;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
+import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.SUCCESSFUL;
+import static com.tecknobit.glider.R.id.blackListBtn;
+import static com.tecknobit.glider.R.id.devicesCard;
+import static com.tecknobit.glider.R.id.devicesRecycler;
+import static com.tecknobit.glider.R.id.host_address;
+import static com.tecknobit.glider.R.id.host_port;
+import static com.tecknobit.glider.R.id.localhostValue;
+import static com.tecknobit.glider.R.id.qr_code_login;
+import static com.tecknobit.glider.R.id.single_use_mode;
+import static com.tecknobit.glider.R.id.swipe;
+import static com.tecknobit.glider.R.string.account_deletion;
+import static com.tecknobit.glider.R.string.account_deletion_message;
+import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.R.string.proceed;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_SESSION;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DISCONNECT;
+import static com.tecknobit.glider.helpers.local.User.devices;
+import static com.tecknobit.glider.helpers.local.User.permission;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
+import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
+import static com.tecknobit.glider.helpers.local.Utils.createAlertDialog;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.records.Session.SessionKeys.QRCodeLoginEnabled;
+import static com.tecknobit.glider.records.Session.SessionKeys.hostAddress;
+import static com.tecknobit.glider.records.Session.SessionKeys.hostPort;
+import static com.tecknobit.glider.records.Session.SessionKeys.runInLocalhost;
+import static com.tecknobit.glider.records.Session.SessionKeys.singleUseMode;
+import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -39,42 +75,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
-import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
-import static com.tecknobit.glider.R.id.blackListBtn;
-import static com.tecknobit.glider.R.id.devicesCard;
-import static com.tecknobit.glider.R.id.devicesRecycler;
-import static com.tecknobit.glider.R.id.host_address;
-import static com.tecknobit.glider.R.id.host_port;
-import static com.tecknobit.glider.R.id.localhostValue;
-import static com.tecknobit.glider.R.id.qr_code_login;
-import static com.tecknobit.glider.R.id.single_use_mode;
-import static com.tecknobit.glider.R.id.swipe;
-import static com.tecknobit.glider.R.string.account_deletion;
-import static com.tecknobit.glider.R.string.account_deletion_message;
-import static com.tecknobit.glider.R.string.ope_failed;
-import static com.tecknobit.glider.R.string.proceed;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_SESSION;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DISCONNECT;
-import static com.tecknobit.glider.helpers.local.User.devices;
-import static com.tecknobit.glider.helpers.local.User.permission;
-import static com.tecknobit.glider.helpers.local.User.socketManager;
-import static com.tecknobit.glider.helpers.local.User.user;
-import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
-import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
-import static com.tecknobit.glider.helpers.local.Utils.createAlertDialog;
-import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
-import static com.tecknobit.glider.records.Session.SessionKeys.QRCodeLoginEnabled;
-import static com.tecknobit.glider.records.Session.SessionKeys.hostAddress;
-import static com.tecknobit.glider.records.Session.SessionKeys.hostPort;
-import static com.tecknobit.glider.records.Session.SessionKeys.runInLocalhost;
-import static com.tecknobit.glider.records.Session.SessionKeys.singleUseMode;
-import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
  * The {@link AccountFragment} fragment is the section of the app where there are the information about:

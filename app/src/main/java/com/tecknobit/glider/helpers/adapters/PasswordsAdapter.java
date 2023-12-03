@@ -1,47 +1,9 @@
 package com.tecknobit.glider.helpers.adapters;
 
-import android.annotation.SuppressLint;
-import android.graphics.Color;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.RelativeLayout;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
-
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
-import com.tecknobit.apimanager.annotations.Wrapper;
-import com.tecknobit.apimanager.annotations.android.ResId;
-import com.tecknobit.apimanager.apis.SocketManager;
-import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.GliderLauncher.Operation;
-import com.tecknobit.glider.helpers.local.ManageRequest;
-import com.tecknobit.glider.records.Device.DevicePermission;
-import com.tecknobit.glider.records.Password;
-import com.tecknobit.glider.records.Password.PasswordKeys;
-import com.tecknobit.glider.records.Password.Status;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import static android.view.LayoutInflater.from;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.SUCCESSFUL;
 import static com.tecknobit.glider.R.string.add_more;
 import static com.tecknobit.glider.R.string.current_scope_edited_successfully;
 import static com.tecknobit.glider.R.string.edit_the_current_scope;
@@ -78,6 +40,44 @@ import static com.tecknobit.glider.records.Device.DeviceKeys.type;
 import static com.tecknobit.glider.records.Device.Type.MOBILE;
 import static com.tecknobit.glider.records.Session.SessionKeys.sessionPassword;
 import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
+
+import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.RelativeLayout;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.Adapter;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textview.MaterialTextView;
+import com.tecknobit.apimanager.annotations.Wrapper;
+import com.tecknobit.apimanager.annotations.android.ResId;
+import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.GliderLauncher.Operation;
+import com.tecknobit.glider.helpers.local.ManageRequest;
+import com.tecknobit.glider.records.Device.DevicePermission;
+import com.tecknobit.glider.records.Password;
+import com.tecknobit.glider.records.Password.PasswordKeys;
+import com.tecknobit.glider.records.Password.Status;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The {@link PasswordsAdapter} is the adapter for the passwords lists
@@ -601,7 +601,7 @@ public class PasswordsAdapter extends RecyclerView.Adapter<PasswordsAdapter.Pass
                                 if (operation.equals(DELETE_PASSWORD))
                                     message = password_successfully_deleted;
                                 if (response.getString(statusCode.name())
-                                        .equals(SocketManager.StandardResponseCode.SUCCESSFUL.name())) {
+                                        .equals(SUCCESSFUL.name())) {
                                     showSnackbar(itemView, message);
                                 } else
                                     showSnackbar(itemView, ope_failed);

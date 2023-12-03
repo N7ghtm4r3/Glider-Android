@@ -1,5 +1,19 @@
 package com.tecknobit.glider.ui.fragments.passwordmanager;
 
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.SUCCESSFUL;
+import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.CREATE_PASSWORD;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
+import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.records.Password.PASSWORD_MAX_LENGTH;
+import static com.tecknobit.glider.records.Password.PASSWORD_MIN_LENGTH;
+import static com.tecknobit.glider.records.Password.PasswordKeys.password;
+import static com.tecknobit.glider.records.Password.PasswordKeys.scopes;
+import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.Editable;
@@ -34,20 +48,6 @@ import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
-import static com.tecknobit.glider.R.string.ope_failed;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.CREATE_PASSWORD;
-import static com.tecknobit.glider.helpers.local.User.socketManager;
-import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
-import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
-import static com.tecknobit.glider.records.Password.PASSWORD_MAX_LENGTH;
-import static com.tecknobit.glider.records.Password.PASSWORD_MIN_LENGTH;
-import static com.tecknobit.glider.records.Password.PasswordKeys.password;
-import static com.tecknobit.glider.records.Password.PasswordKeys.scopes;
-import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
  * The {@link CreateFragment} fragment is the section of the app where the password can be created

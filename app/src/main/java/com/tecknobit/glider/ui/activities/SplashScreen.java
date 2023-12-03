@@ -1,5 +1,18 @@
 package com.tecknobit.glider.ui.activities;
 
+import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
+import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
+import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.valueOf;
+import static com.tecknobit.glider.R.string.the_session_has_been_deleted;
+import static com.tecknobit.glider.R.string.this_device_has_been_disconnected;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.local.User.IS_UPDATED;
+import static com.tecknobit.glider.helpers.local.User.refreshData;
+import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.local.Utils.setLanguageLocale;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -17,19 +30,6 @@ import com.tecknobit.glider.R;
 import com.tecknobit.glider.helpers.local.User;
 import com.tecknobit.glider.ui.fragments.Connect;
 import com.tecknobit.glider.ui.fragments.Update;
-
-import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO;
-import static androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode;
-import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_MATCH_ACTIVITY_OPEN;
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.valueOf;
-import static com.tecknobit.glider.R.string.the_session_has_been_deleted;
-import static com.tecknobit.glider.R.string.this_device_has_been_disconnected;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.local.User.IS_UPDATED;
-import static com.tecknobit.glider.helpers.local.User.refreshData;
-import static com.tecknobit.glider.helpers.local.User.user;
-import static com.tecknobit.glider.helpers.local.Utils.setLanguageLocale;
-import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
 
 /**
  * The {@link SplashScreen} activity is the first screen of the {@code Glider} app. <br>

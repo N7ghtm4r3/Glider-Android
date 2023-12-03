@@ -1,5 +1,21 @@
 package com.tecknobit.glider.ui.fragments;
 
+import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
+import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
+import static androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_PASSWORD;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.RECOVER_PASSWORD;
+import static com.tecknobit.glider.helpers.adapters.PasswordsAdapter.PasswordView;
+import static com.tecknobit.glider.helpers.local.User.passwords;
+import static com.tecknobit.glider.helpers.local.User.user;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
+import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
+import static com.tecknobit.glider.records.Password.Status.ACTIVE;
+import static com.tecknobit.glider.records.Password.Status.DELETED;
+import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
+import static com.tecknobit.glider.ui.activities.MainActivity.navController;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -32,22 +48,6 @@ import com.tecknobit.glider.records.Password.Status;
 import com.tecknobit.glider.ui.fragments.parents.RealtimeRecyclerFragment;
 
 import java.util.ArrayList;
-
-import static androidx.recyclerview.widget.ItemTouchHelper.LEFT;
-import static androidx.recyclerview.widget.ItemTouchHelper.RIGHT;
-import static androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.DELETE_PASSWORD;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.RECOVER_PASSWORD;
-import static com.tecknobit.glider.helpers.adapters.PasswordsAdapter.PasswordView;
-import static com.tecknobit.glider.helpers.local.User.passwords;
-import static com.tecknobit.glider.helpers.local.User.user;
-import static com.tecknobit.glider.helpers.local.Utils.COLOR_PRIMARY;
-import static com.tecknobit.glider.helpers.local.Utils.COLOR_RED;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
-import static com.tecknobit.glider.records.Password.Status.ACTIVE;
-import static com.tecknobit.glider.records.Password.Status.DELETED;
-import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
-import static com.tecknobit.glider.ui.activities.MainActivity.navController;
 
 /**
  * The {@link ListFragment} fragment is the section of the app where there is the list of the
@@ -306,10 +306,14 @@ public class ListFragment extends RealtimeRecyclerFragment {
     protected void loadRecycler() {
         super.loadRecycler();
         runnable = () -> {
+            ArrayList<Password> tmpPasswords;
             if (!recoveryMode)
-                list = new ArrayList<>(passwords.get(ACTIVE));
+                tmpPasswords = passwords.get(ACTIVE);
             else
-                list = new ArrayList<>(passwords.get(DELETED));
+                tmpPasswords = passwords.get(DELETED);
+            list = null;
+            if(tmpPasswords != null)
+                list = new ArrayList<>(tmpPasswords);
             if (list != null) {
                 if (user.isPasswordManager())
                     itemTouchHelper.attachToRecyclerView(recyclerManager);

@@ -1,5 +1,32 @@
 package com.tecknobit.glider.helpers.local;
 
+import static android.content.Context.MODE_PRIVATE;
+import static android.content.pm.PackageManager.NameNotFoundException;
+import static android.os.Build.DEVICE;
+import static android.os.Build.HOST;
+import static android.os.Build.MANUFACTURER;
+import static com.google.firebase.database.FirebaseDatabase.getInstance;
+import static com.tecknobit.apimanager.apis.encryption.BaseCipher.Algorithm.CBC_ALGORITHM;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.FAILED;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.GENERIC_RESPONSE;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.valueOf;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.pingHost;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.databasePath;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.REFRESH_DATA;
+import static com.tecknobit.glider.records.Device.DeviceKeys.name;
+import static com.tecknobit.glider.records.Device.DeviceKeys.type;
+import static com.tecknobit.glider.records.Device.DevicePermission.ACCOUNT_MANAGER;
+import static com.tecknobit.glider.records.Device.DevicePermission.ADMIN;
+import static com.tecknobit.glider.records.Device.DevicePermission.PASSWORD_MANAGER;
+import static com.tecknobit.glider.records.Device.Type.MOBILE;
+import static com.tecknobit.glider.records.Password.PasswordKeys.status;
+import static com.tecknobit.glider.records.Password.Status.ACTIVE;
+import static com.tecknobit.glider.records.Password.Status.DELETED;
+import static com.tecknobit.glider.records.Session.SessionKeys.session;
+import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -9,8 +36,8 @@ import androidx.annotation.NonNull;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.tecknobit.apimanager.apis.SocketManager;
-import com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode;
+import com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode;
+import com.tecknobit.apimanager.apis.sockets.encrypteds.AESSocketManager;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.helpers.DatabaseManager.Table;
 import com.tecknobit.glider.records.Device;
@@ -29,33 +56,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import static android.content.Context.MODE_PRIVATE;
-import static android.content.pm.PackageManager.NameNotFoundException;
-import static android.os.Build.DEVICE;
-import static android.os.Build.HOST;
-import static android.os.Build.MANUFACTURER;
-import static com.google.firebase.database.FirebaseDatabase.getInstance;
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.GENERIC_RESPONSE;
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.valueOf;
-import static com.tecknobit.apimanager.apis.SocketManager.pingHost;
-import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.databasePath;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.REFRESH_DATA;
-import static com.tecknobit.glider.records.Device.DeviceKeys.name;
-import static com.tecknobit.glider.records.Device.DeviceKeys.type;
-import static com.tecknobit.glider.records.Device.DevicePermission.ACCOUNT_MANAGER;
-import static com.tecknobit.glider.records.Device.DevicePermission.ADMIN;
-import static com.tecknobit.glider.records.Device.DevicePermission.PASSWORD_MANAGER;
-import static com.tecknobit.glider.records.Device.Type.MOBILE;
-import static com.tecknobit.glider.records.Password.PasswordKeys.status;
-import static com.tecknobit.glider.records.Password.Status.ACTIVE;
-import static com.tecknobit.glider.records.Password.Status.DELETED;
-import static com.tecknobit.glider.records.Session.SessionKeys.session;
-import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
 
 /**
  * The {@code User} class is a useful to manage the user session during the app workflow
@@ -116,7 +116,7 @@ public class User extends Session {
     /**
      * {@code socketManager} instance to manage the user communication with the backend
      */
-    public static SocketManager socketManager;
+    public static AESSocketManager socketManager;
 
     /**
      * {@code user} instance to manage the user session in app
@@ -155,20 +155,17 @@ public class User extends Session {
                 userShared.getBoolean(SessionKeys.QRCodeLoginEnabled.name(), false),
                 userShared.getBoolean(SessionKeys.runInLocalhost.name(), true));
         language = userShared.getString("language", "en");
-        if (hostAddress != null) {
-            if (secretKey != null) {
-                try {
-                    if (pingHost(hostAddress, hostPort, 2000)) {
-                        socketManager = new SocketManager(hostAddress, hostPort, ivSpec, secretKey,
-                                CBC_ALGORITHM);
-                        refreshData();
-                    } else
-                        resetSession(FAILED);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            } else
-                socketManager = new SocketManager(hostAddress, hostPort);
+        if (hostAddress != null && secretKey != null) {
+            try {
+                if (pingHost(hostAddress, hostPort, 2000)) {
+                    socketManager = new AESSocketManager(hostAddress, hostPort, ivSpec, secretKey,
+                            CBC_ALGORITHM);
+                    refreshData();
+                } else
+                    resetSession(FAILED);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         checkForUpdates();
     }

@@ -1,5 +1,16 @@
 package com.tecknobit.glider.ui.fragments.passwordmanager;
 
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.FAILED;
+import static com.tecknobit.glider.R.string.ope_failed;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.INSERT_PASSWORD;
+import static com.tecknobit.glider.helpers.local.User.socketManager;
+import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
+import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
+import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
+import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,17 +32,6 @@ import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
-import static com.tecknobit.glider.R.string.ope_failed;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.statusCode;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.INSERT_PASSWORD;
-import static com.tecknobit.glider.helpers.local.User.socketManager;
-import static com.tecknobit.glider.helpers.local.Utils.getTextFromEdit;
-import static com.tecknobit.glider.helpers.local.Utils.hideKeyboard;
-import static com.tecknobit.glider.helpers.local.Utils.showSnackbar;
-import static com.tecknobit.glider.ui.activities.MainActivity.MAIN_ACTIVITY;
 
 /**
  * The {@link InsertFragment} fragment is the section of the app where the password can be inserted

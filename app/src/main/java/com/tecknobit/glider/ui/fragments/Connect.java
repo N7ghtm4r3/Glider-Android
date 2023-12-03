@@ -1,44 +1,9 @@
 package com.tecknobit.glider.ui.fragments;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.content.Intent;
-import android.content.res.ColorStateList;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.Window;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.journeyapps.barcodescanner.ScanContract;
-import com.journeyapps.barcodescanner.ScanOptions;
-import com.tecknobit.apimanager.apis.SocketManager;
-import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
-import com.tecknobit.apimanager.formatters.JsonHelper;
-import com.tecknobit.glider.R;
-import com.tecknobit.glider.helpers.GliderLauncher.Operation;
-import com.tecknobit.glider.ui.activities.MainActivity;
-import com.tecknobit.glider.ui.fragments.parents.FormFragment;
-import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import static android.graphics.Color.TRANSPARENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
+import static com.tecknobit.apimanager.apis.encryption.BaseCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.glider.R.string.app_name;
 import static com.tecknobit.glider.R.string.host_hint;
 import static com.tecknobit.glider.R.string.host_is_required;
@@ -67,6 +32,41 @@ import static com.tecknobit.glider.records.Session.SessionKeys.sessionPassword;
 import static com.tecknobit.glider.records.Session.SessionKeys.token;
 import static com.tecknobit.glider.ui.activities.SplashScreen.STARTER_ACTIVITY;
 import static java.lang.Integer.parseInt;
+
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.Window;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
+import com.tecknobit.apimanager.apis.sockets.SocketManager;
+import com.tecknobit.apimanager.apis.sockets.encrypteds.AESSocketManager;
+import com.tecknobit.apimanager.formatters.JsonHelper;
+import com.tecknobit.glider.R;
+import com.tecknobit.glider.helpers.GliderLauncher.Operation;
+import com.tecknobit.glider.ui.activities.MainActivity;
+import com.tecknobit.glider.ui.fragments.parents.FormFragment;
+import com.tecknobit.glider.ui.fragments.parents.GliderFragment;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * The {@link Connect} fragment is the section of the app where the user can be connect with own
@@ -291,16 +291,18 @@ public class Connect extends FormFragment implements OnClickListener {
     private void connect(Dialog dialog) {
         try {
             setRequestPayload(GET_PUBLIC_KEYS);
-            socketManager = new SocketManager(payload.getString(hostAddress.name()),
-                    payload.getInt(hostPort.name()));
+            String host = payload.getString(hostAddress.name());
+            int port = payload.getInt(hostPort.name());
+            SocketManager plainSocketManager = new SocketManager(host, port);
             executor.execute(() -> {
                 try {
-                    socketManager.writeContent(payload);
-                    response = new JSONObject(socketManager.readContent());
+                    plainSocketManager.writeContent(payload);
+                    response = new JSONObject(plainSocketManager.readContent());
                     STARTER_ACTIVITY.runOnUiThread(() -> {
                         try {
-                            socketManager.setCipher(new ClientCipher(response.getString(ivSpec.name()),
-                                    response.getString(secretKey.name()), CBC_ALGORITHM));
+                            socketManager = new AESSocketManager(host, port,
+                                    response.getString(ivSpec.name()),
+                                    response.getString(secretKey.name()), CBC_ALGORITHM);
                             socketManager.writeContent(payload.put(ope.name(), CONNECT));
                             String response = socketManager.readContent();
                             user.saveSessionData(new JSONObject(response));

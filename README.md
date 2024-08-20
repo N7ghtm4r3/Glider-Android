@@ -2,7 +2,7 @@
 
 **v1.0.4**
 
-This is a Java Based open source project useful to manage the creation and the storage of your
+This is a Java Based open source self-hosted project useful to manage the creation and the storage of your
 passwords with the **Glider** ecosystem This repository contains the Android version of **Glider**,
 so if you want to customize you can fork it and work on it, if there are any errors, fixes to do or
 some idea to upgrade this project, please open a ticket or contact us to talk about, thanks and good
